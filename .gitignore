@@ -1,0 +1,21 @@
+# Local configuration with real credentials (use config.example.properties as a template)
+config.properties
+
+# Build output
+target/
+
+# Runtime output: logs and generated invoices may contain personal data
+logs/
+invoices/
+*.lck
+
+# NetBeans private settings
+nbproject/private/
+nb-configuration.xml
+
+# Other IDEs and OS files
+.idea/
+*.iml
+.vscode/
+.DS_Store
+Thumbs.db

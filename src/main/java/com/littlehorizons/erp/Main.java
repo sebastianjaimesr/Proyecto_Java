@@ -1,11 +1,8 @@
 package com.littlehorizons.erp;
 
-import com.littlehorizons.erp.controller.SystemController;
-import com.littlehorizons.erp.dao.jdbc.JdbcSystemDao;
 import com.littlehorizons.erp.exception.ConfigurationException;
 import com.littlehorizons.erp.exception.InputUnavailableException;
 import com.littlehorizons.erp.model.system.ConfigurationSummary;
-import com.littlehorizons.erp.service.SystemService;
 import com.littlehorizons.erp.util.AppConfig;
 import com.littlehorizons.erp.util.AppLogger;
 import com.littlehorizons.erp.util.ConsoleUtils;
@@ -75,9 +72,9 @@ public final class Main {
                 console.getCharset().displayName(),
                 System.getProperty("java.version"));
 
-        SystemService systemService = new SystemService(new JdbcSystemDao(connection), summary);
-        SystemMenuView systemMenuView = new SystemMenuView(console, new SystemController(systemService));
-        MainMenuView mainMenuView = new MainMenuView(console, systemMenuView);
+        ApplicationFactory factory = new ApplicationFactory(config, console, connection, summary);
+        SystemMenuView systemMenuView = factory.systemMenuView();
+        MainMenuView mainMenuView = factory.mainMenuView(systemMenuView);
 
         console.printBox("ERP COLEGIO LITTLE HORIZONS", "Iniciando el sistema...");
         systemMenuView.printStartupStatus();

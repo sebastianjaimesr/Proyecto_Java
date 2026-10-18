@@ -2,6 +2,7 @@ package com.littlehorizons.erp.controller;
 
 import com.littlehorizons.erp.exception.BusinessRuleException;
 import com.littlehorizons.erp.exception.ConfigurationException;
+import com.littlehorizons.erp.exception.ConfirmationRequiredException;
 import com.littlehorizons.erp.exception.DataAccessException;
 import com.littlehorizons.erp.exception.InputUnavailableException;
 import com.littlehorizons.erp.exception.ValidationException;
@@ -30,6 +31,8 @@ public abstract class BaseController {
         try {
             T result = action.get();
             return OperationResult.ok(successMessage.apply(result), result);
+        } catch (ConfirmationRequiredException e) {
+            return OperationResult.needsConfirmation(e.getMessage());
         } catch (ValidationException | BusinessRuleException | ConfigurationException e) {
             return OperationResult.failure(e.getMessage());
         } catch (DataAccessException e) {

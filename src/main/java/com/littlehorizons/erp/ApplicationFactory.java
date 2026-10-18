@@ -1,12 +1,15 @@
 package com.littlehorizons.erp;
 
 import com.littlehorizons.erp.controller.AcademicController;
+import com.littlehorizons.erp.controller.ExtracurricularController;
 import com.littlehorizons.erp.controller.StudentController;
 import com.littlehorizons.erp.controller.SystemController;
 import com.littlehorizons.erp.controller.TeacherController;
 import com.littlehorizons.erp.dao.AttendanceDao;
 import com.littlehorizons.erp.dao.CatalogDao;
+import com.littlehorizons.erp.dao.ClubDao;
 import com.littlehorizons.erp.dao.EnrollmentDao;
+import com.littlehorizons.erp.dao.EventDao;
 import com.littlehorizons.erp.dao.GradeRecordDao;
 import com.littlehorizons.erp.dao.GuardianDao;
 import com.littlehorizons.erp.dao.StudentDao;
@@ -17,7 +20,9 @@ import com.littlehorizons.erp.dao.TeacherDao;
 import com.littlehorizons.erp.dao.TransactionManager;
 import com.littlehorizons.erp.dao.jdbc.JdbcAttendanceDao;
 import com.littlehorizons.erp.dao.jdbc.JdbcCatalogDao;
+import com.littlehorizons.erp.dao.jdbc.JdbcClubDao;
 import com.littlehorizons.erp.dao.jdbc.JdbcEnrollmentDao;
+import com.littlehorizons.erp.dao.jdbc.JdbcEventDao;
 import com.littlehorizons.erp.dao.jdbc.JdbcGradeRecordDao;
 import com.littlehorizons.erp.dao.jdbc.JdbcGuardianDao;
 import com.littlehorizons.erp.dao.jdbc.JdbcStudentDao;
@@ -32,7 +37,9 @@ import com.littlehorizons.erp.service.AcademicService;
 import com.littlehorizons.erp.service.ArithmeticMeanStrategy;
 import com.littlehorizons.erp.service.AttendanceService;
 import com.littlehorizons.erp.service.AverageCalculator;
+import com.littlehorizons.erp.service.ClubService;
 import com.littlehorizons.erp.service.EnrollmentService;
+import com.littlehorizons.erp.service.EventService;
 import com.littlehorizons.erp.service.GuardianService;
 import com.littlehorizons.erp.service.StudentService;
 import com.littlehorizons.erp.service.SubjectService;
@@ -42,6 +49,7 @@ import com.littlehorizons.erp.util.AppConfig;
 import com.littlehorizons.erp.util.ConnectionProvider;
 import com.littlehorizons.erp.util.ConsoleUtils;
 import com.littlehorizons.erp.view.AcademicMenuView;
+import com.littlehorizons.erp.view.ExtracurricularMenuView;
 import com.littlehorizons.erp.view.MainMenuView;
 import com.littlehorizons.erp.view.Menu;
 import com.littlehorizons.erp.view.StudentMenuView;
@@ -77,6 +85,8 @@ public final class ApplicationFactory {
     private final SubjectRegistrationDao registrationDao = new JdbcSubjectRegistrationDao();
     private final GradeRecordDao gradeRecordDao = new JdbcGradeRecordDao();
     private final AttendanceDao attendanceDao = new JdbcAttendanceDao();
+    private final ClubDao clubDao = new JdbcClubDao();
+    private final EventDao eventDao = new JdbcEventDao();
 
     public ApplicationFactory(AppConfig config, ConsoleUtils console, ConnectionProvider connectionProvider,
                               ConfigurationSummary configurationSummary) {
@@ -110,16 +120,22 @@ public final class ApplicationFactory {
                 new AttendanceService(transactions, attendanceDao, studentDao, subjectDao, registrationDao,
                         assignmentDao, clock));
 
+        ExtracurricularController extracurricularController = new ExtracurricularController(
+                new ClubService(transactions, clubDao, studentDao, teacherDao, clock),
+                new EventService(transactions, eventDao, studentDao, teacherDao));
+
         StudentMenuView studentView = new StudentMenuView(support, studentController);
         TeacherMenuView teacherView = new TeacherMenuView(support, teacherController);
         AcademicMenuView academicView = new AcademicMenuView(support, academicController, teacherController,
+                studentView, teacherView);
+        ExtracurricularMenuView extracurricularView = new ExtracurricularMenuView(support, extracurricularController,
                 studentView, teacherView);
 
         return new MainMenuView(console, List.of(
                 new Menu.Item("Gestión de estudiantes y acudientes", studentView::show),
                 new Menu.Item("Gestión académica", academicView::show),
                 new Menu.Item("Gestión de profesores", teacherView::show),
-                MainMenuView.pending(console, "Actividades extracurriculares", 3),
+                new Menu.Item("Actividades extracurriculares", extracurricularView::show),
                 MainMenuView.pending(console, "Gestión financiera", 4),
                 MainMenuView.pending(console, "Gestión de recursos", 5),
                 MainMenuView.pending(console, "Reportes y estadísticas", 6),

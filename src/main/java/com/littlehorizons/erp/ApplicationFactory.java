@@ -2,6 +2,7 @@ package com.littlehorizons.erp;
 
 import com.littlehorizons.erp.controller.AcademicController;
 import com.littlehorizons.erp.controller.ExtracurricularController;
+import com.littlehorizons.erp.controller.FinanceController;
 import com.littlehorizons.erp.controller.StudentController;
 import com.littlehorizons.erp.controller.SystemController;
 import com.littlehorizons.erp.controller.TeacherController;
@@ -12,6 +13,9 @@ import com.littlehorizons.erp.dao.EnrollmentDao;
 import com.littlehorizons.erp.dao.EventDao;
 import com.littlehorizons.erp.dao.GradeRecordDao;
 import com.littlehorizons.erp.dao.GuardianDao;
+import com.littlehorizons.erp.dao.InvoiceDao;
+import com.littlehorizons.erp.dao.PaymentConceptDao;
+import com.littlehorizons.erp.dao.PaymentDao;
 import com.littlehorizons.erp.dao.StudentDao;
 import com.littlehorizons.erp.dao.SubjectDao;
 import com.littlehorizons.erp.dao.SubjectRegistrationDao;
@@ -25,6 +29,9 @@ import com.littlehorizons.erp.dao.jdbc.JdbcEnrollmentDao;
 import com.littlehorizons.erp.dao.jdbc.JdbcEventDao;
 import com.littlehorizons.erp.dao.jdbc.JdbcGradeRecordDao;
 import com.littlehorizons.erp.dao.jdbc.JdbcGuardianDao;
+import com.littlehorizons.erp.dao.jdbc.JdbcInvoiceDao;
+import com.littlehorizons.erp.dao.jdbc.JdbcPaymentConceptDao;
+import com.littlehorizons.erp.dao.jdbc.JdbcPaymentDao;
 import com.littlehorizons.erp.dao.jdbc.JdbcStudentDao;
 import com.littlehorizons.erp.dao.jdbc.JdbcSubjectDao;
 import com.littlehorizons.erp.dao.jdbc.JdbcSubjectRegistrationDao;
@@ -37,19 +44,28 @@ import com.littlehorizons.erp.service.AcademicService;
 import com.littlehorizons.erp.service.ArithmeticMeanStrategy;
 import com.littlehorizons.erp.service.AttendanceService;
 import com.littlehorizons.erp.service.AverageCalculator;
+import com.littlehorizons.erp.service.ChargeCalculator;
 import com.littlehorizons.erp.service.ClubService;
 import com.littlehorizons.erp.service.EnrollmentService;
 import com.littlehorizons.erp.service.EventService;
+import com.littlehorizons.erp.service.FinanceSettings;
 import com.littlehorizons.erp.service.GuardianService;
+import com.littlehorizons.erp.service.InvoiceService;
+import com.littlehorizons.erp.service.OverdueService;
+import com.littlehorizons.erp.service.PaymentConceptService;
+import com.littlehorizons.erp.service.PaymentService;
 import com.littlehorizons.erp.service.StudentService;
 import com.littlehorizons.erp.service.SubjectService;
 import com.littlehorizons.erp.service.SystemService;
+import com.littlehorizons.erp.service.TaxPolicy;
 import com.littlehorizons.erp.service.TeacherService;
 import com.littlehorizons.erp.util.AppConfig;
 import com.littlehorizons.erp.util.ConnectionProvider;
 import com.littlehorizons.erp.util.ConsoleUtils;
+import com.littlehorizons.erp.util.InvoicePdfGenerator;
 import com.littlehorizons.erp.view.AcademicMenuView;
 import com.littlehorizons.erp.view.ExtracurricularMenuView;
+import com.littlehorizons.erp.view.FinanceMenuView;
 import com.littlehorizons.erp.view.MainMenuView;
 import com.littlehorizons.erp.view.Menu;
 import com.littlehorizons.erp.view.StudentMenuView;
@@ -68,6 +84,7 @@ import java.util.Objects;
  */
 public final class ApplicationFactory {
 
+    private final AppConfig config;
     private final ConsoleUtils console;
     private final ConfigurationSummary configurationSummary;
     private final ConnectionProvider connectionProvider;
@@ -87,10 +104,13 @@ public final class ApplicationFactory {
     private final AttendanceDao attendanceDao = new JdbcAttendanceDao();
     private final ClubDao clubDao = new JdbcClubDao();
     private final EventDao eventDao = new JdbcEventDao();
+    private final PaymentConceptDao conceptDao = new JdbcPaymentConceptDao();
+    private final PaymentDao paymentDao = new JdbcPaymentDao();
+    private final InvoiceDao invoiceDao = new JdbcInvoiceDao();
 
     public ApplicationFactory(AppConfig config, ConsoleUtils console, ConnectionProvider connectionProvider,
                               ConfigurationSummary configurationSummary) {
-        Objects.requireNonNull(config, "config");
+        this.config = Objects.requireNonNull(config, "config");
         this.console = Objects.requireNonNull(console, "console");
         this.connectionProvider = Objects.requireNonNull(connectionProvider, "connectionProvider");
         this.configurationSummary = Objects.requireNonNull(configurationSummary, "configurationSummary");
@@ -124,19 +144,31 @@ public final class ApplicationFactory {
                 new ClubService(transactions, clubDao, studentDao, teacherDao, clock),
                 new EventService(transactions, eventDao, studentDao, teacherDao));
 
+        FinanceSettings financeSettings = FinanceSettings.from(config);
+        ChargeCalculator chargeCalculator = new ChargeCalculator();
+        InvoiceService invoiceService = new InvoiceService(transactions, invoiceDao, paymentDao, conceptDao, guardianDao,
+                TaxPolicy.configured(financeSettings.taxPercentByConcept()), financeSettings, new InvoicePdfGenerator());
+        FinanceController financeController = new FinanceController(
+                new PaymentConceptService(transactions, conceptDao, studentDao, guardianDao, chargeCalculator, clock),
+                new PaymentService(transactions, paymentDao, conceptDao, studentDao, guardianDao, invoiceService,
+                        chargeCalculator, clock),
+                invoiceService,
+                new OverdueService(transactions, paymentDao, conceptDao, chargeCalculator, financeSettings, clock));
+
         StudentMenuView studentView = new StudentMenuView(support, studentController);
         TeacherMenuView teacherView = new TeacherMenuView(support, teacherController);
         AcademicMenuView academicView = new AcademicMenuView(support, academicController, teacherController,
                 studentView, teacherView);
         ExtracurricularMenuView extracurricularView = new ExtracurricularMenuView(support, extracurricularController,
                 studentView, teacherView);
+        FinanceMenuView financeView = new FinanceMenuView(support, financeController, studentView);
 
         return new MainMenuView(console, List.of(
                 new Menu.Item("Gestión de estudiantes y acudientes", studentView::show),
                 new Menu.Item("Gestión académica", academicView::show),
                 new Menu.Item("Gestión de profesores", teacherView::show),
                 new Menu.Item("Actividades extracurriculares", extracurricularView::show),
-                MainMenuView.pending(console, "Gestión financiera", 4),
+                new Menu.Item("Gestión financiera", financeView::show),
                 MainMenuView.pending(console, "Gestión de recursos", 5),
                 MainMenuView.pending(console, "Reportes y estadísticas", 6),
                 new Menu.Item("Configuración y estado del sistema", systemMenuView::show)));

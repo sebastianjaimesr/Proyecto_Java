@@ -129,6 +129,17 @@ public final class AppConfig {
         }
     }
 
+    /** Every property whose key starts with {@code prefix}, keyed by the rest of the name. */
+    public java.util.Map<String, String> withPrefix(String prefix) {
+        java.util.Map<String, String> values = new java.util.TreeMap<>();
+        for (String key : properties.stringPropertyNames()) {
+            if (key.startsWith(prefix) && key.length() > prefix.length()) {
+                values.put(key.substring(prefix.length()), properties.getProperty(key).trim());
+            }
+        }
+        return values;
+    }
+
     /** Human readable origin of the values (file path or memory). */
     public String getSource() {
         return source;

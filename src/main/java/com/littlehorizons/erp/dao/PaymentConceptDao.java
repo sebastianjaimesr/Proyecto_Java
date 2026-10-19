@@ -10,8 +10,8 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * Persistence of {@code conceptos_pago} and of the per-student adjustments in
- * {@code valores_estudiante_concepto} (authorized change P-2).
+ * Persistencia de {@code conceptos_pago} y de los ajustes por estudiante en
+ * {@code valores_estudiante_concepto} (cambio autorizado P-2).
  */
 public interface PaymentConceptDao {
 
@@ -25,16 +25,16 @@ public interface PaymentConceptDao {
 
     List<PaymentConcept> findAll(Connection connection, boolean onlyActive) throws SQLException;
 
-    // ------------------------------------------------------- adjustments
+    // ------------------------------------------------------- ajustes
 
     int insertAdjustment(Connection connection, PriceAdjustment adjustment) throws SQLException;
 
     Optional<PriceAdjustment> findAdjustment(Connection connection, int studentId, int conceptId, int academicYear,
                                              AdjustmentType type) throws SQLException;
 
-    /** Adjustments of a student in a year (all concepts). */
+    /** Ajustes de un estudiante en un año (todos los conceptos). */
     List<PriceAdjustment> findAdjustments(Connection connection, int studentId, int academicYear) throws SQLException;
 
-    /** Removes an adjustment; payments already made are not affected. */
+    /** Elimina un ajuste; los pagos ya realizados no se ven afectados. */
     void deleteAdjustment(Connection connection, int adjustmentId) throws SQLException;
 }

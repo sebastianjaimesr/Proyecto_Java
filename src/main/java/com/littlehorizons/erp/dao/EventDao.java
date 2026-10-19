@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * Persistence of {@code eventos} and {@code participantes_evento}.
+ * Persistencia de {@code eventos} y {@code participantes_evento}.
  */
 public interface EventDao {
 
@@ -22,10 +22,10 @@ public interface EventDao {
 
     Optional<Event> findById(Connection connection, int eventId) throws SQLException;
 
-    /** Events of a year, optionally of one type, ordered by date. */
+    /** Eventos de un año, opcionalmente de un solo tipo, ordenados por fecha. */
     List<Event> findByYear(Connection connection, int year, EventType type) throws SQLException;
 
-    // ------------------------------------------------------- participants
+    // ------------------------------------------------------- participantes
 
     int insertParticipant(Connection connection, EventParticipant participant) throws SQLException;
 
@@ -34,15 +34,15 @@ public interface EventDao {
     void updateParticipation(Connection connection, int participationId, ParticipationRole role,
                              CompetitionPosition position, String notes) throws SQLException;
 
-    /** Participant holding a podium position in the event, if any. */
+    /** Participante que ocupa una posición de podio en el evento, si lo hay. */
     Optional<EventParticipant> findByPosition(Connection connection, int eventId, CompetitionPosition position)
             throws SQLException;
 
     List<EventParticipant> findParticipants(Connection connection, int eventId) throws SQLException;
 
-    /** Participation history of a student, newest event first. */
+    /** Historial de participación de un estudiante, del evento más reciente al más antiguo. */
     List<EventParticipant> findByStudent(Connection connection, int studentId) throws SQLException;
 
-    /** Every recorded position in competitions of a year (competition results report). */
+    /** Todas las posiciones registradas en competencias de un año (reporte de resultados). */
     List<EventParticipant> findResults(Connection connection, int year) throws SQLException;
 }

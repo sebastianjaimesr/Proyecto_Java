@@ -23,7 +23,7 @@ import static com.littlehorizons.erp.dao.jdbc.JdbcSupport.setInteger;
 import static com.littlehorizons.erp.dao.jdbc.JdbcSupport.setString;
 
 /**
- * JDBC implementation of {@link EventDao}.
+ * Implementación JDBC de {@link EventDao}.
  */
 public class JdbcEventDao implements EventDao {
 
@@ -183,7 +183,7 @@ public class JdbcEventDao implements EventDao {
                 resultSet.getString("observaciones"));
     }
 
-    /** The column is free text: values written outside the application are shown as "no position". */
+    /** La columna es texto libre: los valores escritos fuera de la aplicación se muestran como "sin posición". */
     private static CompetitionPosition parsePosition(String value) {
         try {
             return CompetitionPosition.fromDbValue(value);

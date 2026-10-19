@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- * Screens of "8. Configuración y estado del sistema".
+ * Pantallas de "8. Configuración y estado del sistema".
  */
 public class SystemMenuView {
 
@@ -23,7 +23,7 @@ public class SystemMenuView {
         this.controller = Objects.requireNonNull(controller, "controller");
     }
 
-    /** Opens the submenu. */
+    /** Abre el submenú. */
     public void show() {
         Menu.submenu(console, List.of(
                         new Menu.Item("Probar la conexión y verificar el esquema", this::showDatabaseStatus),
@@ -32,9 +32,9 @@ public class SystemMenuView {
     }
 
     /**
-     * Prints a one-line connection status; used at start-up.
+     * Imprime en una línea el estado de la conexión; se usa al iniciar.
      *
-     * @return whether the database is reachable and complete
+     * @return si la base de datos responde y está completa
      */
     public boolean printStartupStatus() {
         OperationResult<SchemaStatus> result = controller.checkDatabase();

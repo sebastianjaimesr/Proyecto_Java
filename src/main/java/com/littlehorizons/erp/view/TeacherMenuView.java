@@ -22,8 +22,8 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
- * Screens of "3. Gestión de profesores": teachers, subject assignments and
- * weekly class schedules.
+ * Pantallas de "3. Gestión de profesores": profesores, asignaciones de materias y
+ * horarios semanales de clase.
  */
 public class TeacherMenuView {
 
@@ -109,7 +109,7 @@ public class TeacherMenuView {
         console.pause();
     }
 
-    /** Lets the user choose a grade and then one of its subjects. */
+    /** Permite elegir un grado y luego una de sus materias. */
     Optional<Subject> pickSubject(boolean onlyActive) {
         Optional<List<Grade>> grades = support.quiet(controller.findGrades());
         if (grades.isEmpty()) {

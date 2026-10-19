@@ -25,20 +25,20 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
- * Obligations pending for more than one month (approved rule D-07, inferred
- * from the official schema, which has no accounts receivable table).
+ * Obligaciones pendientes por más de un mes (regla aprobada D-07, inferida
+ * del esquema oficial, que no tiene tabla de cuentas por cobrar).
  *
- * <p>For each student with an active enrollment in the year:</p>
+ * <p>Para cada estudiante con matrícula activa en el año:</p>
  * <ul>
- *   <li>Concepts that apply: those in {@code finance.mandatory.concepts}
- *       (MAT and PENSION by default) plus any recurring concept the student
- *       has already paid that year (for example transport).</li>
- *   <li>Recurring concept: overdue when the last payment, or the enrollment
- *       date if it was never paid, is more than one month old.</li>
- *   <li>Non-recurring concept: overdue when the amount paid in the year is
- *       below the expected value and the enrollment is more than one month old.</li>
+ * <li>Conceptos que aplican: los de {@code finance.mandatory.concepts}
+ *       (MAT y PENSION por defecto) más cualquier concepto recurrente que el estudiante
+ *       ya haya pagado ese año (por ejemplo, transporte).</li>
+ * <li>Concepto recurrente: vencido cuando el último pago, o la fecha de matrícula
+ *       si nunca se pagó, tiene más de un mes.</li>
+ * <li>Concepto no recurrente: vencido cuando lo pagado en el año es
+ *       menor que el valor esperado y la matrícula tiene más de un mes.</li>
  * </ul>
- * <p>Days overdue are counted from the end of that month of grace.</p>
+ * <p>Los días de mora se cuentan desde el final de ese mes de gracia.</p>
  */
 public class OverdueService {
 
@@ -59,7 +59,7 @@ public class OverdueService {
         this.clock = Objects.requireNonNull(clock, "clock");
     }
 
-    /** Overdue obligations of the year, most overdue first. */
+    /** Obligaciones vencidas del año, primero las más atrasadas. */
     public List<OverdueObligation> findOverdue(int academicYear) {
         LocalDate today = LocalDate.now(clock);
         LocalDate cutoff = today.minusMonths(1);

@@ -1,7 +1,7 @@
 package com.littlehorizons.erp.model.report;
 
 /**
- * Events and participations of one event type in a year.
+ * Eventos y participaciones de un tipo de evento en un año.
  */
 public record EventTypeParticipation(String eventType, int events, int participations, int distinctStudents) {
 }

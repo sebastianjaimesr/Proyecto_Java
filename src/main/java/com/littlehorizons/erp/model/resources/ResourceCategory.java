@@ -1,8 +1,8 @@
 package com.littlehorizons.erp.model.resources;
 
 /**
- * Resource category ({@code categorias_recurso}); the official script loads
- * Libro, Equipo de Laboratorio, Equipo Deportivo, Dispositivo Tecnológico and
+ * Categoría de recurso ({@code categorias_recurso}); el script oficial carga
+ * Libro, Equipo de Laboratorio, Equipo Deportivo, Dispositivo Tecnológico y
  * Material Didáctico.
  */
 public record ResourceCategory(int id, String name, String description) {

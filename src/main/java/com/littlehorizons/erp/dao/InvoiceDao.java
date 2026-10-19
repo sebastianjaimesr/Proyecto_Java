@@ -10,13 +10,13 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * Persistence of {@code facturas}.
+ * Persistencia de {@code facturas}.
  */
 public interface InvoiceDao {
 
     /**
-     * Inserts the invoice with a temporary unique number and returns its id;
-     * the caller then assigns the final consecutive derived from the id.
+     * Inserta la factura con un número único temporal y devuelve su id;
+     * luego quien la llama asigna el consecutivo final, derivado del id.
      */
     int insertDraft(Connection connection, int paymentId, LocalDate issueDate, LocalDateTime issuedAt)
             throws SQLException;
@@ -29,6 +29,6 @@ public interface InvoiceDao {
 
     Optional<Invoice> findByPayment(Connection connection, int paymentId) throws SQLException;
 
-    /** Invoices whose PDF could not be generated yet (recovery list). */
+    /** Facturas cuyo PDF todavía no se pudo generar (lista de recuperación). */
     List<Invoice> findWithoutPdf(Connection connection) throws SQLException;
 }

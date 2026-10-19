@@ -6,12 +6,12 @@ import java.math.BigDecimal;
 import java.util.Map;
 
 /**
- * Grades of one student in one subject and year, and the resulting average.
+ * Notas de un estudiante en una materia y año, y el promedio resultante.
  *
- * @param grades       grade per period (I to IV and Final, when present)
- * @param average      Final grade when it exists, otherwise the mean of the
- *                     periods with grades; {@code null} when there are none
- * @param finalGrade   whether {@code average} is the stored Final grade
+ * @param grades       nota por período (I a IV y Final, si existe)
+ * @param average      la nota Final si existe; si no, la media de los
+ *                     períodos con nota; {@code null} si no hay ninguna
+ * @param finalGrade   si {@code average} es la nota Final guardada
  */
 public record SubjectAverage(
         int subjectId,
@@ -28,7 +28,7 @@ public record SubjectAverage(
         return average != null;
     }
 
-    /** Number of regular periods (I to IV) with a grade. */
+    /** Cantidad de períodos regulares (I a IV) con nota. */
     public long gradedPeriods() {
         return grades.keySet().stream().filter(GradingPeriod::isEditable).count();
     }

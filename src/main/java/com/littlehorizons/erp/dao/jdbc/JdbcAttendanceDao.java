@@ -20,7 +20,7 @@ import static com.littlehorizons.erp.dao.jdbc.JdbcSupport.setInteger;
 import static com.littlehorizons.erp.dao.jdbc.JdbcSupport.setString;
 
 /**
- * JDBC implementation of {@link AttendanceDao}.
+ * Implementación JDBC de {@link AttendanceDao}.
  */
 public class JdbcAttendanceDao implements AttendanceDao {
 
@@ -33,8 +33,8 @@ public class JdbcAttendanceDao implements AttendanceDao {
             + "registrado_por = ? WHERE id_asistencia = ?";
 
     /**
-     * Counts per student in the range. The current grade comes from the
-     * enrollment of the year of the start date, when there is one.
+     * Conteos por estudiante en el rango. El grado actual sale de la
+     * matrícula del año de la fecha de inicio, cuando existe.
      */
     private static final String SUMMARY = "SELECT e.id_estudiante, e.numero_documento, "
             + "CONCAT_WS(' ', e.primer_apellido, e.segundo_apellido, e.primer_nombre) AS nombre_estudiante, "

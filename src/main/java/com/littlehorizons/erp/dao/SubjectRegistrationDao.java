@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * Persistence of {@code inscripciones_materia}.
+ * Persistencia de {@code inscripciones_materia}.
  */
 public interface SubjectRegistrationDao {
 
@@ -22,15 +22,15 @@ public interface SubjectRegistrationDao {
     Optional<SubjectRegistration> find(Connection connection, int studentId, int subjectId, int academicYear,
                                        AcademicPeriod period) throws SQLException;
 
-    /** Registrations of a student in a year, ordered by subject and period. */
+    /** Inscripciones de un estudiante en un año, ordenadas por materia y período. */
     List<SubjectRegistration> findByStudent(Connection connection, int studentId, int academicYear)
             throws SQLException;
 
-    /** Whether the student has a non-withdrawn registration in the subject in any period of the year. */
+    /** Si el estudiante tiene una inscripción no retirada en la materia, en cualquier período del año. */
     boolean hasActiveRegistration(Connection connection, int studentId, int subjectId, int academicYear)
             throws SQLException;
 
-    /** Students with a non-withdrawn registration in the subject and year; {@code section} null means all. */
+    /** Estudiantes con inscripción no retirada en la materia y el año; {@code section} null significa todas. */
     List<Student> findStudentsBySubject(Connection connection, int subjectId, int academicYear, String section)
             throws SQLException;
 }

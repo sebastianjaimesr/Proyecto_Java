@@ -8,12 +8,12 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 
 /**
- * JDBC connection provider for MySQL built from {@link AppConfig}.
+ * Proveedor de conexiones JDBC para MySQL construido a partir de {@link AppConfig}.
  *
- * <p>Singleton by design: the connection settings are resolved once. It does
- * <strong>not</strong> keep a shared open connection; every call to
- * {@link #getConnection()} opens a new one, which keeps transactions isolated
- * and makes the class safe to use from several threads.</p>
+ * <p>Singleton por diseño: la configuración de conexión se resuelve una vez.
+ * <strong>No</strong> guarda una conexión abierta compartida; cada llamada a
+ * {@link #getConnection()} abre una nueva, lo que mantiene las transacciones aisladas
+ * y hace la clase segura para usar desde varios hilos.</p>
  */
 public final class DatabaseConnection implements ConnectionProvider {
 
@@ -43,14 +43,14 @@ public final class DatabaseConnection implements ConnectionProvider {
         }
         this.databaseName = config.getRequired(KEY_NAME);
         this.user = config.getRequired(KEY_USER);
-        // An empty password is allowed for local installations without one.
+        // Se permite una contraseña vacía para instalaciones locales sin contraseña.
         this.password = config.getOptional(KEY_PASSWORD, "");
         String params = config.getOptional(KEY_PARAMS, "");
         this.url = "jdbc:mysql://" + host + ":" + port + "/" + databaseName
                 + (params.isEmpty() ? "" : "?" + params);
     }
 
-    /** Shared provider built from {@link AppConfig#getInstance()}. */
+    /** Proveedor compartido construido con {@link AppConfig#getInstance()}. */
     public static DatabaseConnection getInstance() {
         DatabaseConnection result = instance;
         if (result == null) {
@@ -65,7 +65,7 @@ public final class DatabaseConnection implements ConnectionProvider {
         return result;
     }
 
-    /** Independent provider for a specific configuration; used by tests. */
+    /** Proveedor independiente para una configuración específica; lo usan las pruebas. */
     public static DatabaseConnection fromConfig(AppConfig config) {
         return new DatabaseConnection(config);
     }
@@ -75,13 +75,13 @@ public final class DatabaseConnection implements ConnectionProvider {
         try {
             return DriverManager.getConnection(url, user, password);
         } catch (SQLException e) {
-            // The URL and user name are safe to log; the password is never included.
+            // La URL y el usuario se pueden registrar sin riesgo; la contraseña nunca se incluye.
             throw new DataAccessException("Could not open a connection to " + url
                     + " as user '" + user + "' (SQLState " + e.getSQLState() + ")", e);
         }
     }
 
-    /** JDBC URL without credentials, safe to show or log. */
+    /** URL JDBC sin credenciales, segura para mostrar o registrar. */
     public String getSafeUrl() {
         return url;
     }

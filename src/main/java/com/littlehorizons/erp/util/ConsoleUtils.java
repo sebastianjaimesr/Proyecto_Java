@@ -23,15 +23,15 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 /**
- * Console input and output helpers shared by every view.
+ * Ayudas de entrada y salida por consola que comparten todas las vistas.
  *
- * <p>Reading methods keep asking until the value passes the matching
- * {@link InputValidator} rule, printing the validation message in Spanish
- * after each invalid attempt.</p>
+ * <p>Los métodos de lectura siguen preguntando hasta que el valor cumple la regla
+ * correspondiente de {@link InputValidator}, mostrando el mensaje de validación en español
+ * después de cada intento inválido.</p>
  */
 public class ConsoleUtils implements AutoCloseable {
 
-    /** Value of {@code console.encoding} that picks the encoding automatically. */
+    /** Valor de {@code console.encoding} que elige la codificación automáticamente. */
     public static final String AUTO_ENCODING = "AUTO";
 
     private static final int MIN_BOX_WIDTH = 46;
@@ -47,9 +47,9 @@ public class ConsoleUtils implements AutoCloseable {
     }
 
     /**
-     * Console bound to the process standard streams.
+     * Consola conectada a los flujos estándar del proceso.
      *
-     * @param encodingSetting {@value #AUTO_ENCODING} or a charset name such as UTF-8
+     * @param encodingSetting {@value #AUTO_ENCODING} o el nombre de un charset, como UTF-8
      */
     public static ConsoleUtils forSystemConsole(String encodingSetting) {
         Charset charset = resolveCharset(encodingSetting);
@@ -58,9 +58,9 @@ public class ConsoleUtils implements AutoCloseable {
     }
 
     /**
-     * AUTO uses the terminal encoding when the program runs in a real console
-     * (for example cmd with code page 850) and UTF-8 otherwise (NetBeans output
-     * window, redirected streams). Unknown names fall back to UTF-8.
+     * AUTO usa la codificación de la terminal cuando el programa corre en una consola real
+     * (por ejemplo, cmd con la página de códigos 850) y UTF-8 en los demás casos (ventana Output
+     * de NetBeans, flujos redirigidos). Los nombres desconocidos usan UTF-8.
      */
     static Charset resolveCharset(String encodingSetting) {
         if (encodingSetting == null || encodingSetting.isBlank()
@@ -79,9 +79,9 @@ public class ConsoleUtils implements AutoCloseable {
         return charset;
     }
 
-    // ------------------------------------------------------------------ output
+    // ------------------------------------------------------------------ salida
 
-    /** Title framed in a double-line box. */
+    /** Título enmarcado en una caja de doble línea. */
     public void printBox(String... lines) {
         int width = Math.max(MIN_BOX_WIDTH,
                 IntStream.range(0, lines.length).map(i -> lines[i].length()).max().orElse(0) + 4);
@@ -95,7 +95,7 @@ public class ConsoleUtils implements AutoCloseable {
         out.println("╚" + "═".repeat(width) + "╝");
     }
 
-    /** Section title with an underline. */
+    /** Título de sección subrayado. */
     public void printTitle(String title) {
         out.println();
         out.println(title);
@@ -126,13 +126,13 @@ public class ConsoleUtils implements AutoCloseable {
         out.println("[INFO] " + message);
     }
 
-    /** Numbered menu: each option as "n. label". */
+    /** Menú numerado: cada opción como "n. etiqueta". */
     public void printMenu(List<String> options) {
         IntStream.range(0, options.size())
                 .forEach(i -> out.println((i + 1) + ". " + options.get(i)));
     }
 
-    /** Simple text table with columns sized to their widest value. */
+    /** Tabla de texto simple con columnas del ancho de su valor más largo. */
     public void printTable(List<String> headers, List<List<String>> rows) {
         int[] widths = IntStream.range(0, headers.size())
                 .map(column -> Math.max(headers.get(column).length(),
@@ -151,12 +151,12 @@ public class ConsoleUtils implements AutoCloseable {
         out.println(separator);
     }
 
-    // ------------------------------------------------------------------- input
+    // ------------------------------------------------------------------- entrada
 
     /**
-     * Reads one line after showing the prompt.
+     * Lee una línea después de mostrar el mensaje.
      *
-     * @throws InputUnavailableException if the input stream has ended
+     * @throws InputUnavailableException si se terminó el flujo de entrada
      */
     public String readLine(String prompt) {
         out.print(prompt);
@@ -172,7 +172,7 @@ public class ConsoleUtils implements AutoCloseable {
         }
     }
 
-    /** Asks again until {@code parser} accepts the text. */
+    /** Vuelve a preguntar hasta que {@code parser} acepte el texto. */
     public <T> T readValid(String prompt, Function<String, T> parser) {
         while (true) {
             String line = readLine(prompt);
@@ -232,7 +232,7 @@ public class ConsoleUtils implements AutoCloseable {
         return readValid(prompt, raw -> InputValidator.validateCode(raw, fieldName, maxLength));
     }
 
-    /** Shows the numbered options and returns the chosen one. */
+    /** Muestra las opciones numeradas y devuelve la elegida. */
     public <T> T readChoice(String prompt, List<T> options, Function<T, String> labelOf, String fieldName) {
         printMenu(options.stream().map(labelOf).collect(Collectors.toList()));
         return readValid(prompt, raw -> InputValidator.parseChoice(raw, options, labelOf, fieldName));
@@ -246,7 +246,7 @@ public class ConsoleUtils implements AutoCloseable {
         readLine("Presione Enter para continuar...");
     }
 
-    /** Releases the input reader; called once when the application exits. */
+    /** Libera el lector de entrada; se llama una vez al salir de la aplicación. */
     @Override
     public void close() {
         out.flush();

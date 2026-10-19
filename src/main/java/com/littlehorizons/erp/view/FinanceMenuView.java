@@ -29,7 +29,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
- * Screens of "5. Gestión financiera".
+ * Pantallas de "5. Gestión financiera".
  */
 public class FinanceMenuView {
 
@@ -69,7 +69,7 @@ public class FinanceMenuView {
                 "CONCEPTOS DE PAGO").run();
     }
 
-    // -------------------------------------------------------------- concepts
+    // -------------------------------------------------------------- conceptos
 
     private Optional<PaymentConcept> pickConcept(boolean onlyActive) {
         Optional<List<PaymentConcept>> concepts = support.quiet(controller.findConcepts(onlyActive));
@@ -192,7 +192,7 @@ public class FinanceMenuView {
         console.pause();
     }
 
-    // -------------------------------------------------------------- payments
+    // -------------------------------------------------------------- pagos
 
     private void registerPayment() {
         console.printTitle("Registrar pago");

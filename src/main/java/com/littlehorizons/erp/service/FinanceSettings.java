@@ -14,8 +14,8 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
- * Finance settings read from config.properties: issuer legal data, invoice
- * folder, VAT per concept and concepts every enrolled student must pay.
+ * Configuración financiera leída de config.properties: datos legales del emisor, carpeta
+ * de facturas, IVA por concepto y conceptos que todo matriculado debe pagar.
  */
 public record FinanceSettings(
         IssuerInfo issuer,
@@ -51,7 +51,7 @@ public record FinanceSettings(
         return new FinanceSettings(issuer, Paths.get(config.getOptional("invoices.dir", "invoices")), taxes, mandatory);
     }
 
-    /** Default settings for tests: pending issuer data, no VAT, MAT and PENSION mandatory. */
+    /** Configuración por defecto para pruebas: datos del emisor pendientes, sin IVA, MAT y PENSION obligatorios. */
     public static FinanceSettings defaults(Path invoicesDirectory) {
         return new FinanceSettings(new IssuerInfo(DEFAULT_BUSINESS_NAME, IssuerInfo.PENDING, IssuerInfo.PENDING,
                 IssuerInfo.PENDING, IssuerInfo.PENDING, DEFAULT_RESOLUTION), invoicesDirectory, Map.of(),

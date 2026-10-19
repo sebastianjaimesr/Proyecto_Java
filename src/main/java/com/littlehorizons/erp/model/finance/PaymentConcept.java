@@ -3,11 +3,11 @@ package com.littlehorizons.erp.model.finance;
 import java.math.BigDecimal;
 
 /**
- * Payment concept of the catalogue ({@code conceptos_pago}).
+ * Concepto de pago del catálogo ({@code conceptos_pago}).
  *
- * @param id         {@code null} before the record is inserted
- * @param baseAmount value in Colombian pesos, DECIMAL(10,2)
- * @param recurring  monthly charge such as the pension
+ * @param id         {@code null} antes de insertar el registro
+ * @param baseAmount valor en pesos colombianos, DECIMAL(10,2)
+ * @param recurring  cobro mensual, como la pensión
  */
 public record PaymentConcept(
         Integer id,

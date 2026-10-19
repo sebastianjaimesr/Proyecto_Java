@@ -3,13 +3,13 @@ package com.littlehorizons.erp.model.extracurricular;
 import java.time.LocalDate;
 
 /**
- * Participation of a student in an event ({@code participantes_evento}).
+ * Participación de un estudiante en un evento ({@code participantes_evento}).
  *
- * @param id          {@code null} before the record is inserted
- * @param eventName   joined, for display
- * @param eventDate   joined, for display
- * @param studentName joined, for display
- * @param position    {@code null} until a result is recorded
+ * @param id          {@code null} antes de insertar el registro
+ * @param eventName   obtenido con join, para mostrar
+ * @param eventDate   obtenido con join, para mostrar
+ * @param studentName obtenido con join, para mostrar
+ * @param position    {@code null} hasta que se registre un resultado
  */
 public record EventParticipant(
         Integer id,

@@ -21,9 +21,9 @@ import java.util.TreeMap;
 import java.util.stream.Collectors;
 
 /**
- * Aggregated reports. Counting over whole tables is delegated to SQL
- * ({@link ReportDao}); Streams are used where Java adds value: ranking by the
- * same average rules used in the academic module, and grouping payments.
+ * Reportes agregados. Los conteos sobre tablas completas se delegan a SQL
+ * ({@link ReportDao}); los Streams se usan donde Java aporta: el ranking con las
+ * mismas reglas de promedio del módulo académico y la agrupación de pagos.
  */
 public class ReportService {
 
@@ -42,11 +42,11 @@ public class ReportService {
         this.calculator = Objects.requireNonNull(calculator, "calculator");
     }
 
-    /** General average of one student, used in the ranking. */
+    /** Promedio general de un estudiante, usado en el ranking. */
     public record StudentRanking(int position, int studentId, String studentName, BigDecimal average, int subjects) {
     }
 
-    /** Payments of a year grouped three ways. */
+    /** Pagos de un año agrupados de tres formas. */
     public record PaymentSummary(
             int academicYear,
             BigDecimal total,
@@ -56,7 +56,7 @@ public class ReportService {
             Map<Integer, BigDecimal> byMonth) {
     }
 
-    /** Club occupancy. */
+    /** Ocupación de los clubes. */
     public record ClubOccupancy(String clubName, int activeMembers, int capacity, BigDecimal occupancyPercent,
                                 boolean active) {
     }
@@ -74,9 +74,9 @@ public class ReportService {
     }
 
     /**
-     * Students ordered by general average of the year (same rules as the
-     * student report: Final grade when present, subjects without grades
-     * excluded). Ties keep alphabetical order.
+     * Estudiantes ordenados por promedio general del año (mismas reglas del
+     * reporte por estudiante: nota Final si existe, materias sin notas
+     * excluidas). Los empates conservan el orden alfabético.
      */
     public List<StudentRanking> ranking(int academicYear, int limit) {
         List<GradeRecord> records = transactions.read(connection -> reportDao.gradesOfYear(connection, academicYear));

@@ -77,7 +77,7 @@ class ConsoleUtilsTest {
 
     @Test
     void autoEncodingFallsBackToUtf8WithoutTerminal() {
-        // Under Maven Surefire there is no interactive console.
+        // Bajo Maven Surefire no hay una consola interactiva.
         if (System.console() == null) {
             assertEquals(StandardCharsets.UTF_8, ConsoleUtils.resolveCharset("AUTO"));
         }

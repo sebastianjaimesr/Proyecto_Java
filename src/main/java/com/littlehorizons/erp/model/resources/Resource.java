@@ -3,10 +3,10 @@ package com.littlehorizons.erp.model.resources;
 import java.time.LocalDate;
 
 /**
- * Inventory item that can be lent ({@code recursos}).
+ * Elemento del inventario que se puede prestar ({@code recursos}).
  *
- * @param id           {@code null} before the record is inserted
- * @param categoryName joined, for display
+ * @param id           {@code null} antes de insertar el registro
+ * @param categoryName obtenido con join, para mostrar
  */
 public record Resource(
         Integer id,

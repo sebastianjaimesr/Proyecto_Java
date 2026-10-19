@@ -22,10 +22,10 @@ import static com.littlehorizons.erp.dao.jdbc.JdbcSupport.setEnum;
 import static com.littlehorizons.erp.dao.jdbc.JdbcSupport.setString;
 
 /**
- * JDBC implementation of {@link LoanDao}.
+ * Implementación JDBC de {@link LoanDao}.
  *
- * <p>The SQL of each table is built once from the constants of
- * {@link BorrowerType}; user values are always bound as parameters.</p>
+ * <p>El SQL de cada tabla se construye una sola vez a partir de las constantes de
+ * {@link BorrowerType}; los valores del usuario siempre se pasan como parámetros.</p>
  */
 public class JdbcLoanDao implements LoanDao {
 
@@ -36,7 +36,7 @@ public class JdbcLoanDao implements LoanDao {
         sql.put(BorrowerType.TEACHER, new Sql(BorrowerType.TEACHER, "profesores", "e"));
     }
 
-    /** Statements for one loan table. */
+    /** Sentencias SQL de una tabla de préstamos. */
     private static final class Sql {
         final String select;
         final String insert;

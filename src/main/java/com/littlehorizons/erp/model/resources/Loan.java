@@ -4,12 +4,12 @@ import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 
 /**
- * Loan of a resource to a student or a teacher ({@code prestamos_estudiante}
- * or {@code prestamos_profesor}).
+ * Préstamo de un recurso a un estudiante o a un profesor ({@code prestamos_estudiante}
+ * o {@code prestamos_profesor}).
  *
- * @param id           {@code null} before the record is inserted
- * @param returnDate   {@code null} while the resource has not been returned
- * @param borrowerName joined, for display
+ * @param id           {@code null} antes de insertar el registro
+ * @param returnDate   {@code null} mientras el recurso no se haya devuelto
+ * @param borrowerName obtenido con join, para mostrar
  */
 public record Loan(
         Integer id,
@@ -25,7 +25,7 @@ public record Loan(
         LoanStatus status,
         String notes) {
 
-    /** Not returned and past its due date, whatever the stored status says. */
+    /** No devuelto y con la fecha límite vencida, diga lo que diga el estado guardado. */
     public boolean isOverdueOn(LocalDate today) {
         return returnDate == null && status != LoanStatus.RETURNED && dueDate.isBefore(today);
     }

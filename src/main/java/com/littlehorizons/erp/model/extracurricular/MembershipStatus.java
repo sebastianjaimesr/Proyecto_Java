@@ -3,7 +3,7 @@ package com.littlehorizons.erp.model.extracurricular;
 import com.littlehorizons.erp.model.common.DbEnum;
 
 /**
- * Status of a club membership ({@code membresias_club.estado_membresia}).
+ * Estado de una membresía de club ({@code membresias_club.estado_membresia}).
  */
 public enum MembershipStatus implements DbEnum {
 
@@ -21,7 +21,7 @@ public enum MembershipStatus implements DbEnum {
         return dbValue;
     }
 
-    /** Value stored in MySQL to enum constant. */
+    /** Convierte el valor guardado en MySQL en la constante del enum. */
     public static MembershipStatus fromDbValue(String value) {
         return DbEnum.fromDbValue(MembershipStatus.class, value);
     }

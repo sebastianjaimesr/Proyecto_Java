@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * Persistence of {@code matriculas} (one enrollment per student and year).
+ * Persistencia de {@code matriculas} (una matrícula por estudiante y año).
  */
 public interface EnrollmentDao {
 
@@ -24,6 +24,6 @@ public interface EnrollmentDao {
     Optional<Enrollment> findByStudentAndYear(Connection connection, int studentId, int academicYear)
             throws SQLException;
 
-    /** Enrollment history of a student, newest year first. */
+    /** Historial de matrículas de un estudiante, del año más reciente al más antiguo. */
     List<Enrollment> findByStudent(Connection connection, int studentId) throws SQLException;
 }

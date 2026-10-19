@@ -3,11 +3,11 @@ package com.littlehorizons.erp.model.finance;
 import java.math.BigDecimal;
 
 /**
- * Comparison between what a student should pay for a concept and what was
- * paid. For recurring concepts the comparison is per month of payment; for
- * the others it is per academic year.
+ * Comparación entre lo que un estudiante debe pagar por un concepto y lo que
+ * pagó. En los conceptos recurrentes la comparación es por mes de pago; en
+ * los demás, por año académico.
  *
- * @param month 1-12 for recurring concepts, {@code null} otherwise
+ * @param month 1-12 en conceptos recurrentes, {@code null} en los demás
  */
 public record ChargeStatus(
         int conceptId,
@@ -20,7 +20,7 @@ public record ChargeStatus(
         BigDecimal balance,
         State state) {
 
-    /** Payment state shown to the user. */
+    /** Estado de pago que se muestra al usuario. */
     public enum State {
         PAID("Pagado"),
         PARTIAL("Pago parcial"),

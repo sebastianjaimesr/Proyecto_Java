@@ -4,11 +4,11 @@ import java.math.BigDecimal;
 import java.util.List;
 
 /**
- * Averages of a student in one academic year.
+ * Promedios de un estudiante en un año académico.
  *
- * @param subjects       one entry per subject with registrations or grades
- * @param generalAverage mean of the subject averages; subjects without grades
- *                       are excluded and counted in {@code subjectsWithoutGrades}
+ * @param subjects       una entrada por materia con inscripciones o notas
+ * @param generalAverage media de los promedios de materia; las materias sin notas
+ *                       se excluyen y se cuentan en {@code subjectsWithoutGrades}
  */
 public record StudentAverageReport(
         int studentId,

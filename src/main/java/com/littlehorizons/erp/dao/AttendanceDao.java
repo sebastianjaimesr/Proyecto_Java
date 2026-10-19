@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * Persistence of {@code asistencias}.
+ * Persistencia de {@code asistencias}.
  */
 public interface AttendanceDao {
 
@@ -23,18 +23,18 @@ public interface AttendanceDao {
     Optional<Attendance> find(Connection connection, int studentId, int subjectId, LocalDate date)
             throws SQLException;
 
-    /** Attendance of a student between two dates (inclusive), newest first. */
+    /** Asistencia de un estudiante entre dos fechas (inclusive), de la más reciente a la más antigua. */
     List<Attendance> findByStudent(Connection connection, int studentId, LocalDate from, LocalDate to)
             throws SQLException;
 
     /**
-     * Students with more than {@code maxAbsences} records in status "Ausente"
-     * between two dates (inclusive), with their late and excused counts.
+     * Estudiantes con más de {@code maxAbsences} registros en estado "Ausente"
+     * entre dos fechas (inclusive), con sus conteos de tardanzas y excusas.
      */
     List<AbsenceReportRow> findStudentsOverAbsenceLimit(Connection connection, LocalDate from, LocalDate to,
                                                         int maxAbsences) throws SQLException;
 
-    /** Absence counts per student in a range, for every student with any record (reports). */
+    /** Conteo de ausencias por estudiante en un rango, para todo estudiante con algún registro (reportes). */
     List<AbsenceReportRow> summarizeByStudent(Connection connection, LocalDate from, LocalDate to)
             throws SQLException;
 }

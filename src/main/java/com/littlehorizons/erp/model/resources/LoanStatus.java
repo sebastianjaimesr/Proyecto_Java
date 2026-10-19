@@ -3,7 +3,7 @@ package com.littlehorizons.erp.model.resources;
 import com.littlehorizons.erp.model.common.DbEnum;
 
 /**
- * Loan status in both loan tables.
+ * Estado del préstamo en ambas tablas de préstamos.
  */
 public enum LoanStatus implements DbEnum {
 
@@ -22,7 +22,7 @@ public enum LoanStatus implements DbEnum {
         return dbValue;
     }
 
-    /** Value stored in MySQL to enum constant. */
+    /** Convierte el valor guardado en MySQL en la constante del enum. */
     public static LoanStatus fromDbValue(String value) {
         return DbEnum.fromDbValue(LoanStatus.class, value);
     }

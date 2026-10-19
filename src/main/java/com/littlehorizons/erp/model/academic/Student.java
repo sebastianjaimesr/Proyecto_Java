@@ -6,10 +6,10 @@ import java.time.LocalDate;
 import java.time.Period;
 
 /**
- * Student ({@code estudiantes}). Medical fields are sensitive and are shown
- * only on the detail screen, never in lists or logs.
+ * Estudiante ({@code estudiantes}). Los campos médicos son sensibles y se muestran
+ * solo en la pantalla de detalle, nunca en listas ni en los registros.
  *
- * @param id {@code null} before the record is inserted
+ * @param id {@code null} antes de insertar el registro
  */
 public record Student(
         Integer id,

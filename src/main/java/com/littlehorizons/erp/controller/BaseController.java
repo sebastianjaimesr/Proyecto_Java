@@ -12,11 +12,11 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 
 /**
- * Translates exceptions from the service layer into {@link OperationResult}s.
+ * Traduce las excepciones de la capa de servicios a {@link OperationResult}.
  *
- * <p>Validation and business rule messages are already written for the user.
- * Technical errors are logged with their stack trace and replaced by a generic
- * message, so SQL details and stack traces never reach the console.</p>
+ * <p>Los mensajes de validación y de reglas de negocio ya están escritos para el usuario.
+ * Los errores técnicos se registran con su stack trace y se reemplazan por un mensaje
+ * genérico, así los detalles de SQL y los stack traces nunca llegan a la consola.</p>
  */
 public abstract class BaseController {
 
@@ -26,7 +26,7 @@ public abstract class BaseController {
     static final String UNEXPECTED_ERROR_MESSAGE =
             "Ocurrió un error inesperado. El detalle técnico quedó en error_log.txt.";
 
-    /** Runs {@code action} and builds the success message from its result. */
+    /** Ejecuta {@code action} y construye el mensaje de éxito a partir de su resultado. */
     protected <T> OperationResult<T> execute(Supplier<T> action, Function<T, String> successMessage) {
         try {
             T result = action.get();
@@ -46,7 +46,7 @@ public abstract class BaseController {
         }
     }
 
-    /** Same as {@link #execute(Supplier, Function)} with a fixed success message. */
+    /** Igual que {@link #execute(Supplier, Function)} pero con un mensaje de éxito fijo. */
     protected <T> OperationResult<T> execute(Supplier<T> action, String successMessage) {
         return execute(action, result -> successMessage);
     }

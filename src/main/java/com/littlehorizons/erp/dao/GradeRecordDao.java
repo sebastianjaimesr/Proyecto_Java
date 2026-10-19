@@ -11,23 +11,23 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * Persistence of {@code registros_academicos}.
+ * Persistencia de {@code registros_academicos}.
  */
 public interface GradeRecordDao {
 
     int insert(Connection connection, GradeRecord gradeRecord) throws SQLException;
 
-    /** Corrects the value of an existing grade (same student, subject, year and period). */
+    /** Corrige el valor de una nota existente (mismo estudiante, materia, año y período). */
     void updateValue(Connection connection, int recordId, int teacherId, BigDecimal value, String notes,
                      LocalDate recordDate) throws SQLException;
 
     Optional<GradeRecord> find(Connection connection, int studentId, int subjectId, int academicYear,
                                GradingPeriod period) throws SQLException;
 
-    /** All grades of a student; {@code academicYear} null means every year (academic history). */
+    /** Todas las notas de un estudiante; {@code academicYear} null significa todos los años (historial académico). */
     List<GradeRecord> findByStudent(Connection connection, int studentId, Integer academicYear) throws SQLException;
 
-    /** Grades of a subject in a year; {@code section} null means every section. */
+    /** Notas de una materia en un año; {@code section} null significa todas las secciones. */
     List<GradeRecord> findBySubject(Connection connection, int subjectId, int academicYear, String section)
             throws SQLException;
 }

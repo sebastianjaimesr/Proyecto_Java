@@ -8,9 +8,9 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * Read-only access to the {@code grados} catalogue, which is loaded by the
- * official script and is not edited by the application (Interface Segregation:
- * no write methods are exposed).
+ * Acceso de solo lectura al catálogo {@code grados}, que se carga con el
+ * script oficial y la aplicación no edita (Segregación de interfaces:
+ * no expone métodos de escritura).
  */
 public interface CatalogDao {
 

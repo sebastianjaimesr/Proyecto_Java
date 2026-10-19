@@ -18,8 +18,8 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- * Yearly enrollments (matrículas): one per student and academic year, from
- * Preescolar to Once.
+ * Matrículas anuales: una por estudiante y año académico, de
+ * Preescolar a Once.
  */
 public class EnrollmentService {
 
@@ -45,8 +45,8 @@ public class EnrollmentService {
     }
 
     /**
-     * Enrolls an active student. The database also rejects a second
-     * enrollment for the same year (UNIQUE matricula_unica).
+     * Matricula a un estudiante activo. La base de datos también rechaza una segunda
+     * matrícula para el mismo año (UNIQUE matricula_unica).
      */
     public Enrollment enroll(int studentId, int gradeId, int academicYear, LocalDate enrollmentDate, String notes) {
         LocalDate today = LocalDate.now(clock);
@@ -78,8 +78,8 @@ public class EnrollmentService {
     }
 
     /**
-     * Closes an active enrollment as "Completada" or "Retirada". A closed
-     * enrollment is history and cannot be reopened.
+     * Cierra una matrícula activa como "Completada" o "Retirada". Una matrícula
+     * cerrada es historial y no se puede reabrir.
      */
     public void close(int enrollmentId, EnrollmentStatus newStatus, LocalDate date) {
         if (newStatus == EnrollmentStatus.ACTIVE) {

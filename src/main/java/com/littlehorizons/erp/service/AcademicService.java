@@ -41,7 +41,7 @@ import java.util.TreeSet;
 import java.util.stream.Collectors;
 
 /**
- * Subject registrations, grades, averages and academic history.
+ * Inscripciones a materias, notas, promedios e historial académico.
  */
 public class AcademicService {
 
@@ -72,12 +72,12 @@ public class AcademicService {
         this.clock = Objects.requireNonNull(clock, "clock");
     }
 
-    // ---------------------------------------------------------- registrations
+    // ---------------------------------------------------------- inscripciones
 
     /**
-     * Registers a student in a subject for a period. The student needs an
-     * active enrollment in that year and the subject must belong to the
-     * enrolled grade.
+     * Inscribe a un estudiante en una materia para un período. El estudiante necesita una
+     * matrícula activa en ese año y la materia debe pertenecer al
+     * grado en que está matriculado.
      */
     public SubjectRegistration register(int studentId, int subjectId, int academicYear, AcademicPeriod period,
                                         String rawSection, LocalDate date) {
@@ -96,11 +96,11 @@ public class AcademicService {
     }
 
     /**
-     * Registers the student in every active subject of the enrolled grade for
-     * one period, in a single transaction. Subjects already registered are
-     * skipped.
+     * Inscribe al estudiante en todas las materias activas del grado matriculado para
+     * un período, en una sola transacción. Las materias en las que ya estaba inscrito
+     * se omiten.
      *
-     * @return the new registrations
+     * @return las inscripciones nuevas
      */
     public List<SubjectRegistration> registerAllSubjects(int studentId, int academicYear, AcademicPeriod period,
                                                          String rawSection, LocalDate date) {
@@ -122,7 +122,7 @@ public class AcademicService {
         });
     }
 
-    /** Marks a registration as withdrawn; grades already recorded are kept. */
+    /** Marca una inscripción como retirada; las notas ya registradas se conservan. */
     public void withdrawRegistration(int studentId, int subjectId, int academicYear, AcademicPeriod period) {
         transactions.inTransactionVoid(connection -> {
             SubjectRegistration registration = ServiceChecks.require(
@@ -145,17 +145,17 @@ public class AcademicService {
                 registrationDao.findStudentsBySubject(connection, subjectId, academicYear, normalized));
     }
 
-    // ------------------------------------------------------------------ grades
+    // ------------------------------------------------------------------ notas
 
-    /** Outcome of recording a grade. */
+    /** Resultado de registrar una nota. */
     public record GradeResult(GradeRecord gradeRecord, boolean corrected, BigDecimal previousValue) {
     }
 
     /**
-     * Records a grade for periods I to IV. The student must be registered in
-     * the subject for that period and the teacher must be assigned to the
-     * subject in that year. An existing grade is only replaced when
-     * {@code allowCorrection} is true (the view asks the user first).
+     * Registra una nota para los períodos I a IV. El estudiante debe estar inscrito en
+     * la materia para ese período y el profesor debe estar asignado a la
+     * materia en ese año. Una nota existente solo se reemplaza cuando
+     * {@code allowCorrection} es true (la vista le pregunta antes al usuario).
      */
     public GradeResult recordGrade(int studentId, int subjectId, int teacherId, int academicYear,
                                    GradingPeriod period, BigDecimal value, String notes, boolean allowCorrection) {
@@ -195,9 +195,9 @@ public class AcademicService {
     }
 
     /**
-     * Computes the Final grade as the simple mean of periods I to IV that have
-     * a grade and stores it (replacing a previous Final). Returns the stored
-     * record; a warning is the caller's job when fewer than four periods exist.
+     * Calcula la nota Final como la media simple de los períodos I a IV que tengan
+     * nota y la guarda (reemplazando una Final anterior). Devuelve el registro
+     * guardado; si hay menos de cuatro períodos, avisar es tarea de quien llama.
      */
     public GradeResult computeFinalGrade(int studentId, int subjectId, int academicYear, int teacherId) {
         LocalDate today = LocalDate.now(clock);
@@ -232,7 +232,7 @@ public class AcademicService {
         return transactions.read(connection -> gradeRecordDao.findByStudent(connection, studentId, academicYear));
     }
 
-    /** Grades of a subject, optionally filtered by section and period. */
+    /** Notas de una materia, opcionalmente filtradas por sección y período. */
     public List<GradeRecord> findGradesBySubject(int subjectId, int academicYear, String section,
                                                  GradingPeriod period) {
         String normalized = ServiceChecks.normalizeSection(section);
@@ -242,15 +242,15 @@ public class AcademicService {
                 .collect(Collectors.toList());
     }
 
-    // ---------------------------------------------------------------- averages
+    // ---------------------------------------------------------------- promedios
 
-    /** Subject averages and general average of a student in a year. */
+    /** Promedios por materia y promedio general de un estudiante en un año. */
     public StudentAverageReport studentAverages(int studentId, int academicYear) {
         return transactions.read(connection -> {
             Student student = requireStudent(connection, studentId);
             List<GradeRecord> records = gradeRecordDao.findByStudent(connection, studentId, academicYear);
             List<SubjectAverage> subjects = new ArrayList<>(calculator.subjectAverages(records));
-            // Registered subjects without grades are listed too, so the report shows them explicitly.
+            // También se listan las materias inscritas sin notas, para que el reporte las muestre explícitamente.
             Set<Integer> withGrades = subjects.stream().map(SubjectAverage::subjectId).collect(Collectors.toSet());
             registrationDao.findByStudent(connection, studentId, academicYear).stream()
                     .filter(registration -> registration.status() != RegistrationStatus.WITHDRAWN)
@@ -268,7 +268,7 @@ public class AcademicService {
         });
     }
 
-    /** Average of a subject for the whole course (grade of the subject, optional section). */
+    /** Promedio de una materia para todo el curso (grado de la materia, sección opcional). */
     public CourseAverageReport courseAverage(int subjectId, int academicYear, String section) {
         String normalized = ServiceChecks.normalizeSection(section);
         return transactions.read(connection -> {
@@ -281,7 +281,7 @@ public class AcademicService {
         });
     }
 
-    /** Every year of the student, from the first enrollment or grade until today. */
+    /** Todos los años del estudiante, desde su primera matrícula o nota hasta hoy. */
     public AcademicHistory history(int studentId) {
         return transactions.read(connection -> {
             Student student = requireStudent(connection, studentId);
@@ -303,7 +303,7 @@ public class AcademicService {
         });
     }
 
-    // ----------------------------------------------------------------- helpers
+    // ----------------------------------------------------------------- auxiliares
 
     private void validateRegistrationInput(int academicYear, AcademicPeriod period, LocalDate date) {
         if (period == null) {

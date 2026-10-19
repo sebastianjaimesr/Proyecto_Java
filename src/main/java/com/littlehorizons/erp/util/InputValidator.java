@@ -13,21 +13,21 @@ import java.util.function.Function;
 import java.util.regex.Pattern;
 
 /**
- * Reusable validation and parsing of raw text typed by the user.
+ * Validación y conversión reutilizables del texto que digita el usuario.
  *
- * <p>Every method either returns the normalized value or throws a
- * {@link ValidationException} whose message (in Spanish) tells the user what to
- * fix. The class has no console access, so it is used both by the views and by
- * the services, and it is easy to unit test.</p>
+ * <p>Cada método devuelve el valor normalizado o lanza una
+ * {@link ValidationException} cuyo mensaje (en español) le dice al usuario qué
+ * corregir. La clase no accede a la consola, así que la usan tanto las vistas como
+ * los servicios, y es fácil de probar con pruebas unitarias.</p>
  */
 public final class InputValidator {
 
-    /** Dates are typed as ISO-8601 to avoid day/month ambiguity. */
+    /** Las fechas se digitan en formato ISO-8601 para evitar la confusión entre día y mes. */
     public static final String DATE_PATTERN_LABEL = "AAAA-MM-DD";
 
     public static final BigDecimal MIN_GRADE = new BigDecimal("0.0");
     public static final BigDecimal MAX_GRADE = new BigDecimal("5.0");
-    /** Upper bound of a DECIMAL(10,2) column. */
+    /** Límite superior de una columna DECIMAL(10,2). */
     public static final BigDecimal MAX_MONEY = new BigDecimal("99999999.99");
 
     private static final DateTimeFormatter DATE_FORMAT =
@@ -37,7 +37,7 @@ public final class InputValidator {
     private static final Pattern PHONE_ALLOWED_CHARS = Pattern.compile("^\\+?[0-9 ()-]+$");
     private static final Pattern DOCUMENT_NUMBER = Pattern.compile("^[A-Z0-9]{5,20}$");
     private static final Pattern CODE = Pattern.compile("^[A-Z0-9][A-Z0-9_-]*$");
-    /** Plain decimal notation only: no exponent, no thousands separators. */
+    /** Solo notación decimal simple: sin exponente ni separadores de miles. */
     private static final Pattern DECIMAL = Pattern.compile("^-?\\d+(\\.\\d+)?$");
 
     private static final int MAX_EMAIL_LENGTH = 100;
@@ -50,7 +50,7 @@ public final class InputValidator {
     private InputValidator() {
     }
 
-    /** Menu option between {@code min} and {@code max}, both inclusive. */
+    /** Opción de menú entre {@code min} y {@code max}, ambos incluidos. */
     public static int parseMenuOption(String raw, int min, int max) {
         String value = trimToEmpty(raw);
         try {
@@ -59,13 +59,13 @@ public final class InputValidator {
                 return option;
             }
         } catch (NumberFormatException e) {
-            // Handled below with the same message as an out of range number.
+            // Se maneja más abajo con el mismo mensaje de un número fuera de rango.
         }
         throw new ValidationException("Opción inválida. Ingrese un número entre "
                 + min + " y " + max + ".");
     }
 
-    /** Mandatory text, trimmed, with a maximum length (usually the column size). */
+    /** Texto obligatorio, sin espacios a los lados, con longitud máxima (normalmente el tamaño de la columna). */
     public static String requireText(String raw, String fieldName, int maxLength) {
         String value = trimToEmpty(raw);
         if (value.isEmpty()) {
@@ -74,13 +74,13 @@ public final class InputValidator {
         return checkLength(value, fieldName, maxLength);
     }
 
-    /** Optional text: returns {@code null} when it is blank. */
+    /** Texto opcional: devuelve {@code null} si está vacío. */
     public static String optionalText(String raw, String fieldName, int maxLength) {
         String value = trimToEmpty(raw);
         return value.isEmpty() ? null : checkLength(value, fieldName, maxLength);
     }
 
-    /** Integer between {@code min} and {@code max}, both inclusive. */
+    /** Entero entre {@code min} y {@code max}, ambos incluidos. */
     public static int parseInt(String raw, String fieldName, int min, int max) {
         String value = trimToEmpty(raw);
         int number;
@@ -96,14 +96,14 @@ public final class InputValidator {
         return number;
     }
 
-    /** Database identifier (positive integer). */
+    /** Identificador de la base de datos (entero positivo). */
     public static int parseId(String raw, String fieldName) {
         return parseInt(raw, fieldName, 1, Integer.MAX_VALUE);
     }
 
     /**
-     * Decimal number with at most {@code maxScale} decimals. Both "4.5" and
-     * "4,5" are accepted; thousands separators are not.
+     * Número decimal con máximo {@code maxScale} decimales. Se aceptan "4.5" y
+     * "4,5"; los separadores de miles no.
      */
     public static BigDecimal parseDecimal(String raw, String fieldName, int maxScale) {
         String value = trimToEmpty(raw);
@@ -122,7 +122,7 @@ public final class InputValidator {
         return number;
     }
 
-    /** Grade between 0.0 and 5.0 with one decimal, as stored in DECIMAL(2,1). */
+    /** Nota entre 0.0 y 5.0 con un decimal, como se guarda en DECIMAL(2,1). */
     public static BigDecimal parseGrade(String raw) {
         BigDecimal grade = parseDecimal(raw, "nota", GRADE_SCALE);
         if (grade.compareTo(MIN_GRADE) < 0 || grade.compareTo(MAX_GRADE) > 0) {
@@ -131,7 +131,7 @@ public final class InputValidator {
         return grade.setScale(GRADE_SCALE);
     }
 
-    /** Non-negative amount in pesos with up to two decimals (DECIMAL(10,2)). */
+    /** Monto no negativo en pesos con hasta dos decimales (DECIMAL(10,2)). */
     public static BigDecimal parseMoney(String raw, String fieldName) {
         BigDecimal amount = parseDecimal(raw, fieldName, MONEY_SCALE);
         if (amount.signum() < 0) {
@@ -144,7 +144,7 @@ public final class InputValidator {
         return amount.setScale(MONEY_SCALE);
     }
 
-    /** Calendar date in {@value #DATE_PATTERN_LABEL} format; invalid days are rejected. */
+    /** Fecha del calendario en formato {@value #DATE_PATTERN_LABEL}; los días inválidos se rechazan. */
     public static LocalDate parseDate(String raw, String fieldName) {
         String value = trimToEmpty(raw);
         try {
@@ -155,7 +155,7 @@ public final class InputValidator {
         }
     }
 
-    /** E-mail address, stored in lower case. */
+    /** Correo electrónico, guardado en minúsculas. */
     public static String validateEmail(String raw, String fieldName) {
         String value = trimToEmpty(raw).toLowerCase(Locale.ROOT);
         if (value.length() > MAX_EMAIL_LENGTH || !EMAIL.matcher(value).matches()) {
@@ -166,8 +166,8 @@ public final class InputValidator {
     }
 
     /**
-     * Phone number: digits with optional leading '+', spaces, dashes or
-     * parentheses, and between 7 and 15 digits in total.
+     * Número de teléfono: dígitos con '+' inicial opcional, espacios, guiones o
+     * paréntesis, y entre 7 y 15 dígitos en total.
      */
     public static String validatePhone(String raw, String fieldName) {
         String value = trimToEmpty(raw);
@@ -181,7 +181,7 @@ public final class InputValidator {
         return value;
     }
 
-    /** Identity document number: 5 to 20 letters or digits, stored in upper case. */
+    /** Número de documento de identidad: de 5 a 20 letras o dígitos, guardado en mayúsculas. */
     public static String validateDocumentNumber(String raw) {
         String value = trimToEmpty(raw).toUpperCase(Locale.ROOT);
         if (!DOCUMENT_NUMBER.matcher(value).matches()) {
@@ -192,8 +192,8 @@ public final class InputValidator {
     }
 
     /**
-     * Catalogue code such as "MAT-5" or "LIB-0001": upper case letters, digits,
-     * '-' or '_'. Uniqueness is checked against the database by the services.
+     * Código de catálogo como "MAT-5" o "LIB-0001": letras mayúsculas, dígitos,
+     * '-' o '_'. Los servicios verifican contra la base de datos que no esté repetido.
      */
     public static String validateCode(String raw, String fieldName, int maxLength) {
         String value = trimToEmpty(raw).toUpperCase(Locale.ROOT);
@@ -205,9 +205,9 @@ public final class InputValidator {
     }
 
     /**
-     * Picks one of the allowed options, either by its 1-based position in the
-     * list or by its label (case-insensitive). Used for payment methods,
-     * statuses and other closed lists.
+     * Elige una de las opciones permitidas, por su posición en la lista (empezando en 1)
+     * o por su etiqueta (sin distinguir mayúsculas). Se usa para métodos de pago,
+     * estados y otras listas cerradas.
      */
     public static <T> T parseChoice(String raw, List<T> options, Function<T, String> labelOf, String fieldName) {
         String value = trimToEmpty(raw);
@@ -217,7 +217,7 @@ public final class InputValidator {
                 return options.get(position - 1);
             }
         } catch (NumberFormatException e) {
-            // Not a position: try to match the label below.
+            // No es una posición: se intenta buscar por etiqueta más abajo.
         }
         return options.stream()
                 .filter(option -> labelOf.apply(option).equalsIgnoreCase(value))
@@ -226,7 +226,7 @@ public final class InputValidator {
                         + ". Elija un número entre 1 y " + options.size() + "."));
     }
 
-    /** Yes/no answer: accepts s, si, sí, n, no (case-insensitive). */
+    /** Respuesta sí/no: acepta s, si, sí, n, no (sin distinguir mayúsculas). */
     public static boolean parseYesNo(String raw) {
         String value = trimToEmpty(raw).toLowerCase(Locale.ROOT);
         switch (value) {

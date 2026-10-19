@@ -21,7 +21,7 @@ import static com.littlehorizons.erp.dao.jdbc.JdbcSupport.setInteger;
 import static com.littlehorizons.erp.dao.jdbc.JdbcSupport.setString;
 
 /**
- * JDBC implementation of {@link ClubDao}.
+ * Implementación JDBC de {@link ClubDao}.
  */
 public class JdbcClubDao implements ClubDao {
 

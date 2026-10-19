@@ -3,7 +3,7 @@ package com.littlehorizons.erp.model.academic;
 import com.littlehorizons.erp.model.common.DbEnum;
 
 /**
- * Period of a grade record: I to IV plus the computed Final grade.
+ * Período de una nota: I a IV más la nota Final calculada.
  */
 public enum GradingPeriod implements DbEnum {
 
@@ -24,12 +24,12 @@ public enum GradingPeriod implements DbEnum {
         return dbValue;
     }
 
-    /** Periods a teacher can type; Final is computed by the system. */
+    /** Períodos que un profesor puede digitar; la Final la calcula el sistema. */
     public boolean isEditable() {
         return this != FINAL;
     }
 
-    /** Value stored in MySQL to enum constant. */
+    /** Convierte el valor guardado en MySQL en la constante del enum. */
     public static GradingPeriod fromDbValue(String value) {
         return DbEnum.fromDbValue(GradingPeriod.class, value);
     }

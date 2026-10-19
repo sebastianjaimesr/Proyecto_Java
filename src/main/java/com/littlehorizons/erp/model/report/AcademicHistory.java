@@ -4,8 +4,8 @@ import java.math.BigDecimal;
 import java.util.List;
 
 /**
- * Academic history of a student since admission: one entry per year with
- * grades or enrollment.
+ * Historial académico de un estudiante desde su ingreso: una entrada por año con
+ * notas o matrícula.
  */
 public record AcademicHistory(int studentId, String studentName, List<YearSummary> years) {
 
@@ -13,7 +13,7 @@ public record AcademicHistory(int studentId, String studentName, List<YearSummar
         years = List.copyOf(years);
     }
 
-    /** Grades of one year. {@code gradeName} and {@code enrollmentStatus} may be null without enrollment. */
+    /** Notas de un año. {@code gradeName} y {@code enrollmentStatus} pueden ser null si no hay matrícula. */
     public record YearSummary(
             int academicYear,
             String gradeName,

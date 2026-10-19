@@ -24,7 +24,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
- * Screens of "7. Reportes y estadísticas". Each option is read-only.
+ * Pantallas de "7. Reportes y estadísticas". Todas las opciones son de solo lectura.
  */
 public class ReportMenuView {
 

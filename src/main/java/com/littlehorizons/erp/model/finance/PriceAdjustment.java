@@ -3,12 +3,12 @@ package com.littlehorizons.erp.model.finance;
 import java.math.BigDecimal;
 
 /**
- * Per-student adjustment of a concept for one year
- * ({@code valores_estudiante_concepto}, authorized change P-2).
+ * Ajuste de un concepto para un estudiante durante un año
+ * ({@code valores_estudiante_concepto}, cambio autorizado P-2).
  *
- * @param id              {@code null} before the record is inserted
- * @param discountPercent percentage for scholarships and sibling discounts
- * @param customAmount    value that replaces the base amount
+ * @param id              {@code null} antes de insertar el registro
+ * @param discountPercent porcentaje para becas y descuentos por hermanos
+ * @param customAmount    valor que reemplaza el valor base
  */
 public record PriceAdjustment(
         Integer id,

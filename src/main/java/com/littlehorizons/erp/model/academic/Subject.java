@@ -1,10 +1,10 @@
 package com.littlehorizons.erp.model.academic;
 
 /**
- * Subject of one grade ({@code materias}).
+ * Materia de un grado ({@code materias}).
  *
- * @param id        {@code null} before the record is inserted
- * @param gradeName joined from {@code grados}; may be {@code null} on insert
+ * @param id        {@code null} antes de insertar el registro
+ * @param gradeName obtenido de {@code grados}; puede ser {@code null} al insertar
  */
 public record Subject(
         Integer id,

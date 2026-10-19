@@ -19,7 +19,7 @@ import static com.littlehorizons.erp.dao.jdbc.JdbcSupport.setEnum;
 import static com.littlehorizons.erp.dao.jdbc.JdbcSupport.setString;
 
 /**
- * JDBC implementation of {@link TeacherDao}.
+ * Implementación JDBC de {@link TeacherDao}.
  */
 public class JdbcTeacherDao implements TeacherDao {
 

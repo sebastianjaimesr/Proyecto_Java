@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * Persistence of {@code acudientes} and of the many-to-many relation
+ * Persistencia de {@code acudientes} y de la relación muchos a muchos
  * {@code estudiante_acudiente}.
  */
 public interface GuardianDao {
@@ -34,7 +34,7 @@ public interface GuardianDao {
     void updateLink(Connection connection, int studentId, int guardianId, boolean primary, boolean emergencyContact)
             throws SQLException;
 
-    /** Clears the "principal" flag of every guardian of the student. */
+    /** Quita la marca de "principal" a todos los acudientes del estudiante. */
     void clearPrimary(Connection connection, int studentId) throws SQLException;
 
     boolean isLinked(Connection connection, int studentId, int guardianId) throws SQLException;
@@ -45,6 +45,6 @@ public interface GuardianDao {
 
     List<StudentLink> findStudentsOfGuardian(Connection connection, int guardianId) throws SQLException;
 
-    /** Other students that share at least one guardian with {@code studentId}. */
+    /** Otros estudiantes que comparten al menos un acudiente con {@code studentId} (hermanos). */
     List<Student> findSiblings(Connection connection, int studentId) throws SQLException;
 }

@@ -1,9 +1,9 @@
 package com.littlehorizons.erp.model.finance;
 
 /**
- * Legal data of the school printed on invoices. Values come from
- * config.properties; missing ones are shown as "PENDIENTE DE CONFIGURACIÓN"
- * because the project must not invent a real NIT or address.
+ * Datos legales del colegio que se imprimen en las facturas. Los valores vienen de
+ * config.properties; los que faltan se muestran como "PENDIENTE DE CONFIGURACIÓN"
+ * porque el proyecto no debe inventar un NIT ni una dirección reales.
  */
 public record IssuerInfo(
         String businessName,

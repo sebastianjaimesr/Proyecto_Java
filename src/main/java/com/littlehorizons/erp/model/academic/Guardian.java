@@ -3,9 +3,9 @@ package com.littlehorizons.erp.model.academic;
 import com.littlehorizons.erp.model.common.PersonName;
 
 /**
- * Guardian or legal tutor ({@code acudientes}).
+ * Acudiente o tutor legal ({@code acudientes}).
  *
- * @param id {@code null} before the record is inserted
+ * @param id {@code null} antes de insertar el registro
  */
 public record Guardian(
         Integer id,

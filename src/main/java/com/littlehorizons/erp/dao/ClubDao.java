@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * Persistence of {@code clubes} and {@code membresias_club}.
+ * Persistencia de {@code clubes} y {@code membresias_club}.
  */
 public interface ClubDao {
 
@@ -21,9 +21,9 @@ public interface ClubDao {
     Optional<Club> findById(Connection connection, int clubId) throws SQLException;
 
     /**
-     * Reads the club with {@code SELECT ... FOR UPDATE}. Inside a transaction
-     * this serializes concurrent enrollments in the same club, so two users
-     * cannot take the last seat at the same time.
+     * Lee el club con {@code SELECT ... FOR UPDATE}. Dentro de una transacción
+     * esto pone en fila las inscripciones simultáneas al mismo club, así dos usuarios
+     * no pueden tomar el último cupo al mismo tiempo.
      */
     Optional<Club> lockById(Connection connection, int clubId) throws SQLException;
 
@@ -33,7 +33,7 @@ public interface ClubDao {
 
     int countActiveMembers(Connection connection, int clubId) throws SQLException;
 
-    // ------------------------------------------------------- memberships
+    // ------------------------------------------------------- membresías
 
     int insertMembership(Connection connection, ClubMembership membership) throws SQLException;
 
@@ -47,6 +47,6 @@ public interface ClubDao {
 
     List<ClubMembership> findMembers(Connection connection, int clubId, boolean onlyActive) throws SQLException;
 
-    /** Every membership of a student, including withdrawn ones (history). */
+    /** Todas las membresías de un estudiante, incluidas las retiradas (historial). */
     List<ClubMembership> findByStudent(Connection connection, int studentId) throws SQLException;
 }

@@ -25,12 +25,12 @@ import java.util.stream.Collectors;
 import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
 /**
- * Builds a throw-away database {@code erp_little_horizons_test} from the DDL
- * sections of {@code docs/database.sql} (official script plus authorized
- * changes, without test data), so integration tests never touch the real
- * {@code erp_little_horizons} data.
+ * Crea una base desechable {@code erp_little_horizons_test} a partir de las secciones DDL
+ * de {@code docs/database.sql} (script oficial más cambios autorizados,
+ * sin datos de prueba), así las pruebas de integración nunca tocan los datos reales de
+ * {@code erp_little_horizons}.
  *
- * <p>Integration tests are skipped when {@code config.properties} is missing.</p>
+ * <p>Las pruebas de integración se omiten cuando falta {@code config.properties}.</p>
  */
 public final class TestDatabase {
 
@@ -48,9 +48,9 @@ public final class TestDatabase {
     }
 
     /**
-     * Drops and recreates the test database.
+     * Borra y vuelve a crear la base de pruebas.
      *
-     * @throws org.opentest4j.TestAbortedException when there is no local configuration
+     * @throws org.opentest4j.TestAbortedException cuando no hay configuración local
      */
     public static TestDatabase recreate() {
         Path configFile = AppConfig.resolveConfigPath();
@@ -77,7 +77,7 @@ public final class TestDatabase {
         return new JdbcTransactionManager(connectionProvider);
     }
 
-    /** Runs SQL statements on the test database (fixtures). */
+    /** Ejecuta sentencias SQL en la base de pruebas (datos de prueba). */
     public void execute(String... statements) {
         runScript(connectionProvider, Arrays.asList(statements));
     }

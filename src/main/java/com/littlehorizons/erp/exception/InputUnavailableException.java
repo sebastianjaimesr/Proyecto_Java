@@ -1,8 +1,8 @@
 package com.littlehorizons.erp.exception;
 
 /**
- * The console input stream was closed (end of input), so no more answers can
- * be read. The application reacts by shutting down in an orderly way.
+ * Se cerró la entrada de la consola (fin de entrada), así que no se pueden leer más
+ * respuestas. La aplicación reacciona cerrándose de forma ordenada.
  */
 public class InputUnavailableException extends ErpException {
 

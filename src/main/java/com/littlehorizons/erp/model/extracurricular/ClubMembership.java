@@ -3,11 +3,11 @@ package com.littlehorizons.erp.model.extracurricular;
 import java.time.LocalDate;
 
 /**
- * Membership of a student in a club ({@code membresias_club}).
+ * Membresía de un estudiante en un club ({@code membresias_club}).
  *
- * @param id          {@code null} before the record is inserted
- * @param studentName joined, for display
- * @param clubName    joined, for display
+ * @param id          {@code null} antes de insertar el registro
+ * @param studentName obtenido con join, para mostrar
+ * @param clubName    obtenido con join, para mostrar
  */
 public record ClubMembership(
         Integer id,

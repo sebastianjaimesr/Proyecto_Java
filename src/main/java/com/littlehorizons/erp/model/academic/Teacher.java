@@ -5,9 +5,9 @@ import com.littlehorizons.erp.model.common.PersonName;
 import java.time.LocalDate;
 
 /**
- * Teacher ({@code profesores}).
+ * Profesor ({@code profesores}).
  *
- * @param id {@code null} before the record is inserted
+ * @param id {@code null} antes de insertar el registro
  */
 public record Teacher(
         Integer id,

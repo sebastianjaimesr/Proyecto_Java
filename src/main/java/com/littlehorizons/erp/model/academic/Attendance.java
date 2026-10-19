@@ -3,11 +3,11 @@ package com.littlehorizons.erp.model.academic;
 import java.time.LocalDate;
 
 /**
- * Daily attendance of a student in a subject ({@code asistencias}).
+ * Asistencia diaria de un estudiante en una materia ({@code asistencias}).
  *
- * @param id          {@code null} before the record is inserted
- * @param recordedBy  teacher who took attendance
- * @param subjectName joined, for display
+ * @param id          {@code null} antes de insertar el registro
+ * @param recordedBy  profesor que tomó la asistencia
+ * @param subjectName obtenido con join, para mostrar
  */
 public record Attendance(
         Integer id,

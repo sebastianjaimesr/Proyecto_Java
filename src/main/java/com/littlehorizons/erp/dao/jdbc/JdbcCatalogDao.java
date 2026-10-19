@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * JDBC implementation of {@link CatalogDao}.
+ * Implementación JDBC de {@link CatalogDao}.
  */
 public class JdbcCatalogDao implements CatalogDao {
 

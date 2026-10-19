@@ -26,11 +26,11 @@ import java.nio.file.StandardCopyOption;
 import java.time.format.DateTimeFormatter;
 
 /**
- * Lays out the invoice PDF with OpenPDF.
+ * Arma el PDF de la factura con OpenPDF.
  *
- * <p>The file is first written to a temporary file in the same folder and then
- * moved over the final name, so an interrupted generation never leaves a
- * half-written {@code factura_NNNNNN.pdf}.</p>
+ * <p>Primero se escribe en un archivo temporal en la misma carpeta y luego
+ * se mueve al nombre final, así una generación interrumpida nunca deja un
+ * {@code factura_NNNNNN.pdf} a medio escribir.</p>
  */
 public class InvoicePdfGenerator {
 
@@ -48,7 +48,7 @@ public class InvoicePdfGenerator {
     private static final Font WHITE_BOLD = new Font(Font.HELVETICA, 9, Font.BOLD, Color.WHITE);
     private static final Font WARNING = new Font(Font.HELVETICA, 8, Font.BOLD, new Color(170, 40, 40));
 
-    /** Writes the PDF and returns its absolute path. */
+    /** Escribe el PDF y devuelve su ruta absoluta. */
     public Path generate(InvoiceDocument invoice, Path targetFile) throws IOException {
         Path target = targetFile.toAbsolutePath().normalize();
         Files.createDirectories(target.getParent());
@@ -60,7 +60,7 @@ public class InvoicePdfGenerator {
             try {
                 Files.move(temporary, target, StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.ATOMIC_MOVE);
             } catch (AtomicMoveNotSupportedException e) {
-                // Some synced folders (OneDrive) refuse atomic moves; a plain move is the fallback.
+                // Algunas carpetas sincronizadas (OneDrive) no permiten movimientos atómicos; se usa un movimiento normal como alternativa.
                 Files.move(temporary, target, StandardCopyOption.REPLACE_EXISTING);
             }
             return target;

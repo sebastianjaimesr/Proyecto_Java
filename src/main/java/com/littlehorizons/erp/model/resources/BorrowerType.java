@@ -1,9 +1,9 @@
 package com.littlehorizons.erp.model.resources;
 
 /**
- * Who borrows a resource. The official schema keeps student and teacher loans
- * in separate tables, so each type maps to its own table and borrower column.
- * The names below are constants of the application, never user input.
+ * Quién pide prestado un recurso. El esquema oficial guarda los préstamos de estudiantes y de profesores
+ * en tablas separadas, así que cada tipo apunta a su propia tabla y columna de prestatario.
+ * Los nombres de abajo son constantes de la aplicación, nunca entrada del usuario.
  */
 public enum BorrowerType {
 

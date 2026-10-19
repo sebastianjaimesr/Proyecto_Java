@@ -7,15 +7,15 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- * Reusable console menu: prints the header and the numbered options, reads a
- * valid choice and runs its action until the user picks the exit option.
+ * Menú de consola reutilizable: imprime el encabezado y las opciones numeradas, lee una
+ * opción válida y ejecuta su acción hasta que el usuario elige la opción de salida.
  *
- * <p>Modules add their screens as {@link Item}s, so new options do not
- * require changes to this class (Open/Closed).</p>
+ * <p>Los módulos agregan sus pantallas como {@link Item}, así las opciones nuevas no
+ * requieren cambiar esta clase (Abierto/Cerrado).</p>
  */
 public final class Menu {
 
-    /** One option of the menu. */
+    /** Una opción del menú. */
     public record Item(String label, Runnable action) {
 
         public Item {
@@ -41,17 +41,17 @@ public final class Menu {
         this.exitIsLastNumber = exitIsLastNumber;
     }
 
-    /** Main menu: options 1..n and "Salir" as the last number. */
+    /** Menú principal: opciones 1..n y "Salir" como último número. */
     public static Menu main(ConsoleUtils console, List<Item> items, String... header) {
         return new Menu(console, header, items, "Salir", true);
     }
 
-    /** Submenu: options 1..n and "0. Volver al menú anterior". */
+    /** Submenú: opciones 1..n y "0. Volver al menú anterior". */
     public static Menu submenu(ConsoleUtils console, List<Item> items, String... header) {
         return new Menu(console, header, items, "Volver al menú anterior", false);
     }
 
-    /** Shows the menu until the exit option is chosen. */
+    /** Muestra el menú hasta que se elige la opción de salida. */
     public void run() {
         int exitNumber = exitIsLastNumber ? items.size() + 1 : 0;
         int min = exitIsLastNumber ? 1 : 0;

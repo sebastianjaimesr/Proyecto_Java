@@ -3,7 +3,7 @@ package com.littlehorizons.erp.model.academic;
 import com.littlehorizons.erp.model.common.DbEnum;
 
 /**
- * Academic period of a subject registration (I to IV).
+ * Período académico de una inscripción a materia (I a IV).
  */
 public enum AcademicPeriod implements DbEnum {
 
@@ -23,7 +23,7 @@ public enum AcademicPeriod implements DbEnum {
         return dbValue;
     }
 
-    /** Value stored in MySQL to enum constant. */
+    /** Convierte el valor guardado en MySQL en la constante del enum. */
     public static AcademicPeriod fromDbValue(String value) {
         return DbEnum.fromDbValue(AcademicPeriod.class, value);
     }

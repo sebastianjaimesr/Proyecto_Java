@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * Persistence of {@code profesores}. Teachers are deactivated, not deleted.
+ * Persistencia de {@code profesores}. Los profesores se desactivan, no se borran.
  */
 public interface TeacherDao {
 

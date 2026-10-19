@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * Persistence of {@code recursos} and the read-only {@code categorias_recurso}.
+ * Persistencia de {@code recursos} y del catálogo de solo lectura {@code categorias_recurso}.
  */
 public interface ResourceDao {
 
@@ -24,14 +24,14 @@ public interface ResourceDao {
 
     Optional<Resource> findById(Connection connection, int resourceId) throws SQLException;
 
-    /** Reads the resource with {@code SELECT ... FOR UPDATE} to serialize loans and returns. */
+    /** Lee el recurso con {@code SELECT ... FOR UPDATE} para poner en fila préstamos y devoluciones. */
     Optional<Resource> lockById(Connection connection, int resourceId) throws SQLException;
 
     Optional<Resource> findByCode(Connection connection, String code) throws SQLException;
 
     /**
-     * Resources filtered by text (code or name), category and status; null
-     * filters are ignored.
+     * Recursos filtrados por texto (código o nombre), categoría y estado; los filtros
+     * null se ignoran.
      */
     List<Resource> search(Connection connection, String text, Integer categoryId, ResourceStatus status, int limit)
             throws SQLException;

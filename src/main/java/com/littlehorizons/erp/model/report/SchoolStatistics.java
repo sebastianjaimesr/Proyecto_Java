@@ -3,7 +3,7 @@ package com.littlehorizons.erp.model.report;
 import java.math.BigDecimal;
 
 /**
- * General figures of the school for one year.
+ * Cifras generales del colegio en un año.
  */
 public record SchoolStatistics(
         int academicYear,

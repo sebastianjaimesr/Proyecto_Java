@@ -24,8 +24,8 @@ import java.util.Objects;
 import java.util.Optional;
 
 /**
- * Teachers, their subject assignments and weekly class schedule, including
- * basic timetable conflict detection.
+ * Profesores, sus asignaciones de materias y su horario semanal de clases, con
+ * detección básica de conflictos de horario.
  */
 public class TeacherService {
 
@@ -48,7 +48,7 @@ public class TeacherService {
         this.clock = Objects.requireNonNull(clock, "clock");
     }
 
-    // --------------------------------------------------------------- teachers
+    // --------------------------------------------------------------- profesores
 
     public Teacher register(Teacher draft) {
         Teacher teacher = normalize(draft);
@@ -61,7 +61,7 @@ public class TeacherService {
         });
     }
 
-    /** Updates data and status (Activo, Inactivo, Licencia). Teachers are never deleted. */
+    /** Actualiza datos y estado (Activo, Inactivo, Licencia). Los profesores nunca se borran. */
     public Teacher update(Teacher changes) {
         Objects.requireNonNull(changes.id(), "id");
         if (changes.status() == null) {
@@ -86,9 +86,9 @@ public class TeacherService {
         return transactions.read(connection -> teacherDao.search(connection, text, SEARCH_LIMIT));
     }
 
-    // ------------------------------------------------------------ assignments
+    // ------------------------------------------------------------ asignaciones
 
-    /** Assigns an active teacher to an active subject for a year and optional section. */
+    /** Asigna un profesor activo a una materia activa para un año y una sección opcional. */
     public TeacherAssignment assign(int teacherId, int subjectId, int academicYear, String rawSection) {
         ServiceChecks.academicYear(academicYear, LocalDate.now(clock));
         String section = ServiceChecks.normalizeSection(rawSection);
@@ -123,11 +123,11 @@ public class TeacherService {
         return transactions.read(connection -> assignmentDao.findBySubject(connection, subjectId, academicYear));
     }
 
-    // -------------------------------------------------------------- schedules
+    // -------------------------------------------------------------- horarios
 
     /**
-     * Adds a weekly class slot. It is rejected when it overlaps another slot of
-     * the same teacher, or of the same grade and section, in that year.
+     * Agrega una franja semanal de clase. Se rechaza si se cruza con otra franja del
+     * mismo profesor, o del mismo grado y sección, en ese año.
      */
     public ClassSchedule addSchedule(int assignmentId, WeekDay day, LocalTime start, LocalTime end, String room) {
         validateTimes(day, start, end);

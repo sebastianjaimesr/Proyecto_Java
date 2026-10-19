@@ -43,7 +43,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
- * Clubs and events against the real MySQL test database.
+ * Clubes y eventos contra la base MySQL real de pruebas.
  */
 class ExtracurricularIntegrationTest {
 

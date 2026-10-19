@@ -4,11 +4,11 @@ import java.math.BigDecimal;
 import java.util.List;
 
 /**
- * Average of a subject for every student of the course (grade and optional
- * section) in a year.
+ * Promedio de una materia para cada estudiante del curso (grado y sección
+ * opcional) en un año.
  *
- * @param students      subject average of each student with grades
- * @param courseAverage mean of the student averages; {@code null} without grades
+ * @param students      promedio de la materia de cada estudiante con notas
+ * @param courseAverage media de los promedios de los estudiantes; {@code null} si no hay notas
  */
 public record CourseAverageReport(
         int subjectId,
@@ -25,7 +25,7 @@ public record CourseAverageReport(
         students = List.copyOf(students);
     }
 
-    /** Average of one student in the subject. */
+    /** Promedio de un estudiante en la materia. */
     public record StudentGrade(int studentId, String studentName, BigDecimal average, boolean finalGrade) {
     }
 }

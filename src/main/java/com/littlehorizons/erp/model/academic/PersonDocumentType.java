@@ -3,7 +3,7 @@ package com.littlehorizons.erp.model.academic;
 import com.littlehorizons.erp.model.common.DbEnum;
 
 /**
- * Document types for adults: guardians and teachers.
+ * Tipos de documento para adultos: acudientes y profesores.
  */
 public enum PersonDocumentType implements DbEnum {
 
@@ -22,7 +22,7 @@ public enum PersonDocumentType implements DbEnum {
         return dbValue;
     }
 
-    /** Value stored in MySQL to enum constant. */
+    /** Convierte el valor guardado en MySQL en la constante del enum. */
     public static PersonDocumentType fromDbValue(String value) {
         return DbEnum.fromDbValue(PersonDocumentType.class, value);
     }

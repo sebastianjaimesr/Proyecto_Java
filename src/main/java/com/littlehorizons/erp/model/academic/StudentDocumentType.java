@@ -3,7 +3,7 @@ package com.littlehorizons.erp.model.academic;
 import com.littlehorizons.erp.model.common.DbEnum;
 
 /**
- * Document types allowed for students ({@code estudiantes.tipo_documento}).
+ * Tipos de documento permitidos para estudiantes ({@code estudiantes.tipo_documento}).
  */
 public enum StudentDocumentType implements DbEnum {
 
@@ -23,7 +23,7 @@ public enum StudentDocumentType implements DbEnum {
         return dbValue;
     }
 
-    /** Value stored in MySQL to enum constant. */
+    /** Convierte el valor guardado en MySQL en la constante del enum. */
     public static StudentDocumentType fromDbValue(String value) {
         return DbEnum.fromDbValue(StudentDocumentType.class, value);
     }

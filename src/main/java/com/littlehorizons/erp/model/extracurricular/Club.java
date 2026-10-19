@@ -1,13 +1,13 @@
 package com.littlehorizons.erp.model.extracurricular;
 
 /**
- * Extracurricular club ({@code clubes}).
+ * Club extracurricular ({@code clubes}).
  *
- * @param id             {@code null} before the record is inserted
- * @param supervisorId   teacher in charge; may be {@code null}
- * @param supervisorName joined, for display
- * @param capacity       maximum number of active members
- * @param activeMembers  computed count of active memberships, for display
+ * @param id             {@code null} antes de insertar el registro
+ * @param supervisorId   profesor a cargo; puede ser {@code null}
+ * @param supervisorName obtenido con join, para mostrar
+ * @param capacity       número máximo de miembros activos
+ * @param activeMembers  conteo calculado de membresías activas, para mostrar
  */
 public record Club(
         Integer id,
@@ -20,7 +20,7 @@ public record Club(
         boolean active,
         int activeMembers) {
 
-    /** Default of {@code clubes.capacidad_maxima} in the official schema. */
+    /** Valor por defecto de {@code clubes.capacidad_maxima} en el esquema oficial. */
     public static final int DEFAULT_CAPACITY = 30;
 
     public int availableSeats() {

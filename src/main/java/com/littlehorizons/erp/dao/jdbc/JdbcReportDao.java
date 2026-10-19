@@ -14,7 +14,7 @@ import java.sql.SQLException;
 import java.util.List;
 
 /**
- * JDBC implementation of {@link ReportDao}.
+ * Implementación JDBC de {@link ReportDao}.
  */
 public class JdbcReportDao implements ReportDao {
 

@@ -3,11 +3,11 @@ package com.littlehorizons.erp.model.system;
 import java.util.List;
 
 /**
- * Result of comparing the connected database with the official schema.
+ * Resultado de comparar la base conectada con el esquema oficial.
  *
- * @param databaseInfo   facts read from the server
- * @param expectedTables number of tables defined by the official script
- * @param missingTables  official tables that do not exist in the database
+ * @param databaseInfo   datos leídos del servidor
+ * @param expectedTables número de tablas definidas por el script oficial
+ * @param missingTables  tablas oficiales que no existen en la base
  */
 public record SchemaStatus(DatabaseInfo databaseInfo, int expectedTables, List<String> missingTables) {
 

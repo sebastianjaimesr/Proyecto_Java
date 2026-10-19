@@ -18,7 +18,7 @@ import static com.littlehorizons.erp.dao.jdbc.JdbcSupport.setDate;
 import static com.littlehorizons.erp.dao.jdbc.JdbcSupport.setTimestamp;
 
 /**
- * JDBC implementation of {@link InvoiceDao}.
+ * Implementación JDBC de {@link InvoiceDao}.
  */
 public class JdbcInvoiceDao implements InvoiceDao {
 

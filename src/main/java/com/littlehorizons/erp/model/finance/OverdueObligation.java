@@ -4,12 +4,12 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 
 /**
- * Obligation pending for more than one month (inferred rule D-07, see
+ * Obligación pendiente por más de un mes (regla inferida D-07, ver
  * {@link com.littlehorizons.erp.service.OverdueService}).
  *
- * @param referenceDate last payment of the concept, or the enrollment date when
- *                      it was never paid
- * @param pendingAmount expected minus paid for the current period
+ * @param referenceDate último pago del concepto, o la fecha de matrícula si
+ *                      nunca se pagó
+ * @param pendingAmount valor esperado menos lo pagado en el período actual
  */
 public record OverdueObligation(
         int studentId,

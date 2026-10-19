@@ -9,8 +9,8 @@ import java.time.format.DateTimeFormatter;
 import java.util.Locale;
 
 /**
- * Display formats for Colombian users: pesos with thousands separator, dates
- * and masked documents.
+ * Formatos de presentación para usuarios colombianos: pesos con separador de miles, fechas
+ * y documentos enmascarados.
  */
 public final class Formats {
 
@@ -22,7 +22,7 @@ public final class Formats {
     private Formats() {
     }
 
-    /** "$ 1.250.000" (pesos, no decimals when the amount is whole). */
+    /** "$ 1.250.000" (pesos, sin decimales cuando el monto es entero). */
     public static String money(BigDecimal amount) {
         if (amount == null) {
             return "-";
@@ -31,7 +31,7 @@ public final class Formats {
         return "$ " + format.format(amount);
     }
 
-    /** Grade with one decimal, or "-" when missing. */
+    /** Nota con un decimal, o "-" si no existe. */
     public static String grade(BigDecimal value) {
         return value == null ? "-" : value.setScale(1, java.math.RoundingMode.HALF_UP).toPlainString();
     }
@@ -44,7 +44,7 @@ public final class Formats {
         return dateTime == null ? "-" : DATE_TIME.format(dateTime);
     }
 
-    /** Shows only the last digits of a document in lists: "******5678". */
+    /** En las listas muestra solo los últimos dígitos de un documento: "******5678". */
     public static String maskDocument(String document) {
         if (document == null) {
             return "-";

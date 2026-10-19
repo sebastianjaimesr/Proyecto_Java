@@ -10,8 +10,8 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * Persistence of the two loan tables of the official schema:
- * {@code prestamos_estudiante} and {@code prestamos_profesor}.
+ * Persistencia de las dos tablas de préstamos del esquema oficial:
+ * {@code prestamos_estudiante} y {@code prestamos_profesor}.
  */
 public interface LoanDao {
 
@@ -19,23 +19,23 @@ public interface LoanDao {
 
     Optional<Loan> findById(Connection connection, BorrowerType type, int loanId) throws SQLException;
 
-    /** Loans of the resource not yet returned, in either table. */
+    /** Préstamos del recurso que aún no se han devuelto, en cualquiera de las dos tablas. */
     List<Loan> findOpenByResource(Connection connection, int resourceId) throws SQLException;
 
     void markReturned(Connection connection, BorrowerType type, int loanId, LocalDate returnDate, String notes)
             throws SQLException;
 
     /**
-     * Sets status "Vencido" on active loans of both tables whose due date is
-     * before {@code today}.
+     * Pone el estado "Vencido" a los préstamos activos de ambas tablas cuya fecha límite
+     * es anterior a {@code today}.
      *
-     * @return number of updated loans
+     * @return cantidad de préstamos actualizados
      */
     int markOverdue(Connection connection, LocalDate today) throws SQLException;
 
-    /** Loans not returned (Activo or Vencido) of both tables, oldest due date first. */
+    /** Préstamos no devueltos (Activo o Vencido) de ambas tablas, primero los de fecha límite más antigua. */
     List<Loan> findOpen(Connection connection) throws SQLException;
 
-    /** Loan history of a borrower, newest first. */
+    /** Historial de préstamos de quien pidió prestado, del más reciente al más antiguo. */
     List<Loan> findByBorrower(Connection connection, BorrowerType type, int borrowerId) throws SQLException;
 }

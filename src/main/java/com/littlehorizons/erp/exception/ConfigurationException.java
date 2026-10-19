@@ -1,8 +1,8 @@
 package com.littlehorizons.erp.exception;
 
 /**
- * Missing or invalid local configuration (config.properties). The message is in
- * Spanish and explains how to fix the file; it never contains credentials.
+ * Configuración local faltante o inválida (config.properties). El mensaje está en
+ * español y explica cómo corregir el archivo; nunca contiene credenciales.
  */
 public class ConfigurationException extends ErpException {
 

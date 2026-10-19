@@ -93,7 +93,7 @@ class AverageCalculatorTest {
                 grade(3, 10, GradingPeriod.FINAL, "3.9")));
 
         assertEquals(3, students.size());
-        // students: 2.5, 4.6, 3.9 -> 3.666 -> 3.7
+        // estudiantes: 2.5, 4.6, 3.9 -> 3.666 -> 3.7
         assertEquals(new BigDecimal("3.7"), calculator.courseAverage(students));
         assertEquals(new BigDecimal("4.6"), calculator.highest(students).orElseThrow());
         assertEquals(new BigDecimal("2.5"), calculator.lowest(students).orElseThrow());

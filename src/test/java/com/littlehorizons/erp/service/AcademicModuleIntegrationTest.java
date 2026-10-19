@@ -54,14 +54,14 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
- * Academic module against a real MySQL test database created from
- * docs/database.sql. Each test builds its own data with unique documents.
+ * Módulo académico contra una base MySQL de pruebas creada a partir de
+ * docs/database.sql. Cada prueba crea sus propios datos con documentos únicos.
  */
 class AcademicModuleIntegrationTest {
 
     private static final int YEAR = 2026;
-    private static final int GRADE_FIFTH = 6;   // id of "Quinto" in the official seed (Preescolar = 1)
-    private static final int GRADE_SIXTH = 7;   // id of "Sexto"
+    private static final int GRADE_FIFTH = 6;   // id de "Quinto" en los datos oficiales (Preescolar = 1)
+    private static final int GRADE_SIXTH = 7;   // id de "Sexto"
     private static final AtomicInteger SEQUENCE = new AtomicInteger(100);
 
     private static TestDatabase database;
@@ -97,7 +97,7 @@ class AcademicModuleIntegrationTest {
                 registrationDao, assignmentDao, TestDatabase.CLOCK);
     }
 
-    // ---------------------------------------------------------------- data
+    // ---------------------------------------------------------------- datos
 
     private static Student newStudent() {
         int n = SEQUENCE.incrementAndGet();
@@ -126,7 +126,7 @@ class AcademicModuleIntegrationTest {
         return subjects.register(new Subject(null, "MAT-" + n, "Matemáticas " + n, null, gradeId, null, 5, true));
     }
 
-    // ------------------------------------------------------------- students
+    // ------------------------------------------------------------- estudiantes
 
     @Test
     @DisplayName("Duplicate student documents are rejected")
@@ -214,7 +214,7 @@ class AcademicModuleIntegrationTest {
                         com.littlehorizons.erp.model.academic.RegistrationStatus.ACTIVE))));
     }
 
-    // -------------------------------------------------------- registrations
+    // -------------------------------------------------------- inscripciones
 
     @Test
     void registrationRequiresEnrollmentAndMatchingGrade() {
@@ -249,7 +249,7 @@ class AcademicModuleIntegrationTest {
         assertEquals(activeSubjects, created.size());
     }
 
-    // --------------------------------------------------------------- grades
+    // --------------------------------------------------------------- notas
 
     @Test
     void gradesAreValidatedCorrectedOnlyWithConfirmationAndFinalIsTheMean() {
@@ -332,7 +332,7 @@ class AcademicModuleIntegrationTest {
         assertEquals(new BigDecimal("2.0"), report.lowest());
     }
 
-    // ------------------------------------------------------------ schedules
+    // ------------------------------------------------------------ horarios
 
     @Test
     void scheduleConflictsAreDetectedForTeacherAndGroup() {
@@ -364,7 +364,7 @@ class AcademicModuleIntegrationTest {
         assertThrows(BusinessRuleException.class, () -> teachers.assign(teacher.id(), subject.id(), YEAR, " "));
     }
 
-    // ----------------------------------------------------------- attendance
+    // ----------------------------------------------------------- asistencia
 
     @Test
     @DisplayName("Weekly report lists students with more than three 'Ausente' marks only")

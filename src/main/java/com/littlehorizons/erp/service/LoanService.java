@@ -29,12 +29,12 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 
 /**
- * Loans and returns of resources to students and teachers.
+ * Préstamos y devoluciones de recursos a estudiantes y profesores.
  *
- * <p>Each loan and each return changes two tables (the loan and the
- * resource status) in one transaction. The resource row is locked first with
- * {@code SELECT ... FOR UPDATE}, so the same resource cannot be lent twice
- * at the same time, even across the two loan tables.</p>
+ * <p>Cada préstamo y cada devolución cambian dos tablas (el préstamo y el
+ * estado del recurso) en una transacción. Primero se bloquea la fila del recurso con
+ * {@code SELECT ... FOR UPDATE}, así el mismo recurso no se puede prestar dos veces
+ * al mismo tiempo, ni siquiera entre las dos tablas de préstamos.</p>
  */
 public class LoanService {
 
@@ -87,7 +87,7 @@ public class LoanService {
         });
     }
 
-    /** Registers the return and makes the resource available again, atomically. */
+    /** Registra la devolución y deja el recurso disponible otra vez, de forma atómica. */
     public Loan returnLoan(BorrowerType type, int loanId, LocalDate returnDate, String notes) {
         Objects.requireNonNull(type, "type");
         ServiceChecks.notInFuture(returnDate, LocalDate.now(clock), "fecha de devolución");
@@ -108,13 +108,13 @@ public class LoanService {
         });
     }
 
-    /** Marks as "Vencido" every active loan past its due date; returns how many changed. */
+    /** Marca como "Vencido" todo préstamo activo con la fecha límite pasada; devuelve cuántos cambiaron. */
     public int refreshOverdueStatus() {
         LocalDate today = LocalDate.now(clock);
         return transactions.inTransaction(connection -> loanDao.markOverdue(connection, today));
     }
 
-    /** Loans not returned and past their due date, most overdue first. */
+    /** Préstamos no devueltos y vencidos, primero los más atrasados. */
     public List<Loan> findOverdue() {
         LocalDate today = LocalDate.now(clock);
         return transactions.read(loanDao::findOpen).stream()

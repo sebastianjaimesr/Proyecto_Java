@@ -26,13 +26,13 @@ import java.util.Objects;
 import java.util.Optional;
 
 /**
- * Daily attendance per subject and the weekly absence report.
+ * Asistencia diaria por materia y reporte semanal de inasistencias.
  *
- * <p>Approved rule (D-06): the analysis week is the ISO week, Monday to
- * Sunday, that contains the chosen date. Only "Ausente" counts as an
- * absence; "Tardanza" and "Excusa Médica" are reported apart. A student
- * appears when the absences of the week, added over all subjects, are more
- * than three.</p>
+ * <p>Regla aprobada (D-06): la semana de análisis es la semana ISO, de lunes a
+ * domingo, que contiene la fecha elegida. Solo "Ausente" cuenta como
+ * inasistencia; "Tardanza" y "Excusa Médica" se reportan aparte. Un estudiante
+ * aparece cuando sus ausencias de la semana, sumando todas las materias, son más
+ * de tres.</p>
  */
 public class AttendanceService {
 
@@ -59,7 +59,7 @@ public class AttendanceService {
         this.clock = Objects.requireNonNull(clock, "clock");
     }
 
-    /** Monday and Sunday of the ISO week containing {@code date}. */
+    /** Lunes y domingo de la semana ISO que contiene {@code date}. */
     public record Week(LocalDate monday, LocalDate sunday) {
 
         public static Week containing(LocalDate date) {
@@ -69,10 +69,10 @@ public class AttendanceService {
     }
 
     /**
-     * Records the attendance of one student. An existing record for the same
-     * day and subject is only changed when {@code allowCorrection} is true.
+     * Registra la asistencia de un estudiante. Un registro existente del mismo
+     * día y materia solo se cambia cuando {@code allowCorrection} es true.
      *
-     * @return {@code true} when an existing record was corrected
+     * @return {@code true} cuando se corrigió un registro existente
      */
     public boolean record(int studentId, int subjectId, LocalDate date, AttendanceStatus status, String notes,
                           int teacherId, boolean allowCorrection) {
@@ -85,11 +85,11 @@ public class AttendanceService {
     }
 
     /**
-     * Records the attendance of a whole group in one transaction: either every
-     * mark is saved or none is.
+     * Registra la asistencia de todo un grupo en una transacción: se guardan todas
+     * las marcas o ninguna.
      *
-     * @param statuses status per student id
-     * @return number of corrected records
+     * @param statuses estado por id de estudiante
+     * @return cantidad de registros corregidos
      */
     public int recordForGroup(int subjectId, LocalDate date, int teacherId, Map<Integer, AttendanceStatus> statuses,
                               boolean allowCorrection) {
@@ -121,14 +121,14 @@ public class AttendanceService {
         });
     }
 
-    /** Students with more than {@value #MAX_WEEKLY_ABSENCES} absences in the ISO week of {@code anyDayOfWeek}. */
+    /** Estudiantes con más de {@value #MAX_WEEKLY_ABSENCES} ausencias en la semana ISO de {@code anyDayOfWeek}. */
     public List<AbsenceReportRow> weeklyAbsenceReport(LocalDate anyDayOfWeek) {
         Week week = Week.containing(Objects.requireNonNull(anyDayOfWeek, "anyDayOfWeek"));
         return transactions.read(connection -> attendanceDao.findStudentsOverAbsenceLimit(connection, week.monday(),
                 week.sunday(), MAX_WEEKLY_ABSENCES));
     }
 
-    /** Absence counts per student between two dates (inclusive). */
+    /** Conteo de ausencias por estudiante entre dos fechas (inclusive). */
     public List<AbsenceReportRow> absenceSummary(LocalDate from, LocalDate to) {
         if (from == null || to == null || to.isBefore(from)) {
             throw new ValidationException("La fecha final debe ser igual o posterior a la inicial.");

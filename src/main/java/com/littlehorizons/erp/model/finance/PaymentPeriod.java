@@ -3,7 +3,7 @@ package com.littlehorizons.erp.model.finance;
 import com.littlehorizons.erp.model.common.DbEnum;
 
 /**
- * Period a payment applies to ({@code pagos.periodo_academico}).
+ * Período al que aplica un pago ({@code pagos.periodo_academico}).
  */
 public enum PaymentPeriod implements DbEnum {
 
@@ -24,7 +24,7 @@ public enum PaymentPeriod implements DbEnum {
         return dbValue;
     }
 
-    /** Value stored in MySQL to enum constant. */
+    /** Convierte el valor guardado en MySQL en la constante del enum. */
     public static PaymentPeriod fromDbValue(String value) {
         return DbEnum.fromDbValue(PaymentPeriod.class, value);
     }

@@ -23,12 +23,12 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- * Clubs and memberships with capacity control.
+ * Clubes y membresías con control de cupo.
  *
- * <p>Capacity is checked inside a transaction that first locks the club row
- * ({@code SELECT ... FOR UPDATE}); a second enrollment in the same club waits
- * until the first commits, so the count it reads is always current and the
- * limit cannot be exceeded by simultaneous enrollments.</p>
+ * <p>El cupo se revisa dentro de una transacción que primero bloquea la fila del club
+ * ({@code SELECT ... FOR UPDATE}); una segunda inscripción al mismo club espera
+ * a que la primera haga commit, así el conteo que lee siempre está actualizado y
+ * el límite no se puede superar con inscripciones simultáneas.</p>
  */
 public class ClubService {
 
@@ -63,7 +63,7 @@ public class ClubService {
         });
     }
 
-    /** Updates a club; the capacity cannot be set below the current active members. */
+    /** Actualiza un club; el cupo no puede quedar por debajo de los miembros activos actuales. */
     public Club update(Club changes) {
         Objects.requireNonNull(changes.id(), "id");
         Club club = normalize(changes);
@@ -95,8 +95,8 @@ public class ClubService {
     }
 
     /**
-     * Enrolls an active student in an active club if a seat is free and the
-     * student has no active membership in it.
+     * Inscribe a un estudiante activo en un club activo si hay cupo libre y el
+     * estudiante no tiene ya una membresía activa en él.
      */
     public ClubMembership enroll(int studentId, int clubId, LocalDate joinDate) {
         ServiceChecks.notInFuture(joinDate, LocalDate.now(clock), "fecha de ingreso");
@@ -125,7 +125,7 @@ public class ClubService {
         });
     }
 
-    /** Ends a membership; the record is kept as history. */
+    /** Termina una membresía; el registro se conserva como historial. */
     public void withdraw(int membershipId, LocalDate date, String reason) {
         ServiceChecks.notInFuture(date, LocalDate.now(clock), "fecha de retiro");
         String cleanReason = InputValidator.optionalText(reason, "motivo", 1000);

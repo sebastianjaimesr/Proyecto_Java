@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- * Business rules for guardians and their relation with students (N:M).
+ * Reglas de negocio de los acudientes y su relación con los estudiantes (N:M).
  */
 public class GuardianService {
 
@@ -45,8 +45,8 @@ public class GuardianService {
     }
 
     /**
-     * Registers a guardian and links it to a student in one transaction, so a
-     * guardian is never left without the student it was created for.
+     * Registra un acudiente y lo vincula a un estudiante en una sola transacción, así un
+     * acudiente nunca queda sin el estudiante para el que se creó.
      */
     public Guardian registerForStudent(Guardian draft, int studentId, boolean primary, boolean emergencyContact) {
         Guardian guardian = normalize(draft);
@@ -76,7 +76,7 @@ public class GuardianService {
         });
     }
 
-    /** Links an existing guardian; when {@code primary}, it replaces the current primary guardian. */
+    /** Vincula un acudiente existente; si es {@code primary}, reemplaza al acudiente principal actual. */
     public void link(int studentId, int guardianId, boolean primary, boolean emergencyContact) {
         transactions.inTransactionVoid(connection -> {
             requireStudent(connection, studentId);
@@ -93,7 +93,7 @@ public class GuardianService {
         });
     }
 
-    /** Removes the relation; a student must keep at least one guardian. */
+    /** Elimina la relación; un estudiante debe conservar al menos un acudiente. */
     public void unlink(int studentId, int guardianId) {
         transactions.inTransactionVoid(connection -> {
             if (!guardianDao.isLinked(connection, studentId, guardianId)) {

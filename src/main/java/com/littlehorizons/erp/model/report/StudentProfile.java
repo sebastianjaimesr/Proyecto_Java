@@ -7,9 +7,9 @@ import com.littlehorizons.erp.model.academic.Student;
 import java.util.List;
 
 /**
- * Detail screen of a student: personal data, guardians (emergency contacts are
- * guardians flagged as such), enrollment history and siblings (students that
- * share a guardian).
+ * Pantalla de detalle de un estudiante: datos personales, acudientes (los contactos de emergencia son
+ * acudientes marcados como tales), historial de matrículas y hermanos (estudiantes que
+ * comparten un acudiente).
  */
 public record StudentProfile(
         Student student,

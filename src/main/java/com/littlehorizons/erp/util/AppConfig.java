@@ -11,14 +11,14 @@ import java.nio.file.Paths;
 import java.util.Properties;
 
 /**
- * Read-only access to the local configuration file ({@code config.properties}).
+ * Acceso de solo lectura al archivo de configuración local ({@code config.properties}).
  *
- * <p>Singleton: the file is read once per execution and shared by every layer.
- * Tests and alternative setups can build independent instances with
- * {@link #fromProperties(Properties)} or {@link #load(Path)}.</p>
+ * <p>Singleton: el archivo se lee una vez por ejecución y lo comparten todas las capas.
+ * Las pruebas y otras configuraciones pueden crear instancias independientes con
+ * {@link #fromProperties(Properties)} o {@link #load(Path)}.</p>
  *
- * <p>The file location is {@code config.properties} in the working directory,
- * or the path given by the {@code app.config} system property.</p>
+ * <p>El archivo es {@code config.properties} en la carpeta de trabajo,
+ * o la ruta indicada en la propiedad del sistema {@code app.config}.</p>
  */
 public final class AppConfig {
 
@@ -37,9 +37,9 @@ public final class AppConfig {
     }
 
     /**
-     * Returns the shared configuration, loading it on first use.
+     * Devuelve la configuración compartida y la carga la primera vez que se usa.
      *
-     * @throws ConfigurationException if the file is missing or unreadable
+     * @throws ConfigurationException si el archivo falta o no se puede leer
      */
     public static AppConfig getInstance() {
         AppConfig result = instance;
@@ -55,7 +55,7 @@ public final class AppConfig {
         return result;
     }
 
-    /** Path used by {@link #getInstance()}. */
+    /** Ruta que usa {@link #getInstance()}. */
     public static Path resolveConfigPath() {
         String customPath = System.getProperty(CONFIG_PATH_PROPERTY);
         if (customPath != null && !customPath.isBlank()) {
@@ -65,9 +65,9 @@ public final class AppConfig {
     }
 
     /**
-     * Loads a configuration file encoded in UTF-8.
+     * Carga un archivo de configuración en UTF-8.
      *
-     * @throws ConfigurationException if the file is missing or unreadable
+     * @throws ConfigurationException si el archivo falta o no se puede leer
      */
     public static AppConfig load(Path path) {
         Path absolutePath = path.toAbsolutePath().normalize();
@@ -86,15 +86,15 @@ public final class AppConfig {
         return new AppConfig(loaded, absolutePath.toString());
     }
 
-    /** Builds a configuration from memory; used by tests. */
+    /** Construye una configuración en memoria; la usan las pruebas. */
     public static AppConfig fromProperties(Properties properties) {
         return new AppConfig(properties, "(memoria)");
     }
 
     /**
-     * Returns a mandatory value without surrounding spaces.
+     * Devuelve un valor obligatorio sin espacios alrededor.
      *
-     * @throws ConfigurationException if the key is missing or blank
+     * @throws ConfigurationException si la clave falta o está vacía
      */
     public String getRequired(String key) {
         String value = properties.getProperty(key);
@@ -105,16 +105,16 @@ public final class AppConfig {
         return value.trim();
     }
 
-    /** Returns the value, or {@code defaultValue} when it is missing or blank. */
+    /** Devuelve el valor, o {@code defaultValue} si falta o está vacío. */
     public String getOptional(String key, String defaultValue) {
         String value = properties.getProperty(key);
         return (value == null || value.isBlank()) ? defaultValue : value.trim();
     }
 
     /**
-     * Returns an integer value, or {@code defaultValue} when it is missing.
+     * Devuelve un valor entero, o {@code defaultValue} si falta.
      *
-     * @throws ConfigurationException if the value is not an integer
+     * @throws ConfigurationException si el valor no es un entero
      */
     public int getInt(String key, int defaultValue) {
         String value = getOptional(key, null);
@@ -129,7 +129,7 @@ public final class AppConfig {
         }
     }
 
-    /** Every property whose key starts with {@code prefix}, keyed by the rest of the name. */
+    /** Todas las propiedades cuya clave empieza con {@code prefix}, indexadas por el resto del nombre. */
     public java.util.Map<String, String> withPrefix(String prefix) {
         java.util.Map<String, String> values = new java.util.TreeMap<>();
         for (String key : properties.stringPropertyNames()) {
@@ -140,7 +140,7 @@ public final class AppConfig {
         return values;
     }
 
-    /** Human readable origin of the values (file path or memory). */
+    /** Origen legible de los valores (ruta del archivo o memoria). */
     public String getSource() {
         return source;
     }

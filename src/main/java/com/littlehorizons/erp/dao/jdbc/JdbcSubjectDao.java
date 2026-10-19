@@ -13,7 +13,7 @@ import java.util.Optional;
 import static com.littlehorizons.erp.dao.jdbc.JdbcSupport.setString;
 
 /**
- * JDBC implementation of {@link SubjectDao}.
+ * Implementación JDBC de {@link SubjectDao}.
  */
 public class JdbcSubjectDao implements SubjectDao {
 

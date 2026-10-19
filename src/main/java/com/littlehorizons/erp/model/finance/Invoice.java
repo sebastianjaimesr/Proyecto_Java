@@ -4,14 +4,14 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 /**
- * Invoice record of a payment ({@code facturas}).
+ * Registro de factura de un pago ({@code facturas}).
  *
- * @param number      consecutive such as FE-000123
- * @param issuedAt    issue date and time, stored in {@code fecha_creacion} so
- *                    the simulated CUFE can be recomputed
- * @param cufe        simulated CUFE (SHA-384, 96 hexadecimal characters)
- * @param pdfFileName {@code null} while the PDF has not been generated
- * @param pdfPath     {@code null} while the PDF has not been generated
+ * @param number      consecutivo, por ejemplo FE-000123
+ * @param issuedAt    fecha y hora de emisión, guardadas en {@code fecha_creacion} para
+ *                    poder recalcular el CUFE simulado
+ * @param cufe        CUFE simulado (SHA-384, 96 caracteres hexadecimales)
+ * @param pdfFileName {@code null} mientras no se haya generado el PDF
+ * @param pdfPath     {@code null} mientras no se haya generado el PDF
  */
 public record Invoice(
         Integer id,

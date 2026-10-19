@@ -13,16 +13,16 @@ import java.sql.SQLIntegrityConstraintViolationException;
 import java.util.Objects;
 
 /**
- * JDBC implementation of {@link TransactionManager}.
+ * Implementación JDBC de {@link TransactionManager}.
  *
- * <p>Each call opens a new connection with try-with-resources. Transactions
- * use {@code READ COMMITTED} isolation; critical sections (club capacity,
- * resource loans) additionally lock the parent row with
+ * <p>Cada llamada abre una conexión nueva con try-with-resources. Las transacciones
+ * usan aislamiento {@code READ COMMITTED}; las secciones críticas (cupo de clubes,
+ * préstamos de recursos) además bloquean la fila padre con
  * {@code SELECT ... FOR UPDATE}.</p>
  */
 public class JdbcTransactionManager implements TransactionManager {
 
-    /** MySQL error codes translated into business messages. */
+    /** Códigos de error de MySQL que se traducen a mensajes de negocio. */
     private static final int ER_DUP_ENTRY = 1062;
     private static final int ER_ROW_IS_REFERENCED = 1451;
     private static final int ER_NO_REFERENCED_ROW = 1452;
@@ -72,8 +72,8 @@ public class JdbcTransactionManager implements TransactionManager {
     }
 
     /**
-     * Constraint violations become business messages (the database is the last
-     * guard against duplicates); everything else is a technical error.
+     * Las violaciones de restricciones se convierten en mensajes de negocio (la base de datos es la
+     * última barrera contra duplicados); todo lo demás es un error técnico.
      */
     static RuntimeException translate(SQLException e) {
         if (e instanceof SQLIntegrityConstraintViolationException || e.getErrorCode() == ER_CHECK_CONSTRAINT_VIOLATED) {

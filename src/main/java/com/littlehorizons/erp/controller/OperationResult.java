@@ -3,15 +3,15 @@ package com.littlehorizons.erp.controller;
 import java.util.Optional;
 
 /**
- * Outcome of a controller operation, ready to be shown by a view.
+ * Resultado de una operación del controlador, listo para que lo muestre una vista.
  *
- * @param success              whether the operation finished correctly
- * @param message              message for the user, in Spanish
- * @param data                 result of the operation; {@code null} when it failed
- * @param confirmationRequired the operation failed only because it would
- *                             replace existing data and can be retried after
- *                             the user confirms
- * @param <T>                  type of the result
+ * @param success              si la operación terminó correctamente
+ * @param message              mensaje para el usuario, en español
+ * @param data                 resultado de la operación; {@code null} si falló
+ * @param confirmationRequired la operación falló solo porque reemplazaría
+ *                             datos existentes; se puede reintentar después
+ *                             de que el usuario confirme
+ * @param <T>                  tipo del resultado
  */
 public record OperationResult<T>(boolean success, String message, T data, boolean confirmationRequired) {
 

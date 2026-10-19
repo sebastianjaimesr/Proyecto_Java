@@ -22,8 +22,8 @@ import java.util.Map;
 import java.util.Objects;
 
 /**
- * Coordinates "Gestión académica": registrations, grades, averages, history
- * and attendance.
+ * Coordina "Gestión académica": inscripciones, notas, promedios, historial
+ * y asistencia.
  */
 public class AcademicController extends BaseController {
 
@@ -110,7 +110,7 @@ public class AcademicController extends BaseController {
         return execute(() -> academicService.history(studentId), "Historial académico cargado.");
     }
 
-    // ------------------------------------------------------------- attendance
+    // ------------------------------------------------------------- asistencia
 
     public OperationResult<Boolean> recordAttendance(int studentId, int subjectId, LocalDate date,
                                                      AttendanceStatus status, String notes, int teacherId,

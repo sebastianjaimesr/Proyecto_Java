@@ -19,7 +19,7 @@ import static com.littlehorizons.erp.dao.jdbc.JdbcSupport.setInteger;
 import static com.littlehorizons.erp.dao.jdbc.JdbcSupport.setString;
 
 /**
- * JDBC implementation of {@link ResourceDao}.
+ * Implementación JDBC de {@link ResourceDao}.
  */
 public class JdbcResourceDao implements ResourceDao {
 

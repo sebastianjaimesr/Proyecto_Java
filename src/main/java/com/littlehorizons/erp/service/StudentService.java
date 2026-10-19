@@ -23,7 +23,7 @@ import java.util.Optional;
 import java.util.regex.Pattern;
 
 /**
- * Business rules for students: registration, updates, search and withdrawal.
+ * Reglas de negocio de los estudiantes: registro, actualización, búsqueda y retiro.
  */
 public class StudentService {
 
@@ -49,7 +49,7 @@ public class StudentService {
         this.clock = Objects.requireNonNull(clock, "clock");
     }
 
-    /** Validates and inserts a new student with status "Activo". */
+    /** Valida e inserta un estudiante nuevo con estado "Activo". */
     public Student register(Student draft) {
         Student student = normalize(draft).withStatus(StudentStatus.ACTIVE);
         validate(student);
@@ -59,7 +59,7 @@ public class StudentService {
         });
     }
 
-    /** Updates personal data; the status is changed only through {@link #withdraw}. */
+    /** Actualiza los datos personales; el estado solo se cambia a través de {@link #withdraw}. */
     public Student update(Student changes) {
         Objects.requireNonNull(changes.id(), "id");
         Student student = normalize(changes);
@@ -75,9 +75,9 @@ public class StudentService {
     }
 
     /**
-     * Withdraws a student: status "Retirado" and, if there is an active
-     * enrollment in the year of {@code date}, it becomes "Retirada" with that
-     * date. Both changes are one transaction. History is kept.
+     * Retira a un estudiante: estado "Retirado" y, si tiene una matrícula
+     * activa en el año de {@code date}, pasa a "Retirada" con esa
+     * fecha. Ambos cambios son una sola transacción. El historial se conserva.
      */
     public Student withdraw(int studentId, LocalDate date) {
         LocalDate today = LocalDate.now(clock);
@@ -103,7 +103,7 @@ public class StudentService {
         });
     }
 
-    /** Changes the status to Activo, Graduado or Suspendido (Retirado uses {@link #withdraw}). */
+    /** Cambia el estado a Activo, Graduado o Suspendido (Retirado usa {@link #withdraw}). */
     public Student changeStatus(int studentId, StudentStatus status) {
         if (status == StudentStatus.WITHDRAWN) {
             throw new ValidationException("Para retirar a un estudiante use la opción de retiro.");
@@ -129,7 +129,7 @@ public class StudentService {
         return transactions.read(connection -> studentDao.search(connection, text, SEARCH_LIMIT));
     }
 
-    /** Student with guardians and enrollment history, read in one connection. */
+    /** Estudiante con sus acudientes e historial de matrículas, leído con una sola conexión. */
     public StudentProfile getProfile(int studentId) {
         return transactions.read(connection -> {
             Student student = findOrFail(connection, studentId);

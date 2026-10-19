@@ -18,8 +18,8 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- * Coordinates the "Gestión de estudiantes y acudientes" menu with the
- * student, guardian and enrollment services.
+ * Coordina el menú "Gestión de estudiantes y acudientes" con los servicios
+ * de estudiantes, acudientes y matrículas.
  */
 public class StudentController extends BaseController {
 
@@ -34,7 +34,7 @@ public class StudentController extends BaseController {
         this.enrollmentService = Objects.requireNonNull(enrollmentService, "enrollmentService");
     }
 
-    // --------------------------------------------------------------- students
+    // --------------------------------------------------------------- estudiantes
 
     public OperationResult<Student> registerStudent(Student draft) {
         return execute(() -> studentService.register(draft),
@@ -63,7 +63,7 @@ public class StudentController extends BaseController {
         return execute(() -> studentService.getProfile(studentId), "Ficha cargada.");
     }
 
-    // -------------------------------------------------------------- guardians
+    // -------------------------------------------------------------- acudientes
 
     public OperationResult<Guardian> registerGuardian(Guardian draft) {
         return execute(() -> guardianService.register(draft),
@@ -113,7 +113,7 @@ public class StudentController extends BaseController {
                 list -> list.size() + " estudiante(s) a cargo.");
     }
 
-    // ------------------------------------------------------------ enrollments
+    // ------------------------------------------------------------ matrículas
 
     public OperationResult<List<Grade>> findGrades() {
         return execute(enrollmentService::findGrades, "Grados cargados.");

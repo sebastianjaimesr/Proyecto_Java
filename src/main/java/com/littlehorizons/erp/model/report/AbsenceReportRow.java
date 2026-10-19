@@ -1,8 +1,8 @@
 package com.littlehorizons.erp.model.report;
 
 /**
- * Attendance counts of one student in a date range. Only "Ausente" counts as
- * an unexcused absence; late arrivals and medical excuses are shown apart.
+ * Conteos de asistencia de un estudiante en un rango de fechas. Solo "Ausente" cuenta como
+ * inasistencia sin excusa; las tardanzas y excusas médicas se muestran aparte.
  */
 public record AbsenceReportRow(
         int studentId,

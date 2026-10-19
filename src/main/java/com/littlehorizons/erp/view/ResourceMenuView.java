@@ -22,7 +22,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
- * Screens of "6. Gestión de recursos".
+ * Pantallas de "6. Gestión de recursos".
  */
 public class ResourceMenuView {
 

@@ -14,7 +14,7 @@ import java.util.Map;
 import java.util.Objects;
 
 /**
- * Coordinates "Gestión de recursos": inventory, loans and returns.
+ * Coordina "Gestión de recursos": inventario, préstamos y devoluciones.
  */
 public class ResourceController extends BaseController {
 

@@ -20,8 +20,8 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
- * Uses in-memory {@link com.littlehorizons.erp.dao.SystemDao} implementations,
- * possible because the service depends on the interface and not on JDBC.
+ * Usa implementaciones en memoria de {@link com.littlehorizons.erp.dao.SystemDao},
+ * posible porque el servicio depende de la interfaz y no de JDBC.
  */
 class SystemServiceTest {
 

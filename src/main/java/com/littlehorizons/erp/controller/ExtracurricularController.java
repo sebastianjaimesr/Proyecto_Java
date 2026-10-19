@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- * Coordinates "Actividades extracurriculares": clubs and events.
+ * Coordina "Actividades extracurriculares": clubes y eventos.
  */
 public class ExtracurricularController extends BaseController {
 

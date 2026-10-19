@@ -18,7 +18,7 @@ import static com.littlehorizons.erp.dao.jdbc.JdbcSupport.setEnum;
 import static com.littlehorizons.erp.dao.jdbc.JdbcSupport.setString;
 
 /**
- * JDBC implementation of {@link SubjectRegistrationDao}.
+ * Implementación JDBC de {@link SubjectRegistrationDao}.
  */
 public class JdbcSubjectRegistrationDao implements SubjectRegistrationDao {
 

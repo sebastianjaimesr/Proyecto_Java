@@ -3,10 +3,10 @@ package com.littlehorizons.erp.model.academic;
 import java.time.LocalDate;
 
 /**
- * Registration of a student in a subject for one period ({@code inscripciones_materia}).
+ * Inscripción de un estudiante a una materia en un período ({@code inscripciones_materia}).
  *
- * @param id          {@code null} before the record is inserted
- * @param subjectName joined, for display
+ * @param id          {@code null} antes de insertar el registro
+ * @param subjectName obtenido con join, para mostrar
  */
 public record SubjectRegistration(
         Integer id,

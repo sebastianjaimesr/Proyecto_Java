@@ -1,7 +1,7 @@
 package com.littlehorizons.erp.model.report;
 
 /**
- * Enrollments of one grade in a year, by status.
+ * Matrículas de un grado en un año, por estado.
  */
 public record GradeEnrollmentCount(String gradeName, int level, int active, int completed, int withdrawn) {
 

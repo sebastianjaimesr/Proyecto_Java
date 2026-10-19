@@ -9,9 +9,9 @@ import java.time.LocalTime;
 import java.util.Optional;
 
 /**
- * Validation helpers shared by the services. Views already validate the
- * format of each field; services check again because they are the last layer
- * before the database and can be called from tests or other views.
+ * Ayudas de validación compartidas por los servicios. Las vistas ya validan el
+ * formato de cada campo; los servicios validan otra vez porque son la última capa
+ * antes de la base de datos y pueden llamarse desde pruebas u otras vistas.
  */
 final class ServiceChecks {
 
@@ -63,7 +63,7 @@ final class ServiceChecks {
         }
     }
 
-    /** Sections are stored in upper case so that "a" and "A" are the same group. */
+    /** Las secciones se guardan en mayúsculas para que "a" y "A" sean el mismo grupo. */
     static String normalizeSection(String section) {
         if (section == null || section.isBlank()) {
             return null;

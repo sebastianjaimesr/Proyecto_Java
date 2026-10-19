@@ -34,8 +34,8 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
- * Screens of "2. Gestión académica": subjects, registrations, grades,
- * averages, academic history and attendance.
+ * Pantallas de "2. Gestión académica": materias, inscripciones, notas,
+ * promedios, historial académico y asistencia.
  */
 public class AcademicMenuView {
 
@@ -106,7 +106,7 @@ public class AcademicMenuView {
                 "ASISTENCIA").run();
     }
 
-    // -------------------------------------------------------------- subjects
+    // -------------------------------------------------------------- materias
 
     private void registerSubject() {
         console.printTitle("Registrar materia");
@@ -166,7 +166,7 @@ public class AcademicMenuView {
         console.pause();
     }
 
-    // --------------------------------------------------------- registrations
+    // --------------------------------------------------------- inscripciones
 
     private void registerOne() {
         console.printTitle("Inscribir en una materia");
@@ -248,7 +248,7 @@ public class AcademicMenuView {
                 .collect(Collectors.toList()));
     }
 
-    // ---------------------------------------------------------------- grades
+    // ---------------------------------------------------------------- notas
 
     private void recordGrade() {
         console.printTitle("Registrar nota");
@@ -450,7 +450,7 @@ public class AcademicMenuView {
         }
     }
 
-    // ------------------------------------------------------------ attendance
+    // ------------------------------------------------------------ asistencia
 
     private void recordGroupAttendance() {
         console.printTitle("Tomar asistencia de un grupo");

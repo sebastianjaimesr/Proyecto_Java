@@ -18,8 +18,8 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
- * Prompts shared by the module views: showing results, choosing records from
- * a search, reading names, enums, years and optional values.
+ * Preguntas compartidas por las vistas de los módulos: mostrar resultados, elegir registros de
+ * una búsqueda, leer nombres, enums, años y valores opcionales.
  */
 public class ViewSupport {
 
@@ -36,7 +36,7 @@ public class ViewSupport {
         return console;
     }
 
-    /** Prints [OK] or [ERROR] with the message and returns the data when it succeeded. */
+    /** Imprime [OK] o [ERROR] con el mensaje y devuelve los datos si tuvo éxito. */
     public <T> Optional<T> show(OperationResult<T> result) {
         if (result.success()) {
             console.printSuccess(result.message());
@@ -46,7 +46,7 @@ public class ViewSupport {
         return Optional.empty();
     }
 
-    /** Like {@link #show} but prints only errors; used for lookups. */
+    /** Como {@link #show}, pero solo imprime los errores; se usa en las búsquedas. */
     public <T> Optional<T> quiet(OperationResult<T> result) {
         if (!result.success()) {
             console.printError(result.message());
@@ -56,8 +56,8 @@ public class ViewSupport {
     }
 
     /**
-     * Asks for a search text, shows the matches and returns the chosen one:
-     * directly when there is a single match, otherwise by its id.
+     * Pide un texto de búsqueda, muestra las coincidencias y devuelve la elegida:
+     * directamente si hay una sola coincidencia; si no, por su id.
      */
     public <T> Optional<T> pick(String entityName, Function<String, OperationResult<List<T>>> search,
                                 Function<T, Integer> idOf, List<String> headers,
@@ -86,7 +86,7 @@ public class ViewSupport {
                 });
     }
 
-    /** Reads first, middle, last and second last name; optional parts may be left blank. */
+    /** Lee primer nombre, segundo nombre, primer apellido y segundo apellido; las partes opcionales pueden quedar vacías. */
     public PersonName readName(PersonName current) {
         String first = readTextOrKeep("Primer nombre", current == null ? null : current.firstName(), true);
         String middle = readTextOrKeep("Segundo nombre (opcional)", current == null ? null : current.middleName(), false);
@@ -97,8 +97,8 @@ public class ViewSupport {
     }
 
     /**
-     * Reads a text. When {@code current} exists, Enter keeps it; for optional
-     * fields "-" clears it.
+     * Lee un texto. Si {@code current} existe, Enter lo conserva; en los campos
+     * opcionales "-" lo borra.
      */
     public String readTextOrKeep(String label, String current, boolean required) {
         String prompt = current == null ? label + ": " : label + " [" + current + "]: ";
@@ -121,7 +121,7 @@ public class ViewSupport {
         }
     }
 
-    /** Optional text validated with {@code parser}; Enter keeps {@code current} (or leaves it empty). */
+    /** Texto opcional validado con {@code parser}; Enter conserva {@code current} (o lo deja vacío). */
     public String readOptional(String label, String current, Function<String, String> parser) {
         String prompt = current == null ? label + " (opcional): " : label + " [" + current + "] ('-' para borrar): ";
         return console.readValid(prompt, raw -> {
@@ -136,7 +136,7 @@ public class ViewSupport {
         });
     }
 
-    /** Chooses one constant of a {@link DbEnum}, showing its Spanish labels. */
+    /** Elige una constante de un {@link DbEnum}, mostrando sus etiquetas en español. */
     public <E extends Enum<E> & DbEnum> E readEnum(String label, Class<E> type) {
         return readEnum(label, Arrays.asList(type.getEnumConstants()));
     }
@@ -152,7 +152,7 @@ public class ViewSupport {
                 ? current : InputValidator.parseInt(raw, "año", 2000, current + 1));
     }
 
-    /** Date with today as the default value. */
+    /** Fecha con hoy como valor por defecto. */
     public LocalDate readDateOrToday(String label) {
         LocalDate today = LocalDate.now();
         return console.readValid(label + " (" + InputValidator.DATE_PATTERN_LABEL + ") [" + today + "]: ",
@@ -164,7 +164,7 @@ public class ViewSupport {
                 label.toLowerCase(java.util.Locale.ROOT));
     }
 
-    /** Time in 24-hour format, for example 7:00 or 14:30. */
+    /** Hora en formato de 24 horas, por ejemplo 7:00 o 14:30. */
     public LocalTime readTime(String label) {
         return console.readValid(label + " (HH:MM, 24 horas): ", raw -> {
             try {

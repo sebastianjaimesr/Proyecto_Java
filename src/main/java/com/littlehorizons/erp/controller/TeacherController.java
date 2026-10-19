@@ -14,8 +14,8 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- * Coordinates "Gestión de profesores" (teachers, assignments and schedules)
- * and the subject catalogue.
+ * Coordina "Gestión de profesores" (profesores, asignaciones y horarios)
+ * y el catálogo de materias.
  */
 public class TeacherController extends BaseController {
 
@@ -77,7 +77,7 @@ public class TeacherController extends BaseController {
                 list -> list.size() + " clase(s) semanales.");
     }
 
-    // --------------------------------------------------------------- subjects
+    // --------------------------------------------------------------- materias
 
     public OperationResult<Subject> registerSubject(Subject draft) {
         return execute(() -> subjectService.register(draft),

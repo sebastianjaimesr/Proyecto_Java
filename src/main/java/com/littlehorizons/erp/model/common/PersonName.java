@@ -5,9 +5,9 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
- * Colombian full name: one or two first names and one or two last names, as
- * stored in the {@code primer_nombre}, {@code segundo_nombre},
- * {@code primer_apellido} and {@code segundo_apellido} columns.
+ * Nombre completo colombiano: uno o dos nombres y uno o dos apellidos, tal como
+ * se guardan en las columnas {@code primer_nombre}, {@code segundo_nombre},
+ * {@code primer_apellido} y {@code segundo_apellido}.
  */
 public record PersonName(String firstName, String middleName, String lastName, String secondLastName) {
 
@@ -16,14 +16,14 @@ public record PersonName(String firstName, String middleName, String lastName, S
         Objects.requireNonNull(lastName, "lastName");
     }
 
-    /** "Primer Segundo Apellido1 Apellido2", skipping missing parts. */
+    /** "Primer Segundo Apellido1 Apellido2", omitiendo las partes que falten. */
     public String fullName() {
         return Stream.of(firstName, middleName, lastName, secondLastName)
                 .filter(part -> part != null && !part.isBlank())
                 .collect(Collectors.joining(" "));
     }
 
-    /** "Apellido1 Apellido2, Primer Segundo" for sorted lists. */
+    /** "Apellido1 Apellido2, Primer Segundo" para listas ordenadas. */
     public String sortableName() {
         String surnames = Stream.of(lastName, secondLastName)
                 .filter(part -> part != null && !part.isBlank())

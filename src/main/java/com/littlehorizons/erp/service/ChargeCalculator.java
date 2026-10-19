@@ -10,11 +10,11 @@ import java.util.Collection;
 import java.util.Objects;
 
 /**
- * Value a student must pay for a concept in a year.
+ * Valor que un estudiante debe pagar por un concepto en un año.
  *
- * <p>Rule: start from the custom value when the student has one, otherwise
- * from {@code conceptos_pago.monto_base}; then subtract the scholarship and
- * sibling discount percentages added together, with a maximum of 100 %.</p>
+ * <p>Regla: se parte del valor personalizado si el estudiante tiene uno; si no,
+ * de {@code conceptos_pago.monto_base}; luego se resta la suma de los porcentajes
+ * de beca y de descuento por hermanos, con un máximo de 100 %.</p>
  */
 public class ChargeCalculator {
 

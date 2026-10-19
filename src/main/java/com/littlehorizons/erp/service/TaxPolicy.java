@@ -8,19 +8,19 @@ import java.util.Map;
 import java.util.Objects;
 
 /**
- * VAT rule applied to invoices (Strategy pattern).
+ * Regla de IVA que se aplica a las facturas (patrón Strategy).
  *
- * <p>The amount paid is the total. When a concept has a VAT rate configured
- * ({@code finance.tax.percent.CODE}), the invoice splits that total into
- * subtotal and VAT; otherwise VAT is shown as "no aplica". The project does
- * not decide which school services are taxed: the rates are configuration.</p>
+ * <p>El monto pagado es el total. Cuando un concepto tiene una tarifa de IVA configurada
+ * ({@code finance.tax.percent.CODIGO}), la factura divide ese total en
+ * subtotal e IVA; si no, el IVA se muestra como "no aplica". El proyecto no
+ * decide qué servicios del colegio están gravados: las tarifas son configuración.</p>
  */
 public interface TaxPolicy {
 
-    /** VAT percentage (0 to 100) for a concept. */
+    /** Porcentaje de IVA (0 a 100) de un concepto. */
     BigDecimal ratePercent(PaymentConcept concept);
 
-    /** Splits a total that already includes VAT. */
+    /** Divide un total que ya incluye el IVA. */
     default Breakdown split(PaymentConcept concept, BigDecimal total) {
         BigDecimal rate = ratePercent(concept);
         if (rate.signum() == 0) {
@@ -31,11 +31,11 @@ public interface TaxPolicy {
         return new Breakdown(subtotal, total.subtract(subtotal), rate, total);
     }
 
-    /** Subtotal + tax = total, with two decimals. */
+    /** Subtotal + impuesto = total, con dos decimales. */
     record Breakdown(BigDecimal subtotal, BigDecimal tax, BigDecimal ratePercent, BigDecimal total) {
     }
 
-    /** Rates from configuration by concept code; concepts without a rate have no VAT. */
+    /** Tarifas de la configuración por código de concepto; los conceptos sin tarifa no tienen IVA. */
     static TaxPolicy configured(Map<String, BigDecimal> ratesByCode) {
         Map<String, BigDecimal> rates = Map.copyOf(Objects.requireNonNull(ratesByCode, "ratesByCode"));
         return concept -> rates.getOrDefault(concept.code(), BigDecimal.ZERO);

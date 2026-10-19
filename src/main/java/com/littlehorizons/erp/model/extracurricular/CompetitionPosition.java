@@ -3,7 +3,7 @@ package com.littlehorizons.erp.model.extracurricular;
 import com.littlehorizons.erp.model.common.DbEnum;
 
 /**
- * Allowed values for {@code participantes_evento.posicion_obtenida}; the column is free text, so the application restricts it to the four values documented in the official script.
+ * Valores permitidos para {@code participantes_evento.posicion_obtenida}; la columna es texto libre, así que la aplicación la limita a los cuatro valores documentados en el script oficial.
  */
 public enum CompetitionPosition implements DbEnum {
 
@@ -23,12 +23,12 @@ public enum CompetitionPosition implements DbEnum {
         return dbValue;
     }
 
-    /** Podium positions can be awarded only once per event. */
+    /** Las posiciones de podio solo se pueden otorgar una vez por evento. */
     public boolean isPodium() {
         return this != PARTICIPANT;
     }
 
-    /** Value stored in MySQL to enum constant. */
+    /** Convierte el valor guardado en MySQL en la constante del enum. */
     public static CompetitionPosition fromDbValue(String value) {
         return DbEnum.fromDbValue(CompetitionPosition.class, value);
     }

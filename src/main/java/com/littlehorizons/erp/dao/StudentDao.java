@@ -9,8 +9,8 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * Persistence of {@code estudiantes}. Students are never deleted: withdrawing
- * a student changes its status, because related tables cascade on delete.
+ * Persistencia de {@code estudiantes}. Los estudiantes nunca se borran: retirar
+ * a un estudiante cambia su estado, porque las tablas relacionadas se borran en cascada.
  */
 public interface StudentDao {
 
@@ -24,6 +24,6 @@ public interface StudentDao {
 
     Optional<Student> findByDocument(Connection connection, String documentNumber) throws SQLException;
 
-    /** Students whose name or document contains {@code text}; all when it is blank. */
+    /** Estudiantes cuyo nombre o documento contiene {@code text}; todos si está vacío. */
     List<Student> search(Connection connection, String text, int limit) throws SQLException;
 }

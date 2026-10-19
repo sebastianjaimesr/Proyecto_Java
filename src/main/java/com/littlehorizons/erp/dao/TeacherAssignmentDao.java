@@ -10,8 +10,8 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * Persistence of {@code asignaciones_profesor} and their weekly slots in
- * {@code horarios_clase} (authorized change P-1).
+ * Persistencia de {@code asignaciones_profesor} y de sus franjas semanales en
+ * {@code horarios_clase} (cambio autorizado P-1).
  */
 public interface TeacherAssignmentDao {
 
@@ -19,11 +19,11 @@ public interface TeacherAssignmentDao {
 
     Optional<TeacherAssignment> findById(Connection connection, int assignmentId) throws SQLException;
 
-    /** Same teacher, subject, year and section (NULL sections compare as equal). */
+    /** Mismo profesor, materia, año y sección (las secciones NULL se comparan como iguales). */
     boolean exists(Connection connection, int teacherId, int subjectId, int academicYear, String section)
             throws SQLException;
 
-    /** Whether the teacher has any assignment for the subject in that year. */
+    /** Si el profesor tiene alguna asignación de la materia en ese año. */
     boolean isAssigned(Connection connection, int teacherId, int subjectId, int academicYear) throws SQLException;
 
     List<TeacherAssignment> findByTeacher(Connection connection, int teacherId, int academicYear) throws SQLException;
@@ -38,15 +38,15 @@ public interface TeacherAssignmentDao {
 
     List<ClassSchedule> findSchedulesByAssignment(Connection connection, int assignmentId) throws SQLException;
 
-    /** Slots of every assignment of the teacher in that year and day. */
+    /** Franjas de todas las asignaciones del profesor en ese año y día. */
     List<ClassSchedule> findTeacherSchedules(Connection connection, int teacherId, int academicYear, WeekDay day)
             throws SQLException;
 
-    /** Slots of every assignment of the grade and section in that year and day. */
+    /** Franjas de todas las asignaciones del grado y sección en ese año y día. */
     List<ClassSchedule> findGroupSchedules(Connection connection, int gradeId, String section, int academicYear,
                                            WeekDay day) throws SQLException;
 
-    /** Weekly timetable of a teacher in that year. */
+    /** Horario semanal de un profesor en ese año. */
     List<ClassSchedule> findTeacherTimetable(Connection connection, int teacherId, int academicYear)
             throws SQLException;
 }

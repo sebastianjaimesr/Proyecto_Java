@@ -3,7 +3,7 @@ package com.littlehorizons.erp.model.academic;
 import com.littlehorizons.erp.model.common.DbEnum;
 
 /**
- * School days of the week used by {@code horarios_clase.dia_semana} (authorized change P-1).
+ * Días de clase de la semana que usa {@code horarios_clase.dia_semana} (cambio autorizado P-1).
  */
 public enum WeekDay implements DbEnum {
 
@@ -25,7 +25,7 @@ public enum WeekDay implements DbEnum {
         return dbValue;
     }
 
-    /** Value stored in MySQL to enum constant. */
+    /** Convierte el valor guardado en MySQL en la constante del enum. */
     public static WeekDay fromDbValue(String value) {
         return DbEnum.fromDbValue(WeekDay.class, value);
     }

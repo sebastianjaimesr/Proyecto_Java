@@ -9,14 +9,14 @@ import java.util.logging.Formatter;
 import java.util.logging.LogRecord;
 
 /**
- * Formats each entry of {@code error_log.txt} with date, level, class, method,
- * message and full stack trace.
+ * Da formato a cada entrada de {@code error_log.txt} con fecha, nivel, clase, método,
+ * mensaje y stack trace completo.
  *
  * <pre>
  * [2026-10-15 14:03:22] SEVERE com.littlehorizons.erp.dao.jdbc.JdbcSystemDao#findStatus
  * Message: Could not read database status
  * java.sql.SQLException: ...
- *     at ...
+ * at ...
  * ----------------------------------------------------------------------
  * </pre>
  */

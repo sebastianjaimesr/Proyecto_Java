@@ -22,7 +22,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
- * Screens of "4. Actividades extracurriculares".
+ * Pantallas de "4. Actividades extracurriculares".
  */
 public class ExtracurricularMenuView {
 
@@ -72,7 +72,7 @@ public class ExtracurricularMenuView {
                 "EVENTOS Y COMPETENCIAS").run();
     }
 
-    // ----------------------------------------------------------------- clubs
+    // ----------------------------------------------------------------- clubes
 
     private Optional<Club> pickClub(boolean onlyActive) {
         Optional<List<Club>> clubs = support.quiet(controller.findClubs(onlyActive));
@@ -214,7 +214,7 @@ public class ExtracurricularMenuView {
                         Formats.text(membership.withdrawalReason()))).collect(Collectors.toList()));
     }
 
-    // ---------------------------------------------------------------- events
+    // ---------------------------------------------------------------- eventos
 
     private Optional<Event> pickEvent() {
         int year = support.readYear("Año del evento");

@@ -3,10 +3,10 @@ package com.littlehorizons.erp.model.academic;
 import java.time.LocalDate;
 
 /**
- * Yearly enrollment of a student in a grade ({@code matriculas}).
+ * Matrícula anual de un estudiante en un grado ({@code matriculas}).
  *
- * @param id        {@code null} before the record is inserted
- * @param gradeName joined from {@code grados}; may be {@code null} on insert
+ * @param id        {@code null} antes de insertar el registro
+ * @param gradeName obtenido de {@code grados}; puede ser {@code null} al insertar
  */
 public record Enrollment(
         Integer id,

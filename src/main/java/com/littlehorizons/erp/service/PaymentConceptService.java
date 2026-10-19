@@ -19,8 +19,8 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- * Catalogue of payment concepts and per-student values (custom value,
- * scholarship, sibling discount).
+ * Catálogo de conceptos de pago y valores por estudiante (valor personalizado,
+ * beca, descuento por hermanos).
  */
 public class PaymentConceptService {
 
@@ -58,7 +58,7 @@ public class PaymentConceptService {
         });
     }
 
-    /** Updates a concept. Payments already registered keep the amount they were paid with. */
+    /** Actualiza un concepto. Los pagos ya registrados conservan el monto con el que se pagaron. */
     public PaymentConcept update(PaymentConcept changes) {
         Objects.requireNonNull(changes.id(), "id");
         PaymentConcept concept = normalize(changes);
@@ -76,8 +76,8 @@ public class PaymentConceptService {
     }
 
     /**
-     * Registers a custom value, scholarship or sibling discount. A sibling
-     * discount requires another active student who shares a guardian.
+     * Registra un valor personalizado, una beca o un descuento por hermanos. El
+     * descuento por hermanos exige otro estudiante activo que comparta un acudiente.
      */
     public PriceAdjustment addAdjustment(PriceAdjustment draft) {
         PriceAdjustment adjustment = validate(draft);
@@ -114,7 +114,7 @@ public class PaymentConceptService {
         return transactions.read(connection -> conceptDao.findAdjustments(connection, studentId, academicYear));
     }
 
-    /** Value the student must pay for the concept in that year, after adjustments. */
+    /** Valor que el estudiante debe pagar por el concepto en ese año, después de los ajustes. */
     public BigDecimal expectedAmount(int studentId, int conceptId, int academicYear) {
         return transactions.read(connection -> {
             PaymentConcept concept = ServiceChecks.require(conceptDao.findById(connection, conceptId),

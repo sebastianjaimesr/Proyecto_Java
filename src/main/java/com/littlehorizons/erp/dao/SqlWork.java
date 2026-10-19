@@ -4,10 +4,10 @@ import java.sql.Connection;
 import java.sql.SQLException;
 
 /**
- * Unit of database work that runs on a connection supplied by a
+ * Unidad de trabajo de base de datos que se ejecuta sobre una conexión entregada por un
  * {@link TransactionManager}.
  *
- * @param <T> result type
+ * @param <T> tipo del resultado
  */
 @FunctionalInterface
 public interface SqlWork<T> {

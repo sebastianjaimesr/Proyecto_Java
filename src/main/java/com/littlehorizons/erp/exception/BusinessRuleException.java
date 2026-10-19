@@ -1,8 +1,8 @@
 package com.littlehorizons.erp.exception;
 
 /**
- * A valid request that breaks a school rule (for example a full club or an
- * unavailable resource). The message is in Spanish and is shown to the user.
+ * Una solicitud válida que rompe una regla del colegio (por ejemplo, un club lleno o un
+ * recurso no disponible). El mensaje está en español y se muestra al usuario.
  */
 public class BusinessRuleException extends ErpException {
 

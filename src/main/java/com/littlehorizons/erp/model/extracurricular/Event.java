@@ -3,12 +3,12 @@ package com.littlehorizons.erp.model.extracurricular;
 import java.time.LocalDate;
 
 /**
- * School event ({@code eventos}).
+ * Evento escolar ({@code eventos}).
  *
- * @param id            {@code null} before the record is inserted
- * @param competition   whether participants can obtain positions
- * @param organizerId   teacher who organizes it; may be {@code null}
- * @param organizerName joined, for display
+ * @param id            {@code null} antes de insertar el registro
+ * @param competition   si los participantes pueden obtener posiciones
+ * @param organizerId   profesor que lo organiza; puede ser {@code null}
+ * @param organizerName obtenido con join, para mostrar
  */
 public record Event(
         Integer id,

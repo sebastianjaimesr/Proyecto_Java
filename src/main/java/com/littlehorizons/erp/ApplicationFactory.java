@@ -91,9 +91,9 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- * Factory that builds the object graph once: DAOs, services, controllers and
- * views, wired through their constructors (dependency injection without a
- * framework). Concrete JDBC classes are only referenced here.
+ * Fábrica que construye una sola vez todo el grafo de objetos: DAOs, servicios, controladores y
+ * vistas, conectados a través de sus constructores (inyección de dependencias sin
+ * framework). Las clases JDBC concretas solo se nombran aquí.
  */
 public final class ApplicationFactory {
 
@@ -139,7 +139,7 @@ public final class ApplicationFactory {
         return new SystemMenuView(console, new SystemController(systemService));
     }
 
-    /** Builds the main menu with every module in the order of the statement. */
+    /** Construye el menú principal con todos los módulos, en el orden del enunciado. */
     public MainMenuView mainMenuView(SystemMenuView systemMenuView) {
         ViewSupport support = new ViewSupport(console);
 

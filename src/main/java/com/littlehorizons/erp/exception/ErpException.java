@@ -1,11 +1,11 @@
 package com.littlehorizons.erp.exception;
 
 /**
- * Base type for every exception raised by the application.
+ * Tipo base de todas las excepciones que lanza la aplicación.
  *
- * <p>It is unchecked so that the DAO and service signatures stay readable; the
- * controller layer is the boundary where these exceptions are translated into
- * messages for the user.</p>
+ * <p>Es no verificada (unchecked) para que las firmas de DAOs y servicios sigan siendo legibles; la
+ * capa de controladores es la frontera donde estas excepciones se traducen a
+ * mensajes para el usuario.</p>
  */
 public abstract class ErpException extends RuntimeException {
 

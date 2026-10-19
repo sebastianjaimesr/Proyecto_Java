@@ -20,7 +20,7 @@ import static com.littlehorizons.erp.dao.jdbc.JdbcSupport.setInteger;
 import static com.littlehorizons.erp.dao.jdbc.JdbcSupport.setString;
 
 /**
- * JDBC implementation of {@link GradeRecordDao}.
+ * Implementación JDBC de {@link GradeRecordDao}.
  */
 public class JdbcGradeRecordDao implements GradeRecordDao {
 

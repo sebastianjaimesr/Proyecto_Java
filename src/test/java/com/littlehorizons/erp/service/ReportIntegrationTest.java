@@ -17,7 +17,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
- * Aggregated reports over a small fixture inserted with SQL.
+ * Reportes agregados sobre unos datos pequeños insertados con SQL.
  */
 class ReportIntegrationTest {
 
@@ -76,7 +76,7 @@ class ReportIntegrationTest {
         assertEquals(2, ranking.size());
         assertEquals(1, ranking.get(0).studentId());
         assertEquals(new BigDecimal("4.5"), ranking.get(0).average());
-        // Student 2: Matemáticas (3.0 + 3.4) / 2 = 3.2
+        // Estudiante 2: Matemáticas (3.0 + 3.4) / 2 = 3.2
         assertEquals(new BigDecimal("3.2"), ranking.get(1).average());
         assertEquals(2, ranking.get(1).position());
     }

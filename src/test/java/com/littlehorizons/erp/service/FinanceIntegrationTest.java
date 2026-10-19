@@ -50,7 +50,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
- * Payments, invoices and overdue report against the MySQL test database.
+ * Pagos, facturas y reporte de morosidad contra la base MySQL de pruebas.
  */
 class FinanceIntegrationTest {
 
@@ -292,7 +292,7 @@ class FinanceIntegrationTest {
                 .filter(row -> row.studentId() == late.id() && row.conceptCode().equals("PENSION"))
                 .findFirst().orElseThrow();
         assertEquals(LocalDate.of(2026, 8, 10), pension.referenceDate());
-        // 2026-09-10 + 35 days = 2026-10-15
+        // 2026-09-10 + 35 días = 2026-10-15
         assertEquals(35, pension.daysOverdue());
         assertNotNull(pension.guardianPhone());
         assertTrue(report.stream().noneMatch(row -> row.studentId() == late.id() && row.conceptCode().equals("MAT")));

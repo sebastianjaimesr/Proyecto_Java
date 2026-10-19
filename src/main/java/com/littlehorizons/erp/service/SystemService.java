@@ -12,12 +12,12 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
- * Checks the database connection and compares the connected database with the
- * official schema provided by the instructor (22 tables).
+ * Revisa la conexión a la base de datos y compara la base conectada con el
+ * esquema oficial entregado por el instructor (22 tablas).
  */
 public class SystemService {
 
-    /** Tables created by the official script, in creation order. */
+    /** Tablas que crea el script oficial, en orden de creación. */
     public static final List<String> OFFICIAL_TABLES = List.of(
             "grados", "estudiantes", "acudientes", "estudiante_acudiente", "matriculas",
             "materias", "profesores", "asignaciones_profesor", "inscripciones_materia",
@@ -34,14 +34,14 @@ public class SystemService {
     }
 
     /**
-     * Connects to the database and lists the official tables that are missing.
+     * Se conecta a la base de datos y lista las tablas oficiales que faltan.
      *
-     * @throws com.littlehorizons.erp.exception.DataAccessException if the
-     *         database cannot be reached
+     * @throws com.littlehorizons.erp.exception.DataAccessException si no se
+     *         puede conectar a la base de datos
      */
     public SchemaStatus checkSchema() {
         DatabaseInfo info = systemDao.findDatabaseInfo();
-        // MySQL on Windows stores table names in lower case, so compare ignoring case.
+        // MySQL en Windows guarda los nombres de tabla en minúsculas, así que se comparan sin distinguir mayúsculas.
         Set<String> existing = info.tableNames().stream()
                 .map(name -> name.toLowerCase(Locale.ROOT))
                 .collect(Collectors.toSet());

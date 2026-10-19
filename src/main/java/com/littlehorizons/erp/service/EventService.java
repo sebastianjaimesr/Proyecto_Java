@@ -21,12 +21,12 @@ import java.util.Objects;
 import java.util.Optional;
 
 /**
- * School events, participants and competition results.
+ * Eventos escolares, participantes y resultados de competencias.
  *
- * <p>Rules: one participation per student and event (UNIQUE
- * participacion_unica); positions only in events with competition; each
- * podium position (1st, 2nd, 3rd) is awarded to one student per event, while
- * "Participante" can be given to many.</p>
+ * <p>Reglas: una participación por estudiante y evento (UNIQUE
+ * participacion_unica); posiciones solo en eventos con competencia; cada
+ * posición de podio (1.º, 2.º, 3.º) se otorga a un solo estudiante por evento, mientras
+ * "Participante" se puede dar a muchos.</p>
  */
 public class EventService {
 
@@ -55,7 +55,7 @@ public class EventService {
         });
     }
 
-    /** Updates an event; competition cannot be turned off once positions exist. */
+    /** Actualiza un evento; la competencia no se puede desactivar si ya hay posiciones. */
     public Event update(Event changes) {
         Objects.requireNonNull(changes.id(), "id");
         Event event = normalize(changes);
@@ -103,7 +103,7 @@ public class EventService {
         });
     }
 
-    /** Records the position obtained by a participant in a competition. */
+    /** Registra la posición que obtuvo un participante en una competencia. */
     public EventParticipant recordResult(int eventId, int studentId, CompetitionPosition position, String notes) {
         if (position == null) {
             throw new ValidationException("La posición es obligatoria.");

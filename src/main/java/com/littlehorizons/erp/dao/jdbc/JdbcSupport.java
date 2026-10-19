@@ -19,22 +19,22 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * Small helpers shared by the JDBC DAOs: null-safe parameter binding, type
- * conversion and result mapping. Every statement is still a
- * {@link PreparedStatement} closed with try-with-resources.
+ * Ayudas pequeñas compartidas por los DAO JDBC: asignar parámetros que pueden ser null,
+ * convertir tipos y mapear resultados. Cada sentencia sigue siendo un
+ * {@link PreparedStatement} cerrado con try-with-resources.
  */
 final class JdbcSupport {
 
     private JdbcSupport() {
     }
 
-    /** Maps one row of a result set. */
+    /** Convierte una fila de un ResultSet en un objeto. */
     @FunctionalInterface
     interface RowMapper<T> {
         T map(ResultSet resultSet) throws SQLException;
     }
 
-    /** Binds the parameters of a statement. */
+    /** Asigna los parámetros de una sentencia. */
     @FunctionalInterface
     interface Binder {
         void bind(PreparedStatement statement) throws SQLException;
@@ -81,7 +81,7 @@ final class JdbcSupport {
         }
     }
 
-    /** Executes an INSERT and returns the generated AUTO_INCREMENT key. */
+    /** Ejecuta un INSERT y devuelve la clave AUTO_INCREMENT generada. */
     static int insert(java.sql.Connection connection, String sql, Binder binder) throws SQLException {
         try (PreparedStatement statement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             binder.bind(statement);
@@ -95,7 +95,7 @@ final class JdbcSupport {
         }
     }
 
-    // ------------------------------------------------------------ parameters
+    // ------------------------------------------------------------ parámetros
 
     static void setString(PreparedStatement statement, int index, String value) throws SQLException {
         if (value == null) {
@@ -141,7 +141,7 @@ final class JdbcSupport {
         setString(statement, index, value == null ? null : value.dbValue());
     }
 
-    // --------------------------------------------------------------- results
+    // --------------------------------------------------------------- resultados
 
     static Integer getInteger(ResultSet resultSet, String column) throws SQLException {
         int value = resultSet.getInt(column);
@@ -163,7 +163,7 @@ final class JdbcSupport {
         return value == null ? null : value.toLocalDateTime();
     }
 
-    /** Escapes LIKE wildcards in user text and wraps it as a "contains" pattern. */
+    /** Escapa los comodines de LIKE (% y _) en el texto del usuario y lo envuelve como patrón "contiene". */
     static String containsPattern(String text) {
         String escaped = text.replace("\\", "\\\\").replace("%", "\\%").replace("_", "\\_");
         return "%" + escaped + "%";

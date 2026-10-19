@@ -1,15 +1,15 @@
 package com.littlehorizons.erp.model.system;
 
 /**
- * Active configuration shown in the "Configuración y estado del sistema" menu.
- * It deliberately has no password field.
+ * Configuración activa que se muestra en el menú "Configuración y estado del sistema".
+ * A propósito no tiene campo de contraseña.
  *
- * @param configFile      configuration file in use
- * @param jdbcUrl         JDBC URL without credentials
- * @param databaseUser    MySQL user name
- * @param errorLogFile    location of error_log.txt
- * @param consoleEncoding charset used for console input and output
- * @param javaVersion     Java runtime version
+ * @param configFile      archivo de configuración en uso
+ * @param jdbcUrl         URL JDBC sin credenciales
+ * @param databaseUser    nombre de usuario de MySQL
+ * @param errorLogFile    ubicación de error_log.txt
+ * @param consoleEncoding codificación usada para la entrada y salida de la consola
+ * @param javaVersion     versión de Java en ejecución
  */
 public record ConfigurationSummary(
         String configFile,

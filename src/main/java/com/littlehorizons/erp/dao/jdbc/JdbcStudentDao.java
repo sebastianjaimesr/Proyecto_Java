@@ -20,7 +20,7 @@ import static com.littlehorizons.erp.dao.jdbc.JdbcSupport.setEnum;
 import static com.littlehorizons.erp.dao.jdbc.JdbcSupport.setString;
 
 /**
- * JDBC implementation of {@link StudentDao}.
+ * Implementación JDBC de {@link StudentDao}.
  */
 public class JdbcStudentDao implements StudentDao {
 
@@ -111,7 +111,7 @@ public class JdbcStudentDao implements StudentDao {
         setEnum(statement, 16, student.status());
     }
 
-    /** Maps the columns listed in {@link #COLUMNS}; reused by joins in other DAOs. */
+    /** Convierte en objeto las columnas listadas en {@link #COLUMNS}; otros DAOs lo reutilizan en sus joins. */
     static Student map(ResultSet resultSet) throws SQLException {
         return new Student(
                 resultSet.getInt("id_estudiante"),

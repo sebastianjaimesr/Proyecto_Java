@@ -19,9 +19,9 @@ import java.util.TreeMap;
 import java.util.stream.Collectors;
 
 /**
- * Inventory of resources. The status "Prestado" is managed only by
- * {@link LoanService}; a loaned resource cannot be sent to maintenance or
- * retired until it is returned.
+ * Inventario de recursos. El estado "Prestado" solo lo maneja
+ * {@link LoanService}; un recurso prestado no se puede enviar a mantenimiento ni
+ * dar de baja hasta que se devuelva.
  */
 public class ResourceService {
 
@@ -55,7 +55,7 @@ public class ResourceService {
         });
     }
 
-    /** Updates data and status. "Prestado" cannot be set or removed here. */
+    /** Actualiza datos y estado. "Prestado" no se puede poner ni quitar aquí. */
     public Resource update(Resource changes) {
         Objects.requireNonNull(changes.id(), "id");
         Resource resource = normalize(changes);
@@ -90,7 +90,7 @@ public class ResourceService {
         return transactions.read(connection -> resourceDao.search(connection, text, categoryId, status, SEARCH_LIMIT));
     }
 
-    /** Number of resources per category and status, for the availability report. */
+    /** Cantidad de recursos por categoría y estado, para el reporte de disponibilidad. */
     public Map<String, Map<ResourceStatus, Long>> availabilityByCategory() {
         List<Resource> resources = search(null, null, null);
         return resources.stream().collect(Collectors.groupingBy(Resource::categoryName, TreeMap::new,

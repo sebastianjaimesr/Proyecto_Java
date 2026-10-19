@@ -3,21 +3,21 @@ package com.littlehorizons.erp.util;
 import java.sql.Connection;
 
 /**
- * Source of JDBC connections.
+ * Fuente de conexiones JDBC.
  *
- * <p>DAOs depend on this abstraction instead of on {@link DatabaseConnection},
- * so tests can supply another implementation (Dependency Inversion).</p>
+ * <p>Los DAO dependen de esta abstracción y no de {@link DatabaseConnection},
+ * así las pruebas pueden entregar otra implementación (Inversión de dependencias).</p>
  */
 @FunctionalInterface
 public interface ConnectionProvider {
 
     /**
-     * Opens a new connection. Each call returns a different connection that the
-     * caller owns and must close, ideally with try-with-resources; connections
-     * are never shared between operations.
+     * Abre una conexión nueva. Cada llamada devuelve una conexión distinta que
+     * pertenece a quien la pide y debe cerrarla, idealmente con try-with-resources; las conexiones
+     * nunca se comparten entre operaciones.
      *
-     * @throws com.littlehorizons.erp.exception.DataAccessException if the
-     *         database cannot be reached
+     * @throws com.littlehorizons.erp.exception.DataAccessException si no se
+     *         puede conectar a la base de datos
      */
     Connection getConnection();
 }

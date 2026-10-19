@@ -6,9 +6,9 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- * Main menu of the application. Its options are supplied by
- * {@link com.littlehorizons.erp.ApplicationFactory}; a module that is not
- * available yet is added with {@link #pending} so it never pretends to work.
+ * Menú principal de la aplicación. Sus opciones las entrega
+ * {@link com.littlehorizons.erp.ApplicationFactory}; un módulo que todavía no
+ * está disponible se agrega con {@link #pending}, así nunca aparenta funcionar.
  */
 public class MainMenuView {
 
@@ -20,12 +20,12 @@ public class MainMenuView {
         this.items = List.copyOf(items);
     }
 
-    /** Shows the main menu until the user chooses "Salir". */
+    /** Muestra el menú principal hasta que el usuario elige "Salir". */
     public void show() {
         Menu.main(console, items, "ERP COLEGIO LITTLE HORIZONS", "Sistema de Gestión Educativa").run();
     }
 
-    /** Option for a module that is still under development. */
+    /** Opción para un módulo que todavía está en desarrollo. */
     public static Menu.Item pending(ConsoleUtils console, String moduleName, int phase) {
         return new Menu.Item(moduleName + " (pendiente)", () -> {
             console.printWarning("El módulo \"" + moduleName + "\" todavía no está disponible. "

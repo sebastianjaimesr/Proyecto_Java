@@ -3,11 +3,11 @@ package com.littlehorizons.erp.model.system;
 import java.util.List;
 
 /**
- * Facts read from the connected MySQL server.
+ * Datos leídos del servidor MySQL conectado.
  *
- * @param serverVersion value of {@code VERSION()}
- * @param databaseName  database selected by the connection
- * @param tableNames    base tables found in that database, in alphabetical order
+ * @param serverVersion valor de {@code VERSION()}
+ * @param databaseName  base de datos seleccionada por la conexión
+ * @param tableNames    tablas encontradas en esa base, en orden alfabético
  */
 public record DatabaseInfo(String serverVersion, String databaseName, List<String> tableNames) {
 

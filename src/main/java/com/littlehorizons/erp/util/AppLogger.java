@@ -11,13 +11,13 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- * Central configuration of {@code java.util.logging} for the application.
+ * Configuración central de {@code java.util.logging} para la aplicación.
  *
- * <p>Warnings and errors from every class under {@code com.littlehorizons.erp}
- * are appended to {@code <logs.dir>/error_log.txt}. Console output of log
- * records is disabled so that stack traces never reach the user.</p>
+ * <p>Las advertencias y errores de todas las clases bajo {@code com.littlehorizons.erp}
+ * se agregan a {@code <logs.dir>/error_log.txt}. La salida de registros por consola
+ * está desactivada para que los stack traces nunca lleguen al usuario.</p>
  *
- * <p>Never pass passwords or unnecessary personal data in log messages.</p>
+ * <p>Nunca pases contraseñas ni datos personales innecesarios en los mensajes de registro.</p>
  */
 public final class AppLogger {
 
@@ -33,10 +33,10 @@ public final class AppLogger {
     }
 
     /**
-     * Creates the logs directory if needed and attaches the file handler.
-     * Calling it again has no effect while the logger is active.
+     * Crea la carpeta de logs si hace falta y conecta el manejador de archivo.
+     * Llamarlo otra vez no tiene efecto mientras el logger esté activo.
      *
-     * @throws ConfigurationException if the log file cannot be created
+     * @throws ConfigurationException si no se puede crear el archivo de registro
      */
     public static synchronized void init(Path logsDirectory) {
         if (fileHandler != null) {
@@ -46,7 +46,7 @@ public final class AppLogger {
         Path file = directory.resolve(ERROR_LOG_FILE);
         try {
             Files.createDirectories(directory);
-            // '%' is a placeholder in FileHandler patterns, so it must be escaped.
+            // '%' es un marcador en los patrones de FileHandler, así que hay que escaparlo.
             FileHandler handler = new FileHandler(file.toString().replace("%", "%%"), true);
             handler.setEncoding(StandardCharsets.UTF_8.name());
             handler.setFormatter(new ErrorLogFormatter());
@@ -62,12 +62,12 @@ public final class AppLogger {
         }
     }
 
-    /** Logger for a class; its records go to {@code error_log.txt}. */
+    /** Logger de una clase; sus registros van a {@code error_log.txt}. */
     public static Logger getLogger(Class<?> type) {
         return Logger.getLogger(type.getName());
     }
 
-    /** Writes an error with its stack trace to {@code error_log.txt}. */
+    /** Escribe un error con su stack trace en {@code error_log.txt}. */
     public static void logError(Class<?> source, String message, Throwable error) {
         Logger logger = getLogger(source);
         if (logger.isLoggable(Level.SEVERE)) {
@@ -75,12 +75,12 @@ public final class AppLogger {
         }
     }
 
-    /** Absolute path of the active log file, or {@code null} before {@link #init(Path)}. */
+    /** Ruta absoluta del archivo de registro activo, o {@code null} antes de {@link #init(Path)}. */
     public static synchronized Path getLogFile() {
         return logFile;
     }
 
-    /** Flushes and closes the log file; used when the application exits. */
+    /** Vacía y cierra el archivo de registro; se usa al salir de la aplicación. */
     public static synchronized void shutdown() {
         if (fileHandler != null) {
             ROOT_LOGGER.removeHandler(fileHandler);
@@ -90,7 +90,7 @@ public final class AppLogger {
         }
     }
 
-    /** Name of the method that called {@link #logError}, for the log entry. */
+    /** Nombre del método que llamó a {@link #logError}, para la entrada del registro. */
     private static String callerMethodName() {
         return StackWalker.getInstance()
                 .walk(frames -> frames

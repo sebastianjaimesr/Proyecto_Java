@@ -3,7 +3,7 @@ package com.littlehorizons.erp.model.academic;
 import com.littlehorizons.erp.model.common.DbEnum;
 
 /**
- * Status of a subject registration ({@code inscripciones_materia.estado}).
+ * Estado de una inscripción a materia ({@code inscripciones_materia.estado}).
  */
 public enum RegistrationStatus implements DbEnum {
 
@@ -22,7 +22,7 @@ public enum RegistrationStatus implements DbEnum {
         return dbValue;
     }
 
-    /** Value stored in MySQL to enum constant. */
+    /** Convierte el valor guardado en MySQL en la constante del enum. */
     public static RegistrationStatus fromDbValue(String value) {
         return DbEnum.fromDbValue(RegistrationStatus.class, value);
     }

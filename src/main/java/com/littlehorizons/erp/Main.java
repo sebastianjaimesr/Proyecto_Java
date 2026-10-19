@@ -14,9 +14,9 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 
 /**
- * Entry point and composition root: reads the configuration, starts the error
- * log and wires views, controllers, services and DAOs through their
- * constructors.
+ * Punto de entrada y raíz de composición: lee la configuración, inicia el registro
+ * de errores y conecta vistas, controladores, servicios y DAOs a través de sus
+ * constructores.
  */
 public final class Main {
 

@@ -38,7 +38,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
- * Inventory, loans, returns and overdue loans against the MySQL test database.
+ * Inventario, préstamos, devoluciones y préstamos vencidos contra la base MySQL de pruebas.
  */
 class ResourceIntegrationTest {
 

@@ -17,7 +17,7 @@ import static com.littlehorizons.erp.dao.jdbc.JdbcSupport.setString;
 import static com.littlehorizons.erp.dao.jdbc.JdbcSupport.setTime;
 
 /**
- * JDBC implementation of {@link TeacherAssignmentDao}.
+ * Implementación JDBC de {@link TeacherAssignmentDao}.
  */
 public class JdbcTeacherAssignmentDao implements TeacherAssignmentDao {
 

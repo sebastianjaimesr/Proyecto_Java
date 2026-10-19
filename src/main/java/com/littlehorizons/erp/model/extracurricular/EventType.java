@@ -3,7 +3,7 @@ package com.littlehorizons.erp.model.extracurricular;
 import com.littlehorizons.erp.model.common.DbEnum;
 
 /**
- * Event categories ({@code eventos.tipo_evento}).
+ * Categorías de evento ({@code eventos.tipo_evento}).
  */
 public enum EventType implements DbEnum {
 
@@ -24,7 +24,7 @@ public enum EventType implements DbEnum {
         return dbValue;
     }
 
-    /** Value stored in MySQL to enum constant. */
+    /** Convierte el valor guardado en MySQL en la constante del enum. */
     public static EventType fromDbValue(String value) {
         return DbEnum.fromDbValue(EventType.class, value);
     }

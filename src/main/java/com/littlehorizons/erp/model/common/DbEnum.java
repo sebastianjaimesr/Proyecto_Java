@@ -3,20 +3,20 @@ package com.littlehorizons.erp.model.common;
 import java.util.Arrays;
 
 /**
- * Enum whose constants map to the exact text stored in a MySQL ENUM or
- * VARCHAR column. Java constant names are in English; the stored values keep
- * the Spanish labels of the official schema (some contain spaces or accents).
+ * Enum cuyas constantes corresponden al texto exacto guardado en una columna ENUM o
+ * VARCHAR de MySQL. Los nombres de las constantes en Java están en inglés; los valores guardados
+ * conservan las etiquetas en español del esquema oficial (algunas tienen espacios o tildes).
  */
 public interface DbEnum {
 
-    /** Exact value stored in the database, also used as the label on screen. */
+    /** Valor exacto guardado en la base de datos; también se usa como etiqueta en pantalla. */
     String dbValue();
 
     /**
-     * Finds the constant for a stored value.
+     * Busca la constante que corresponde a un valor guardado.
      *
-     * @return the constant, or {@code null} when {@code value} is {@code null}
-     * @throws IllegalArgumentException if the value is unknown
+     * @return la constante, o {@code null} cuando {@code value} es {@code null}
+     * @throws IllegalArgumentException si el valor es desconocido
      */
     static <E extends Enum<E> & DbEnum> E fromDbValue(Class<E> type, String value) {
         if (value == null) {

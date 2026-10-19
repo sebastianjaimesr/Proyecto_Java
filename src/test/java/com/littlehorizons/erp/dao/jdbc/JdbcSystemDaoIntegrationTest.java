@@ -15,9 +15,9 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
 /**
- * Runs against the real MySQL database configured in config.properties.
- * It is skipped (not failed) when that file does not exist, for example on a
- * fresh clone before the database is configured.
+ * Se ejecuta contra la base MySQL real configurada en config.properties.
+ * Se omite (no falla) cuando ese archivo no existe, por ejemplo en un
+ * clon recién descargado antes de configurar la base de datos.
  */
 class JdbcSystemDaoIntegrationTest {
 

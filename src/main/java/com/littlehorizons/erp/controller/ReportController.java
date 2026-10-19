@@ -9,9 +9,9 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- * Coordinates the aggregated reports of "Reportes y estadísticas". Reports
- * that already exist in other modules are reached through their own
- * controllers from the report view.
+ * Coordina los reportes agregados de "Reportes y estadísticas". Los reportes
+ * que ya existen en otros módulos se usan a través de sus propios
+ * controladores desde la vista de reportes.
  */
 public class ReportController extends BaseController {
 

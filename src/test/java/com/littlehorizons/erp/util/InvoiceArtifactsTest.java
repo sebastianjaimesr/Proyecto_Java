@@ -20,7 +20,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
- * Simulated CUFE, QR round trip and PDF generation, without a database.
+ * CUFE simulado, ida y vuelta del QR y generación del PDF, sin base de datos.
  */
 class InvoiceArtifactsTest {
 
@@ -70,7 +70,7 @@ class InvoiceArtifactsTest {
 
         assertTrue(Files.size(pdf) > 1000);
         assertEquals("%PDF", new String(Files.readAllBytes(pdf), 0, 4, java.nio.charset.StandardCharsets.US_ASCII));
-        // Read from bytes: a file-based reader can keep the file mapped on Windows.
+        // Se lee desde bytes: un lector basado en archivo puede dejar el archivo bloqueado en Windows.
         PdfReader reader = new PdfReader(Files.readAllBytes(pdf));
         try {
             String text = new PdfTextExtractor(reader).getTextFromPage(1);

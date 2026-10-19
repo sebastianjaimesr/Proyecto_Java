@@ -25,15 +25,15 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- * Invoice numbering, simulated CUFE and QR, and PDF generation.
+ * Numeración de facturas, CUFE y QR simulados, y generación del PDF.
  *
- * <p>Recovery design: the invoice row (number and CUFE) is created in the same
- * transaction as the payment. The PDF is generated afterwards, outside any
- * transaction, because writing a file is slow and cannot be rolled back. If
- * the PDF fails, the payment and invoice stay registered with
- * {@code ruta_archivo = NULL}; the menu option "Regenerar facturas
- * pendientes" builds the PDF again from the stored data without creating a
- * new payment.</p>
+ * <p>Diseño de recuperación: la fila de la factura (número y CUFE) se crea en la misma
+ * transacción que el pago. El PDF se genera después, fuera de cualquier
+ * transacción, porque escribir un archivo es lento y no se puede deshacer. Si
+ * el PDF falla, el pago y la factura quedan registrados con
+ * {@code ruta_archivo = NULL}; la opción del menú "Regenerar facturas
+ * pendientes" vuelve a construir el PDF con los datos guardados, sin crear un
+ * pago nuevo.</p>
  */
 public class InvoiceService {
 
@@ -61,20 +61,20 @@ public class InvoiceService {
         this.pdfGenerator = Objects.requireNonNull(pdfGenerator, "pdfGenerator");
     }
 
-    /** "FE-000123" for invoice id 123. */
+    /** "FE-000123" para la factura con id 123. */
     public static String invoiceNumber(int invoiceId) {
         return String.format("FE-%06d", invoiceId);
     }
 
-    /** "factura_000123.pdf" for invoice id 123. */
+    /** "factura_000123.pdf" para la factura con id 123. */
     public static String fileName(int invoiceId) {
         return String.format("factura_%06d.pdf", invoiceId);
     }
 
     /**
-     * Creates the invoice of a payment inside the caller's transaction. The
-     * consecutive comes from the AUTO_INCREMENT id, so it is unique without
-     * extra locking.
+     * Crea la factura de un pago dentro de la transacción de quien la llama. El
+     * consecutivo sale del id AUTO_INCREMENT, así es único sin
+     * bloqueos adicionales.
      */
     Invoice createInvoice(Connection connection, Payment payment, LocalDateTime issuedAt) throws SQLException {
         if (invoiceDao.findByPayment(connection, payment.id()).isPresent()) {
@@ -87,7 +87,7 @@ public class InvoiceService {
         return invoiceDao.findById(connection, id).orElseThrow();
     }
 
-    /** Outcome of a PDF generation. */
+    /** Resultado de generar un PDF. */
     public record PdfResult(Invoice invoice, Path path, String errorMessage) {
 
         public boolean generated() {
@@ -96,8 +96,8 @@ public class InvoiceService {
     }
 
     /**
-     * Generates the PDF of an invoice and stores its path. Failures are logged
-     * and returned as a message; they never undo the payment.
+     * Genera el PDF de una factura y guarda su ruta. Los errores se registran
+     * y se devuelven como mensaje; nunca deshacen el pago.
      */
     public PdfResult generatePdf(int invoiceId) {
         InvoiceData data = transactions.read(connection -> loadData(connection, invoiceId));
@@ -117,7 +117,7 @@ public class InvoiceService {
         return new PdfResult(updated, written, null);
     }
 
-    /** Retries every invoice whose PDF is missing. */
+    /** Reintenta todas las facturas a las que les falta el PDF. */
     public List<PdfResult> regeneratePending() {
         List<Invoice> pending = transactions.read(invoiceDao::findWithoutPdf);
         return pending.stream().map(invoice -> generatePdf(invoice.id())).toList();
@@ -132,7 +132,7 @@ public class InvoiceService {
                 "El pago " + paymentId + " no tiene factura."));
     }
 
-    /** Builds the printable document; package-private for tests. */
+    /** Construye el documento imprimible; visible en el paquete para las pruebas. */
     InvoiceDocument toDocument(InvoiceData data) {
         Payment payment = data.payment();
         Invoice invoice = data.invoice();
@@ -164,7 +164,7 @@ public class InvoiceService {
         return text.toString();
     }
 
-    /** Stored data needed to print an invoice. */
+    /** Datos guardados que se necesitan para imprimir una factura. */
     record InvoiceData(Invoice invoice, Payment payment, PaymentConcept concept, Guardian guardian) {
     }
 

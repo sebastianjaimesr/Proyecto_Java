@@ -3,7 +3,7 @@ package com.littlehorizons.erp.model.extracurricular;
 import com.littlehorizons.erp.model.common.DbEnum;
 
 /**
- * Role of a student in an event ({@code participantes_evento.rol_participacion}).
+ * Rol de un estudiante en un evento ({@code participantes_evento.rol_participacion}).
  */
 public enum ParticipationRole implements DbEnum {
 
@@ -23,7 +23,7 @@ public enum ParticipationRole implements DbEnum {
         return dbValue;
     }
 
-    /** Value stored in MySQL to enum constant. */
+    /** Convierte el valor guardado en MySQL en la constante del enum. */
     public static ParticipationRole fromDbValue(String value) {
         return DbEnum.fromDbValue(ParticipationRole.class, value);
     }

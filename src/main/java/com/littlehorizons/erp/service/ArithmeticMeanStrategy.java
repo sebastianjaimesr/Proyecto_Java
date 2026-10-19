@@ -5,8 +5,8 @@ import java.math.RoundingMode;
 import java.util.List;
 
 /**
- * Simple arithmetic mean rounded to one decimal with HALF_UP (3.45 becomes
- * 3.5), the same precision as the DECIMAL(2,1) column.
+ * Media aritmética simple redondeada a un decimal con HALF_UP (3.45 queda en
+ * 3.5), la misma precisión de la columna DECIMAL(2,1).
  */
 public class ArithmeticMeanStrategy implements AverageStrategy {
 

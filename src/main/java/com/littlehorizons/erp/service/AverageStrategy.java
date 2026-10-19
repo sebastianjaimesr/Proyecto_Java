@@ -4,18 +4,18 @@ import java.math.BigDecimal;
 import java.util.List;
 
 /**
- * Algorithm used to combine several grades into one (Strategy pattern).
+ * Algoritmo que combina varias notas en una sola (patrón Strategy).
  *
- * <p>The statement does not define weights, so the application uses
- * {@link ArithmeticMeanStrategy}. A weighted rule approved by the instructor
- * would be a new implementation, without changing the services (Open/Closed).</p>
+ * <p>El enunciado no define pesos, así que la aplicación usa
+ * {@link ArithmeticMeanStrategy}. Una regla ponderada aprobada por el instructor
+ * sería una implementación nueva, sin cambiar los servicios (Abierto/Cerrado).</p>
  */
 @FunctionalInterface
 public interface AverageStrategy {
 
     /**
-     * @param values grades between 0.0 and 5.0
-     * @return the combined grade with one decimal, or {@code null} when there are no values
+     * @param values notas entre 0.0 y 5.0
+     * @return la nota combinada con un decimal, o {@code null} si no hay valores
      */
     BigDecimal average(List<BigDecimal> values);
 }

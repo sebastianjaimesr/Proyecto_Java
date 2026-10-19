@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * Persistence of {@code materias}. Subjects are deactivated, not deleted.
+ * Persistencia de {@code materias}. Las materias se desactivan, no se borran.
  */
 public interface SubjectDao {
 
@@ -20,7 +20,7 @@ public interface SubjectDao {
 
     Optional<Subject> findByCode(Connection connection, String code) throws SQLException;
 
-    /** Subjects of a grade; {@code onlyActive} filters out deactivated ones. */
+    /** Materias de un grado; {@code onlyActive} excluye las desactivadas. */
     List<Subject> findByGrade(Connection connection, int gradeId, boolean onlyActive) throws SQLException;
 
     List<Subject> findAll(Connection connection) throws SQLException;

@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- * JDBC implementation of {@link SystemDao} for MySQL.
+ * Implementación JDBC de {@link SystemDao} para MySQL.
  */
 public class JdbcSystemDao implements SystemDao {
 

@@ -1,10 +1,10 @@
 package com.littlehorizons.erp.exception;
 
 /**
- * Technical failure while talking to the database (connection, SQL, mapping).
+ * Falla técnica al comunicarse con la base de datos (conexión, SQL, mapeo).
  *
- * <p>The message is technical and is written to the error log only; the user
- * receives a generic message from the controller layer.</p>
+ * <p>El mensaje es técnico y solo se escribe en el registro de errores; el usuario
+ * recibe un mensaje genérico desde la capa de controladores.</p>
  */
 public class DataAccessException extends ErpException {
 

@@ -22,7 +22,7 @@ import static com.littlehorizons.erp.dao.jdbc.JdbcSupport.setInteger;
 import static com.littlehorizons.erp.dao.jdbc.JdbcSupport.setString;
 
 /**
- * JDBC implementation of {@link PaymentDao}.
+ * Implementación JDBC de {@link PaymentDao}.
  */
 public class JdbcPaymentDao implements PaymentDao {
 
@@ -41,8 +41,8 @@ public class JdbcPaymentDao implements PaymentDao {
     private static final String SQL_SET_RECEIPT = "UPDATE pagos SET numero_recibo = ? WHERE id_pago = ?";
 
     /**
-     * The main guardian is the financial responsible marked as principal; if
-     * none is principal, the financial responsible with the lowest id.
+     * El acudiente principal es el responsable financiero marcado como principal; si
+     * ninguno lo es, el responsable financiero con el id más bajo.
      */
     private static final String SQL_BILLABLE = "SELECT e.id_estudiante, e.numero_documento, "
             + "CONCAT_WS(' ', e.primer_apellido, e.segundo_apellido, e.primer_nombre) AS nombre_estudiante, "

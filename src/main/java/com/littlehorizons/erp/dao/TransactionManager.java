@@ -1,29 +1,29 @@
 package com.littlehorizons.erp.dao;
 
 /**
- * Runs database work on its own connection.
+ * Ejecuta trabajo de base de datos sobre su propia conexión.
  *
- * <p>Services use it to group several DAO calls: everything inside
- * {@link #inTransaction(SqlWork)} is committed together or rolled back
- * together. DAO methods receive the connection as a parameter, so the
- * transaction boundary is always visible in the service code.</p>
+ * <p>Los servicios lo usan para agrupar varias llamadas a DAOs: todo lo que está dentro de
+ * {@link #inTransaction(SqlWork)} se confirma junto (commit) o se deshace junto
+ * (rollback). Los métodos DAO reciben la conexión como parámetro, así el límite
+ * de la transacción siempre es visible en el código del servicio.</p>
  */
 public interface TransactionManager {
 
     /**
-     * Runs {@code work} in a transaction: commit when it returns, rollback when
-     * it throws.
+     * Ejecuta {@code work} en una transacción: commit cuando termina bien, rollback cuando
+     * lanza una excepción.
      *
-     * @throws com.littlehorizons.erp.exception.DataAccessException for SQL errors
-     * @throws com.littlehorizons.erp.exception.BusinessRuleException when a
-     *         unique or foreign key constraint rejects the data
+     * @throws com.littlehorizons.erp.exception.DataAccessException para errores SQL
+     * @throws com.littlehorizons.erp.exception.BusinessRuleException cuando una
+     *         restricción única o de clave foránea rechaza los datos
      */
     <T> T inTransaction(SqlWork<T> work);
 
-    /** Runs read-only work with auto-commit on a fresh connection. */
+    /** Ejecuta trabajo de solo lectura con auto-commit sobre una conexión nueva. */
     <T> T read(SqlWork<T> work);
 
-    /** Convenience for transactional work without a result. */
+    /** Atajo para trabajo transaccional que no devuelve resultado. */
     default void inTransactionVoid(SqlVoidWork work) {
         inTransaction(connection -> {
             work.execute(connection);
@@ -31,7 +31,7 @@ public interface TransactionManager {
         });
     }
 
-    /** Work without a result. */
+    /** Trabajo sin resultado. */
     @FunctionalInterface
     interface SqlVoidWork {
         void execute(java.sql.Connection connection) throws java.sql.SQLException;

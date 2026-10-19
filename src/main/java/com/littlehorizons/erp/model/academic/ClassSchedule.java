@@ -3,10 +3,10 @@ package com.littlehorizons.erp.model.academic;
 import java.time.LocalTime;
 
 /**
- * One weekly class slot of an assignment ({@code horarios_clase}, authorized change P-1).
+ * Una franja semanal de clase de una asignación ({@code horarios_clase}, cambio autorizado P-1).
  *
- * @param id          {@code null} before the record is inserted
- * @param description joined text "subject - section - teacher", for display
+ * @param id          {@code null} antes de insertar el registro
+ * @param description texto obtenido con join "materia - sección - profesor", para mostrar
  */
 public record ClassSchedule(
         Integer id,
@@ -17,7 +17,7 @@ public record ClassSchedule(
         String room,
         String description) {
 
-    /** Two slots overlap when they share the day and their time ranges intersect. */
+    /** Dos franjas se cruzan cuando comparten el día y sus rangos de horas se intersectan. */
     public boolean overlaps(WeekDay otherDay, LocalTime otherStart, LocalTime otherEnd) {
         return day == otherDay && startTime.isBefore(otherEnd) && otherStart.isBefore(endTime);
     }

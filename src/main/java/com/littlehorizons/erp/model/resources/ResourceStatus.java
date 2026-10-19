@@ -3,7 +3,7 @@ package com.littlehorizons.erp.model.resources;
 import com.littlehorizons.erp.model.common.DbEnum;
 
 /**
- * Inventory status ({@code recursos.estado_recurso}).
+ * Estado del inventario ({@code recursos.estado_recurso}).
  */
 public enum ResourceStatus implements DbEnum {
 
@@ -23,7 +23,7 @@ public enum ResourceStatus implements DbEnum {
         return dbValue;
     }
 
-    /** Value stored in MySQL to enum constant. */
+    /** Convierte el valor guardado en MySQL en la constante del enum. */
     public static ResourceStatus fromDbValue(String value) {
         return DbEnum.fromDbValue(ResourceStatus.class, value);
     }

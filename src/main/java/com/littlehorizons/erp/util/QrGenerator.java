@@ -25,8 +25,8 @@ import java.util.EnumMap;
 import java.util.Map;
 
 /**
- * QR codes with ZXing: generation as PNG bytes and reading back (used by the
- * tests to verify the content).
+ * Códigos QR con ZXing: generación como bytes PNG y lectura de vuelta (la usan las
+ * pruebas para verificar el contenido).
  */
 public final class QrGenerator {
 
@@ -35,7 +35,7 @@ public final class QrGenerator {
     private QrGenerator() {
     }
 
-    /** PNG image of a QR code with UTF-8 content and medium error correction. */
+    /** Imagen PNG de un código QR con contenido UTF-8 y corrección de errores media. */
     public static byte[] toPng(String content, int size) {
         Map<EncodeHintType, Object> hints = new EnumMap<>(EncodeHintType.class);
         hints.put(EncodeHintType.CHARACTER_SET, StandardCharsets.UTF_8.name());
@@ -51,7 +51,7 @@ public final class QrGenerator {
         }
     }
 
-    /** Decodes a QR code from PNG bytes. */
+    /** Decodifica un código QR a partir de bytes PNG. */
     public static String read(byte[] png) {
         try {
             BufferedImage image = ImageIO.read(new ByteArrayInputStream(png));

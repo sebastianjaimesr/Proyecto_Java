@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- * Subjects catalogue per grade.
+ * Catálogo de materias por grado.
  */
 public class SubjectService {
 

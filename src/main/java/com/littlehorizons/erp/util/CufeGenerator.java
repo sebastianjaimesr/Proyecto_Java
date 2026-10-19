@@ -10,17 +10,17 @@ import java.time.format.DateTimeFormatter;
 import java.util.HexFormat;
 
 /**
- * Generates the <strong>simulated</strong> CUFE printed on the invoices.
+ * Genera el CUFE <strong>simulado</strong> que se imprime en las facturas.
  *
- * <p>Documented input (fields joined with "|"):</p>
+ * <p>Entrada documentada (campos unidos con "|"):</p>
  * <pre>
  * numero_factura | NIT configurado | fecha y hora ISO (yyyy-MM-dd'T'HH:mm:ss) | total con 2 decimales
  * ejemplo: FE-000123|900000000-0|2026-10-15T14:30:00|350000.00
  * </pre>
- * <p>The value is the SHA-384 hash of that text in lower-case hexadecimal (96
- * characters, fits in {@code facturas.cufe VARCHAR(100)}). It only imitates
- * the shape of a CUFE: the real DIAN algorithm uses more fields and a
- * technical key assigned by the DIAN, which this project does not have.</p>
+ * <p>El valor es el hash SHA-384 de ese texto en hexadecimal en minúsculas (96
+ * caracteres, cabe en {@code facturas.cufe VARCHAR(100)}). Solo imita
+ * la forma de un CUFE: el algoritmo real de la DIAN usa más campos y una
+ * clave técnica asignada por la DIAN, que este proyecto no tiene.</p>
  */
 public final class CufeGenerator {
 
@@ -30,7 +30,7 @@ public final class CufeGenerator {
     private CufeGenerator() {
     }
 
-    /** Text that is hashed; exposed so the README and tests can show it. */
+    /** Texto al que se le aplica el hash; es público para que el README y las pruebas lo puedan mostrar. */
     public static String input(String invoiceNumber, String nit, LocalDateTime issuedAt, BigDecimal total) {
         return String.join("|", invoiceNumber, nit, ISO_SECONDS.format(issuedAt),
                 total.setScale(2, RoundingMode.HALF_UP).toPlainString());
@@ -42,7 +42,7 @@ public final class CufeGenerator {
             byte[] hash = digest.digest(input(invoiceNumber, nit, issuedAt, total).getBytes(StandardCharsets.UTF_8));
             return HexFormat.of().formatHex(hash);
         } catch (NoSuchAlgorithmException e) {
-            // Every Java SE runtime must provide SHA-384, so this means a broken runtime.
+            // Todo entorno Java SE debe incluir SHA-384, así que esto significa un entorno dañado.
             throw new IllegalStateException("SHA-384 is not available in this Java runtime", e);
         }
     }

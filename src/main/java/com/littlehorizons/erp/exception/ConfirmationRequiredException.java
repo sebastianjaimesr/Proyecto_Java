@@ -1,9 +1,9 @@
 package com.littlehorizons.erp.exception;
 
 /**
- * The operation would replace existing historical data (a grade or an
- * attendance mark). The view asks the user and retries with the correction
- * explicitly allowed.
+ * La operación reemplazaría datos históricos existentes (una nota o una
+ * marca de asistencia). La vista le pregunta al usuario y reintenta con la corrección
+ * permitida explícitamente.
  */
 public class ConfirmationRequiredException extends BusinessRuleException {
 

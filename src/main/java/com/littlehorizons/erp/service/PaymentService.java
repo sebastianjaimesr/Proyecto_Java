@@ -36,8 +36,8 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
- * Registration of payments with their invoice, payment history and account
- * statement (partial versus complete payments).
+ * Registro de pagos con su factura, historial de pagos y estado
+ * de cuenta (pagos parciales frente a completos).
  */
 public class PaymentService {
 
@@ -65,7 +65,7 @@ public class PaymentService {
         this.clock = Objects.requireNonNull(clock, "clock");
     }
 
-    /** Data typed by the user to register a payment. */
+    /** Datos que digita el usuario para registrar un pago. */
     public record PaymentRequest(
             int studentId,
             Integer guardianId,
@@ -79,19 +79,19 @@ public class PaymentService {
             String notes) {
     }
 
-    /** Payment, its invoice and the result of the PDF generation. */
+    /** El pago, su factura y el resultado de generar el PDF. */
     public record PaymentReceipt(Payment payment, Invoice invoice, BigDecimal expectedAmount,
                                  InvoiceService.PdfResult pdf) {
     }
 
     /**
-     * Registers a payment and its invoice in one transaction, then generates
-     * the PDF outside the transaction.
+     * Registra un pago y su factura en una transacción y luego genera
+     * el PDF fuera de la transacción.
      *
-     * <p>Protection against accidental retries: a typed receipt number must be
-     * unique (UNIQUE numero_recibo), and a payment identical to an existing one
-     * (same student, concept, amount, date and method) is only accepted when
-     * {@code confirmDuplicate} is true.</p>
+     * <p>Protección contra reintentos accidentales: un número de recibo digitado debe ser
+     * único (UNIQUE numero_recibo), y un pago idéntico a uno existente
+     * (mismo estudiante, concepto, monto, fecha y método) solo se acepta cuando
+     * {@code confirmDuplicate} es true.</p>
      */
     public PaymentReceipt register(PaymentRequest request, boolean confirmDuplicate) {
         validate(request);
@@ -159,9 +159,9 @@ public class PaymentService {
     }
 
     /**
-     * Expected versus paid per concept. Recurring concepts are compared per
-     * month of payment; the others per year. Only concepts with payments are
-     * listed (pending ones appear in the overdue report).
+     * Valor esperado frente a pagado por concepto. Los conceptos recurrentes se comparan por
+     * mes de pago; los demás, por año. Solo se listan los conceptos con pagos
+     * (los pendientes aparecen en el reporte de morosidad).
      */
     public List<ChargeStatus> statement(int studentId, int academicYear) {
         return transactions.read(connection -> {

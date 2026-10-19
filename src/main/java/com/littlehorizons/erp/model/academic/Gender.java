@@ -3,7 +3,7 @@ package com.littlehorizons.erp.model.academic;
 import com.littlehorizons.erp.model.common.DbEnum;
 
 /**
- * Gender values of {@code estudiantes.genero}.
+ * Valores de género de {@code estudiantes.genero}.
  */
 public enum Gender implements DbEnum {
 
@@ -22,7 +22,7 @@ public enum Gender implements DbEnum {
         return dbValue;
     }
 
-    /** Value stored in MySQL to enum constant. */
+    /** Convierte el valor guardado en MySQL en la constante del enum. */
     public static Gender fromDbValue(String value) {
         return DbEnum.fromDbValue(Gender.class, value);
     }

@@ -5,8 +5,8 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 /**
- * Everything printed on an invoice PDF, already computed. The PDF generator
- * only lays it out.
+ * Todo lo que se imprime en el PDF de una factura, ya calculado. El generador de PDF
+ * solo lo acomoda en la página.
  */
 public record InvoiceDocument(
         String number,
@@ -30,7 +30,7 @@ public record InvoiceDocument(
         lines = List.copyOf(lines);
     }
 
-    /** One detail line: description, quantity, unit value (before tax) and line subtotal. */
+    /** Una línea de detalle: descripción, cantidad, valor unitario (antes de impuestos) y subtotal de la línea. */
     public record Line(String description, int quantity, BigDecimal unitValue, BigDecimal subtotal) {
     }
 }

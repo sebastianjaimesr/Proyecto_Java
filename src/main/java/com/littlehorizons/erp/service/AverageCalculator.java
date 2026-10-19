@@ -17,16 +17,16 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
- * Pure average calculations over grade records, with no database access.
+ * Cálculos puros de promedios sobre registros de notas, sin acceso a la base de datos.
  *
- * <p>Rules (documented in the README):</p>
+ * <p>Reglas (documentadas en el README):</p>
  * <ul>
- *   <li>Subject average: the stored Final grade when it exists; otherwise the
- *       mean of the periods I to IV that have a grade.</li>
- *   <li>General average of a student: mean of the subject averages. Subjects
- *       without grades are excluded (not counted as zero).</li>
- *   <li>Course average of a subject: mean of the subject averages of the
- *       students with grades.</li>
+ * <li>Promedio de materia: la nota Final guardada si existe; si no, la
+ *       media de los períodos I a IV que tengan nota.</li>
+ * <li>Promedio general de un estudiante: media de los promedios de materia. Las materias
+ *       sin notas se excluyen (no cuentan como cero).</li>
+ * <li>Promedio del curso en una materia: media de los promedios de materia de los
+ *       estudiantes con notas.</li>
  * </ul>
  */
 public class AverageCalculator {
@@ -37,7 +37,7 @@ public class AverageCalculator {
         this.strategy = Objects.requireNonNull(strategy, "strategy");
     }
 
-    /** Mean of the regular periods only; used to compute the Final grade. */
+    /** Media solo de los períodos regulares; se usa para calcular la nota Final. */
     public BigDecimal periodMean(Collection<GradeRecord> records) {
         return strategy.average(records.stream()
                 .filter(gradeRecord -> gradeRecord.period().isEditable())
@@ -45,7 +45,7 @@ public class AverageCalculator {
                 .collect(Collectors.toList()));
     }
 
-    /** Average of one subject from the records of one student and year. */
+    /** Promedio de una materia a partir de los registros de un estudiante en un año. */
     public SubjectAverage subjectAverage(int subjectId, String subjectName, Collection<GradeRecord> records) {
         Map<GradingPeriod, BigDecimal> grades = records.stream()
                 .collect(Collectors.toMap(GradeRecord::period, GradeRecord::value,
@@ -55,7 +55,7 @@ public class AverageCalculator {
         return new SubjectAverage(subjectId, subjectName, grades, average, finalGrade != null);
     }
 
-    /** One {@link SubjectAverage} per subject, ordered by subject name. */
+    /** Un {@link SubjectAverage} por materia, ordenado por nombre de materia. */
     public List<SubjectAverage> subjectAverages(Collection<GradeRecord> records) {
         return records.stream()
                 .collect(Collectors.groupingBy(GradeRecord::subjectId))
@@ -66,7 +66,7 @@ public class AverageCalculator {
                 .collect(Collectors.toList());
     }
 
-    /** Mean of the subject averages that exist; {@code null} when none has grades. */
+    /** Media de los promedios de materia que existan; {@code null} si ninguna tiene notas. */
     public BigDecimal generalAverage(Collection<SubjectAverage> subjects) {
         return strategy.average(subjects.stream()
                 .filter(SubjectAverage::hasGrades)
@@ -74,7 +74,7 @@ public class AverageCalculator {
                 .collect(Collectors.toList()));
     }
 
-    /** Average of every student in one subject; records must belong to one subject and year. */
+    /** Promedio de cada estudiante en una materia; los registros deben ser de una sola materia y año. */
     public List<CourseAverageReport.StudentGrade> studentGrades(Collection<GradeRecord> subjectRecords) {
         return subjectRecords.stream()
                 .collect(Collectors.groupingBy(GradeRecord::studentId))
@@ -112,7 +112,7 @@ public class AverageCalculator {
                 .max(order);
     }
 
-    /** Groups records by year, keeping insertion order irrelevant. */
+    /** Agrupa los registros por año, sin importar el orden en que llegaron. */
     public static Map<Integer, List<GradeRecord>> byYear(Collection<GradeRecord> records) {
         return records.stream().collect(Collectors.groupingBy(GradeRecord::academicYear,
                 java.util.TreeMap::new, Collectors.mapping(Function.identity(), Collectors.toList())));

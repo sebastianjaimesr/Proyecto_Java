@@ -25,10 +25,10 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
- * Screens of "1. Gestión de estudiantes y acudientes".
+ * Pantallas de "1. Gestión de estudiantes y acudientes".
  *
- * <p>Lists show masked documents and no medical data; the full record is
- * shown only on the detail screen, and medical data only after confirming.</p>
+ * <p>Las listas muestran documentos enmascarados y ningún dato médico; el registro completo
+ * se muestra solo en la pantalla de detalle, y los datos médicos solo después de confirmar.</p>
  */
 public class StudentMenuView {
 
@@ -61,9 +61,9 @@ public class StudentMenuView {
                 "GESTIÓN DE ESTUDIANTES Y ACUDIENTES").run();
     }
 
-    // ------------------------------------------------------------- students
+    // ------------------------------------------------------------- estudiantes
 
-    /** Shared student picker, also used by other module views. */
+    /** Selector de estudiante compartido; también lo usan las vistas de otros módulos. */
     Optional<Student> pickStudent() {
         return support.pick("estudiante", controller::searchStudents, Student::id, STUDENT_HEADERS,
                 student -> List.of(String.valueOf(student.id()), Formats.maskDocument(student.documentNumber()),
@@ -199,7 +199,7 @@ public class StudentMenuView {
         console.pause();
     }
 
-    // ------------------------------------------------------------ guardians
+    // ------------------------------------------------------------ acudientes
 
     Optional<Guardian> pickGuardian() {
         return support.pick("acudiente", controller::searchGuardians, Guardian::id, GUARDIAN_HEADERS,
@@ -328,7 +328,7 @@ public class StudentMenuView {
         console.pause();
     }
 
-    // ---------------------------------------------------------- enrollments
+    // ---------------------------------------------------------- matrículas
 
     private void enroll() {
         console.printTitle("Matricular estudiante");

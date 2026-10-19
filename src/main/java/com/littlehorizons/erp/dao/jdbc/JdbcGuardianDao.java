@@ -19,7 +19,7 @@ import static com.littlehorizons.erp.dao.jdbc.JdbcSupport.setEnum;
 import static com.littlehorizons.erp.dao.jdbc.JdbcSupport.setString;
 
 /**
- * JDBC implementation of {@link GuardianDao}.
+ * Implementación JDBC de {@link GuardianDao}.
  */
 public class JdbcGuardianDao implements GuardianDao {
 
@@ -185,7 +185,7 @@ public class JdbcGuardianDao implements GuardianDao {
         statement.setBoolean(13, guardian.financialResponsible());
     }
 
-    /** Maps the columns listed in {@link #COLUMNS}. */
+    /** Convierte en objeto las columnas listadas en {@link #COLUMNS}. */
     static Guardian map(ResultSet resultSet) throws SQLException {
         return new Guardian(
                 resultSet.getInt("id_acudiente"),

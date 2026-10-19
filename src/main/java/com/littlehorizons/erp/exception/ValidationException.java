@@ -1,8 +1,8 @@
 package com.littlehorizons.erp.exception;
 
 /**
- * Invalid user input. The message is written in Spanish because it is shown
- * directly to the user so they can correct the value and try again.
+ * Entrada inválida del usuario. El mensaje está en español porque se muestra
+ * directamente al usuario para que corrija el valor y vuelva a intentar.
  */
 public class ValidationException extends ErpException {
 

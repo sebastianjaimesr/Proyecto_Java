@@ -7,7 +7,7 @@ import com.littlehorizons.erp.service.SystemService;
 import java.util.Objects;
 
 /**
- * Coordinates the "Configuración y estado del sistema" menu with
+ * Coordina el menú "Configuración y estado del sistema" con
  * {@link SystemService}.
  */
 public class SystemController extends BaseController {

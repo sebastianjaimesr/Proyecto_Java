@@ -3,7 +3,7 @@ package com.littlehorizons.erp.model.finance;
 import com.littlehorizons.erp.model.common.DbEnum;
 
 /**
- * Payment methods ({@code pagos.metodo_pago}).
+ * Métodos de pago ({@code pagos.metodo_pago}).
  */
 public enum PaymentMethod implements DbEnum {
 
@@ -24,7 +24,7 @@ public enum PaymentMethod implements DbEnum {
         return dbValue;
     }
 
-    /** Value stored in MySQL to enum constant. */
+    /** Convierte el valor guardado en MySQL en la constante del enum. */
     public static PaymentMethod fromDbValue(String value) {
         return DbEnum.fromDbValue(PaymentMethod.class, value);
     }

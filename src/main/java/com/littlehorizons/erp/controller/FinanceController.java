@@ -17,8 +17,8 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- * Coordinates "Gestión financiera": concepts, adjustments, payments, invoices
- * and overdue obligations.
+ * Coordina "Gestión financiera": conceptos, ajustes, pagos, facturas
+ * y obligaciones vencidas.
  */
 public class FinanceController extends BaseController {
 

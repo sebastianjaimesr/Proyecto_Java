@@ -144,6 +144,7 @@ public class JdbcEventDao implements EventDao {
                 statement -> statement.setInt(1, year), JdbcEventDao::mapParticipant);
     }
 
+    /** Asigna los campos del evento a los parámetros ? del INSERT/UPDATE, en orden. */
     private static void bindFields(PreparedStatement statement, Event event) throws SQLException {
         statement.setString(1, event.name());
         setString(statement, 2, event.description());
@@ -155,6 +156,7 @@ public class JdbcEventDao implements EventDao {
         statement.setBoolean(8, event.active());
     }
 
+    /** Convierte una fila de {@code eventos} en un objeto {@link Event}. */
     private static Event map(ResultSet resultSet) throws SQLException {
         return new Event(
                 resultSet.getInt("id_evento"),
@@ -169,6 +171,7 @@ public class JdbcEventDao implements EventDao {
                 resultSet.getBoolean("esta_activo"));
     }
 
+    /** Convierte una fila de {@code participantes_evento} en un objeto {@link EventParticipant}. */
     private static EventParticipant mapParticipant(ResultSet resultSet) throws SQLException {
         return new EventParticipant(
                 resultSet.getInt("id_participacion"),

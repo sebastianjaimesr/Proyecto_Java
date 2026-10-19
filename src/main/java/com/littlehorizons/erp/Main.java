@@ -25,6 +25,10 @@ public final class Main {
     private Main() {
     }
 
+    /**
+     * Arranque del programa: carga la configuración, prepara la consola y el registro de errores,
+     * y si todo está bien ejecuta la aplicación. Si la configuración falla, muestra cómo corregirla.
+     */
     public static void main(String[] args) {
         AppConfig config = null;
         ConfigurationException configError = null;
@@ -61,6 +65,10 @@ public final class Main {
         }
     }
 
+    /**
+     * Arma la aplicación completa con {@link ApplicationFactory}, revisa la conexión a MySQL
+     * y muestra el menú principal hasta que el usuario sale.
+     */
     private static void run(AppConfig config, ConsoleUtils console) {
         DatabaseConnection connection = DatabaseConnection.getInstance();
         Path logFile = AppLogger.getLogFile();

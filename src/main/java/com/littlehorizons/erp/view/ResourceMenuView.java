@@ -44,6 +44,7 @@ public class ResourceMenuView {
         this.teacherView = Objects.requireNonNull(teacherView, "teacherView");
     }
 
+    /** Muestra el submenú de "Gestión de recursos". */
     public void show() {
         Menu.submenu(console, List.of(
                         new Menu.Item("Registrar recurso", this::register),
@@ -58,6 +59,7 @@ public class ResourceMenuView {
                 "GESTIÓN DE RECURSOS").run();
     }
 
+    /** Muestra las categorías de recursos y deja elegir una. */
     private Optional<ResourceCategory> pickCategory() {
         Optional<List<ResourceCategory>> categories = support.quiet(controller.findCategories());
         if (categories.isEmpty()) {
@@ -67,6 +69,7 @@ public class ResourceMenuView {
         return Optional.of(console.readChoice("Opción: ", categories.get(), ResourceCategory::name, "categoría"));
     }
 
+    /** Busca recursos (opcionalmente con un estado) y deja elegir uno. */
     private Optional<Resource> pickResource(ResourceStatus status) {
         String text = console.readLine("Buscar recurso por código o nombre (Enter para listar): ");
         Optional<List<Resource>> resources = support.quiet(controller.searchResources(text, null, status));
@@ -83,12 +86,14 @@ public class ResourceMenuView {
                 });
     }
 
+    /** Imprime una tabla de recursos. */
     private void printResources(List<Resource> resources) {
         console.printTable(RESOURCE_HEADERS, resources.stream().map(resource -> List.of(String.valueOf(resource.id()),
                 resource.code(), resource.name(), resource.categoryName(), Formats.text(resource.location()),
                 resource.status().dbValue())).collect(Collectors.toList()));
     }
 
+    /** Pantalla para registrar un recurso. */
     private void register() {
         console.printTitle("Registrar recurso");
         Optional<ResourceCategory> category = pickCategory();
@@ -108,6 +113,7 @@ public class ResourceMenuView {
         console.pause();
     }
 
+    /** Muestra el inventario con filtros opcionales de texto, categoría y estado. */
     private void list() {
         console.printTitle("Inventario");
         String text = console.readLine("Filtrar por código o nombre (Enter para todos): ");
@@ -119,6 +125,7 @@ public class ResourceMenuView {
         console.pause();
     }
 
+    /** Imprime una tabla con la cantidad de recursos por categoría y estado. */
     void printAvailability(Map<String, Map<ResourceStatus, Long>> availability) {
         console.println("Disponibilidad por categoría:");
         List<String> headers = new java.util.ArrayList<>(List.of("Categoría"));
@@ -132,6 +139,7 @@ public class ResourceMenuView {
         }).collect(Collectors.toList()));
     }
 
+    /** Pantalla para actualizar un recurso o cambiar su estado. */
     private void update() {
         console.printTitle("Actualizar recurso");
         Optional<Resource> selected = pickResource(null);
@@ -158,6 +166,7 @@ public class ResourceMenuView {
         console.pause();
     }
 
+    /** Presta un recurso disponible a un estudiante o profesor. */
     private void lend(BorrowerType type) {
         console.printTitle("Préstamo a " + type.label().toLowerCase(java.util.Locale.ROOT));
         Optional<Resource> resource = pickResource(ResourceStatus.AVAILABLE);
@@ -182,6 +191,7 @@ public class ResourceMenuView {
         console.pause();
     }
 
+    /** Registra la devolución de un préstamo. */
     private void returnLoan() {
         console.printTitle("Registrar devolución");
         Optional<List<Loan>> open = support.quiet(controller.findOpen());
@@ -201,12 +211,14 @@ public class ResourceMenuView {
         console.pause();
     }
 
+    /** Muestra los préstamos sin devolver. */
     private void openLoans() {
         console.printTitle("Préstamos sin devolver");
         support.show(controller.findOpen()).ifPresent(this::printLoans);
         console.pause();
     }
 
+    /** Actualiza los préstamos vencidos y los muestra. */
     private void overdue() {
         console.printTitle("Préstamos vencidos");
         support.show(controller.refreshOverdue());
@@ -214,6 +226,7 @@ public class ResourceMenuView {
         console.pause();
     }
 
+    /** Imprime una tabla de préstamos con sus días de mora (también la usa la vista de reportes). */
     void printLoans(List<Loan> loans) {
         console.printTable(List.of("Id", "Tipo", "Recurso", "Solicitante", "Préstamo", "Devolver", "Estado", "Días de mora"),
                 loans.stream().map(loan -> List.of(String.valueOf(loan.id()), loan.borrowerType().label(),
@@ -222,6 +235,7 @@ public class ResourceMenuView {
                         String.valueOf(controller.daysOverdue(loan)))).collect(Collectors.toList()));
     }
 
+    /** Muestra el historial de préstamos de un estudiante o profesor. */
     private void history() {
         console.printTitle("Historial de préstamos");
         BorrowerType type = console.readChoice("Tipo de solicitante: ", List.of(BorrowerType.values()),

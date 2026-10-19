@@ -169,6 +169,7 @@ public class JdbcGuardianDao implements GuardianDao {
                 JdbcStudentDao::map);
     }
 
+    /** Asigna los campos del acudiente a los parámetros ? del INSERT/UPDATE, en orden. */
     private static void bindFields(PreparedStatement statement, Guardian guardian) throws SQLException {
         setEnum(statement, 1, guardian.documentType());
         statement.setString(2, guardian.documentNumber());

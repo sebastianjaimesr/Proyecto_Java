@@ -39,10 +39,14 @@ public class ResourceService {
         this.clock = Objects.requireNonNull(clock, "clock");
     }
 
+    /** Categorías de recursos del catálogo. */
     public List<ResourceCategory> findCategories() {
         return transactions.read(resourceDao::findCategories);
     }
 
+    /**
+     * Registra un recurso nuevo con estado "Disponible" después de validar que el código no esté repetido.
+     */
     public Resource register(Resource draft) {
         Resource resource = normalize(draft).withStatus(ResourceStatus.AVAILABLE);
         return transactions.inTransaction(connection -> {
@@ -80,12 +84,14 @@ public class ResourceService {
         });
     }
 
+    /** Busca un recurso por su código o lanza un error si no existe. */
     public Resource findByCode(String code) {
         String normalized = InputValidator.validateCode(code, "código", 50);
         return transactions.read(connection -> ServiceChecks.require(resourceDao.findByCode(connection, normalized),
                 "No existe un recurso con el código " + normalized + "."));
     }
 
+    /** Busca recursos por texto, categoría y estado (los filtros null se ignoran). */
     public List<Resource> search(String text, Integer categoryId, ResourceStatus status) {
         return transactions.read(connection -> resourceDao.search(connection, text, categoryId, status, SEARCH_LIMIT));
     }
@@ -98,12 +104,14 @@ public class ResourceService {
                         Collectors.counting())));
     }
 
+    /** Verifica que la categoría exista en el catálogo. */
     private static void checkCategory(List<ResourceCategory> categories, int categoryId) {
         if (categories.stream().noneMatch(category -> category.id() == categoryId)) {
             throw new BusinessRuleException("No existe una categoría con id " + categoryId + ".");
         }
     }
 
+    /** Valida y limpia los datos del recurso (código, nombre, fecha de adquisición no futura). */
     private Resource normalize(Resource resource) {
         String code = InputValidator.validateCode(resource.code(), "código del recurso", 50);
         String name = InputValidator.requireText(resource.name(), "nombre del recurso", 150);

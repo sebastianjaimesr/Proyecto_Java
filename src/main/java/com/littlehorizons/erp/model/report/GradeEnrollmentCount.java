@@ -5,6 +5,7 @@ package com.littlehorizons.erp.model.report;
  */
 public record GradeEnrollmentCount(String gradeName, int level, int active, int completed, int withdrawn) {
 
+    /** Total de matrículas del grado (activas + completadas + retiradas). */
     public int total() {
         return active + completed + withdrawn;
     }

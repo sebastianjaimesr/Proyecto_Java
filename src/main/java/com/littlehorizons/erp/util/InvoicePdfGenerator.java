@@ -69,6 +69,7 @@ public class InvoicePdfGenerator {
         }
     }
 
+    /** Arma el documento PDF completo: encabezado, cliente, detalle, totales, CUFE/QR y aviso legal. */
     private void write(InvoiceDocument invoice, OutputStream output) throws IOException {
         Document document = new Document(PageSize.LETTER, 40, 40, 36, 36);
         try {
@@ -96,6 +97,7 @@ public class InvoicePdfGenerator {
         }
     }
 
+    /** Encabezado de la factura: datos del colegio a la izquierda, número y fechas a la derecha. */
     private static PdfPTable header(InvoiceDocument invoice) {
         PdfPTable table = new PdfPTable(new float[] {3, 2});
         table.setWidthPercentage(100);
@@ -122,6 +124,7 @@ public class InvoicePdfGenerator {
         return table;
     }
 
+    /** Tabla con los datos del cliente (acudiente responsable) y del estudiante. */
     private static PdfPTable customer(InvoiceDocument invoice) {
         PdfPTable table = new PdfPTable(new float[] {1, 3});
         table.setWidthPercentage(100);
@@ -137,6 +140,7 @@ public class InvoicePdfGenerator {
         return table;
     }
 
+    /** Tabla de detalle: concepto, cantidad, valor unitario y subtotal. */
     private static PdfPTable details(InvoiceDocument invoice) {
         PdfPTable table = new PdfPTable(new float[] {5, 1, 2, 2});
         table.setWidthPercentage(100);
@@ -155,6 +159,7 @@ public class InvoicePdfGenerator {
         return table;
     }
 
+    /** Tabla de totales: subtotal, IVA (o "no aplica") y total. */
     private static PdfPTable totals(InvoiceDocument invoice) {
         PdfPTable table = new PdfPTable(new float[] {8, 2});
         table.setWidthPercentage(100);
@@ -167,6 +172,7 @@ public class InvoicePdfGenerator {
         return table;
     }
 
+    /** Bloque de validación: CUFE simulado y código QR, con el aviso de que es una simulación. */
     private static PdfPTable validation(InvoiceDocument invoice) throws IOException {
         PdfPTable table = new PdfPTable(new float[] {4, 1.6f});
         table.setWidthPercentage(100);
@@ -197,6 +203,7 @@ public class InvoicePdfGenerator {
         return table;
     }
 
+    /** Agrega una fila etiqueta-valor a una tabla (con "-" si el valor está vacío). */
     private static void addRow(PdfPTable table, String label, String value) {
         PdfPCell labelCell = new PdfPCell(new Phrase(label, BOLD));
         labelCell.setBackgroundColor(LIGHT_GRAY);
@@ -207,6 +214,7 @@ public class InvoicePdfGenerator {
         table.addCell(valueCell);
     }
 
+    /** Agrega una fila de total alineada a la derecha. */
     private static void addTotal(PdfPTable table, String label, BigDecimal value, Font font) {
         PdfPCell labelCell = new PdfPCell(new Phrase(label, font));
         labelCell.setHorizontalAlignment(Element.ALIGN_RIGHT);
@@ -219,6 +227,7 @@ public class InvoicePdfGenerator {
         table.addCell(valueCell);
     }
 
+    /** Celda de tabla con texto y alineación. */
     private static PdfPCell cell(String text, int alignment) {
         PdfPCell cell = new PdfPCell(new Phrase(text, NORMAL));
         cell.setHorizontalAlignment(alignment);
@@ -226,6 +235,7 @@ public class InvoicePdfGenerator {
         return cell;
     }
 
+    /** Párrafo vacío pequeño que sirve como espacio entre bloques. */
     private static Paragraph spacer() {
         Paragraph paragraph = new Paragraph(" ", SMALL);
         paragraph.setSpacingAfter(4);

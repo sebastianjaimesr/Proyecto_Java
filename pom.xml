@@ -16,7 +16,7 @@
         <maven.compiler.release>17</maven.compiler.release>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-        <!-- Read by NetBeans "Run Project" and by "mvn exec:java". -->
+        <!-- Clase principal: la usan "Run Project" de NetBeans y "mvn exec:java". -->
         <exec.mainClass>com.littlehorizons.erp.Main</exec.mainClass>
 
         <mysql.connector.version>8.4.0</mysql.connector.version>
@@ -38,13 +38,13 @@
     </dependencyManagement>
 
     <dependencies>
-        <!-- JDBC driver. 8.4.x is the LTS line that matches MySQL Server 8.0/8.4. -->
+        <!-- Driver JDBC. La línea 8.4.x es la LTS compatible con MySQL Server 8.0/8.4. -->
         <dependency>
             <groupId>com.mysql</groupId>
             <artifactId>mysql-connector-j</artifactId>
             <version>${mysql.connector.version}</version>
             <exclusions>
-                <!-- Only needed by the X DevAPI, which this project does not use. -->
+                <!-- Solo la necesita la X DevAPI, que este proyecto no usa. -->
                 <exclusion>
                     <groupId>com.google.protobuf</groupId>
                     <artifactId>protobuf-java</artifactId>
@@ -52,14 +52,14 @@
             </exclusions>
         </dependency>
 
-        <!-- Invoice PDF (LGPL/MPL licensed fork of iText 4). -->
+        <!-- PDF de las facturas (bifurcación de iText 4 con licencia LGPL/MPL). -->
         <dependency>
             <groupId>com.github.librepdf</groupId>
             <artifactId>openpdf</artifactId>
             <version>${openpdf.version}</version>
         </dependency>
 
-        <!-- QR code generation (core) and image rendering/reading (javase). -->
+        <!-- Generación de códigos QR (core) y dibujo/lectura de la imagen (javase). -->
         <dependency>
             <groupId>com.google.zxing</groupId>
             <artifactId>core</artifactId>
@@ -70,7 +70,7 @@
             <artifactId>javase</artifactId>
             <version>${zxing.version}</version>
             <exclusions>
-                <!-- Command line parser of the ZXing tools, not used by the application. -->
+                <!-- Lector de línea de comandos de las herramientas de ZXing; la aplicación no lo usa. -->
                 <exclusion>
                     <groupId>com.beust</groupId>
                     <artifactId>jcommander</artifactId>
@@ -78,7 +78,7 @@
             </exclusions>
         </dependency>
 
-        <!-- Test only: not packaged with the application. -->
+        <!-- Solo para pruebas: no se empaqueta con la aplicación. -->
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter</artifactId>

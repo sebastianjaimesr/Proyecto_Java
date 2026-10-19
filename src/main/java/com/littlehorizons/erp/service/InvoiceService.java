@@ -123,10 +123,12 @@ public class InvoiceService {
         return pending.stream().map(invoice -> generatePdf(invoice.id())).toList();
     }
 
+    /** Facturas que todavía no tienen PDF. */
     public List<Invoice> findPending() {
         return transactions.read(invoiceDao::findWithoutPdf);
     }
 
+    /** Factura de un pago, o un error si el pago no tiene factura. */
     public Invoice findByPayment(int paymentId) {
         return transactions.read(connection -> ServiceChecks.require(invoiceDao.findByPayment(connection, paymentId),
                 "El pago " + paymentId + " no tiene factura."));
@@ -153,6 +155,9 @@ public class InvoiceService {
                 breakdown.subtotal(), breakdown.ratePercent(), breakdown.tax(), breakdown.total(), invoice.cufe(), qr);
     }
 
+    /**
+     * Texto del año y período del pago para la descripción de la factura, por ejemplo " - año 2026 - período I".
+     */
     private static String periodText(Payment payment) {
         StringBuilder text = new StringBuilder();
         if (payment.academicYear() != null) {
@@ -168,6 +173,9 @@ public class InvoiceService {
     record InvoiceData(Invoice invoice, Payment payment, PaymentConcept concept, Guardian guardian) {
     }
 
+    /**
+     * Lee de la base todo lo que se necesita para imprimir una factura: la factura, el pago, el concepto y el acudiente.
+     */
     private InvoiceData loadData(Connection connection, int invoiceId) throws SQLException {
         Invoice invoice = ServiceChecks.require(invoiceDao.findById(connection, invoiceId),
                 "No existe una factura con id " + invoiceId + ".");

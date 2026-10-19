@@ -23,6 +23,7 @@ public record Invoice(
         String pdfFileName,
         String pdfPath) {
 
+    /** Indica si la factura ya tiene su PDF generado. */
     public boolean hasPdf() {
         return pdfPath != null;
     }

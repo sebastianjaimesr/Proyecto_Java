@@ -20,6 +20,11 @@ import java.util.Objects;
 /**
  * Coordina el menú "Gestión de estudiantes y acudientes" con los servicios
  * de estudiantes, acudientes y matrículas.
+ *
+ * <p>Patrón de todos sus métodos: llaman al servicio correspondiente dentro de
+ * {@code execute(...)} (heredado de {@link BaseController}), que devuelve un
+ * {@link OperationResult} con el dato y un mensaje en español; si el servicio lanza
+ * una excepción, la convierte en un mensaje de error para la vista.</p>
  */
 public class StudentController extends BaseController {
 

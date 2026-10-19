@@ -16,6 +16,11 @@ import java.util.Objects;
 /**
  * Coordina "Gestión de profesores" (profesores, asignaciones y horarios)
  * y el catálogo de materias.
+ *
+ * <p>Patrón de todos sus métodos: llaman al servicio correspondiente dentro de
+ * {@code execute(...)} (heredado de {@link BaseController}), que devuelve un
+ * {@link OperationResult} con el dato y un mensaje en español; si el servicio lanza
+ * una excepción, la convierte en un mensaje de error para la vista.</p>
  */
 public class TeacherController extends BaseController {
 

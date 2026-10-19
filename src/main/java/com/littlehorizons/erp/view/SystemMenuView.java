@@ -54,6 +54,7 @@ public class SystemMenuView {
         return status.isComplete();
     }
 
+    /** Prueba la conexión y muestra la versión de MySQL y las tablas oficiales encontradas o faltantes. */
     private void showDatabaseStatus() {
         console.printTitle("Prueba de conexión");
         OperationResult<SchemaStatus> result = controller.checkDatabase();
@@ -80,6 +81,7 @@ public class SystemMenuView {
         console.pause();
     }
 
+    /** Muestra la configuración activa (sin la contraseña). */
     private void showConfiguration() {
         console.printTitle("Configuración activa");
         OperationResult<ConfigurationSummary> result = controller.getConfiguration();

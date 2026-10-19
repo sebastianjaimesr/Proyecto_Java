@@ -23,30 +23,36 @@ final class ServiceChecks {
     private ServiceChecks() {
     }
 
+    /** Devuelve el valor si existe; si no, lanza un error de regla de negocio con el mensaje indicado. */
     static <T> T require(Optional<T> value, String notFoundMessage) {
         return value.orElseThrow(() -> new BusinessRuleException(notFoundMessage));
     }
 
+    /** Valida un texto obligatorio con longitud máxima. */
     static void requireText(String value, String fieldName, int maxLength) {
         InputValidator.requireText(value, fieldName, maxLength);
     }
 
+    /** Valida un texto opcional con longitud máxima. */
     static void optionalText(String value, String fieldName, int maxLength) {
         InputValidator.optionalText(value, fieldName, maxLength);
     }
 
+    /** Si se escribió un correo, valida su formato. */
     static void optionalEmail(String value, String fieldName) {
         if (value != null && !value.isBlank()) {
             InputValidator.validateEmail(value, fieldName);
         }
     }
 
+    /** Si se escribió un teléfono, valida su formato. */
     static void optionalPhone(String value, String fieldName) {
         if (value != null && !value.isBlank()) {
             InputValidator.validatePhone(value, fieldName);
         }
     }
 
+    /** Valida que la fecha exista y no sea posterior a hoy. */
     static void notInFuture(LocalDate date, LocalDate today, String fieldName) {
         if (date == null) {
             throw new ValidationException("El campo " + fieldName + " es obligatorio.");
@@ -56,6 +62,7 @@ final class ServiceChecks {
         }
     }
 
+    /** Valida que el año académico esté en un rango razonable (no demasiado antiguo ni muy en el futuro). */
     static void academicYear(int year, LocalDate today) {
         int max = today.getYear() + MAX_YEARS_AHEAD;
         if (year < MIN_ACADEMIC_YEAR || year > max) {

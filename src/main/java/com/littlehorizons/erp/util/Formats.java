@@ -36,10 +36,12 @@ public final class Formats {
         return value == null ? "-" : value.setScale(1, java.math.RoundingMode.HALF_UP).toPlainString();
     }
 
+    /** Fecha en formato dd/MM/yyyy, o "-" si no hay fecha. */
     public static String date(LocalDate date) {
         return date == null ? "-" : DATE.format(date);
     }
 
+    /** Fecha y hora en formato dd/MM/yyyy HH:mm, o "-" si no hay. */
     public static String dateTime(LocalDateTime dateTime) {
         return dateTime == null ? "-" : DATE_TIME.format(dateTime);
     }
@@ -56,10 +58,12 @@ public final class Formats {
                 + document.substring(document.length() - VISIBLE_DOCUMENT_DIGITS);
     }
 
+    /** El texto, o "-" si está vacío. */
     public static String text(String value) {
         return value == null || value.isBlank() ? "-" : value;
     }
 
+    /** "Sí" o "No". */
     public static String yesNo(boolean value) {
         return value ? "Sí" : "No";
     }

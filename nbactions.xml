@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- NetBeans "Run Project" (F6) and "Debug Project" actions. -->
+<!-- Acciones "Run Project" (F6) y "Debug Project" de NetBeans. -->
 <actions>
     <action>
         <actionName>run</actionName>

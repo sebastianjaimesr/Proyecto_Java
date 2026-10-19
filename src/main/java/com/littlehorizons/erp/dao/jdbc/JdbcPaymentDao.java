@@ -147,6 +147,7 @@ public class JdbcPaymentDao implements PaymentDao {
                         resultSet.getString("telefono")));
     }
 
+    /** Convierte una fila de {@code pagos} en un objeto {@link Payment}. */
     private static Payment map(ResultSet resultSet) throws SQLException {
         return new Payment(
                 resultSet.getInt("id_pago"),

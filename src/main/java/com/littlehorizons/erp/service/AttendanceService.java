@@ -110,6 +110,7 @@ public class AttendanceService {
         });
     }
 
+    /** Historial de asistencia de un estudiante entre dos fechas; valida que el rango tenga sentido. */
     public List<Attendance> history(int studentId, LocalDate from, LocalDate to) {
         if (from == null || to == null || to.isBefore(from)) {
             throw new ValidationException("La fecha final debe ser igual o posterior a la inicial.");
@@ -136,6 +137,9 @@ public class AttendanceService {
         return transactions.read(connection -> attendanceDao.summarizeByStudent(connection, from, to));
     }
 
+    /**
+     * Valida los datos de una marca de asistencia (estado obligatorio, fecha no futura, longitud de las notas).
+     */
     private void validate(LocalDate date, AttendanceStatus status, String notes) {
         if (status == null) {
             throw new ValidationException("El estado de asistencia es obligatorio.");
@@ -144,6 +148,9 @@ public class AttendanceService {
         ServiceChecks.optionalText(notes, "observaciones", MAX_NOTES_LENGTH);
     }
 
+    /**
+     * Verifica que existan el estudiante, la materia y el profesor, y que el profesor esté asignado a la materia.
+     */
     private void checkContext(Connection connection, int studentId, int subjectId, LocalDate date, int teacherId)
             throws SQLException {
         ServiceChecks.require(studentDao.findById(connection, studentId),
@@ -161,6 +168,10 @@ public class AttendanceService {
         }
     }
 
+    /**
+     * Guarda la marca de asistencia: inserta si no existe; si existe, solo la corrige con permiso.
+     * Devuelve true si corrigió un registro existente.
+     */
     private boolean save(Connection connection, Attendance attendance, boolean allowCorrection) throws SQLException {
         Optional<Attendance> existing = attendanceDao.find(connection, attendance.studentId(),
                 attendance.subjectId(), attendance.date());

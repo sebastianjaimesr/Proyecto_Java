@@ -115,16 +115,19 @@ public class StudentService {
         });
     }
 
+    /** Busca un estudiante por id o lanza un error si no existe. */
     public Student findById(int studentId) {
         return transactions.read(connection -> findOrFail(connection, studentId));
     }
 
+    /** Busca un estudiante por número de documento o lanza un error si no existe. */
     public Student findByDocument(String documentNumber) {
         String document = InputValidator.validateDocumentNumber(documentNumber);
         return transactions.read(connection -> ServiceChecks.require(studentDao.findByDocument(connection, document),
                 "No existe un estudiante con el documento " + document + "."));
     }
 
+    /** Busca estudiantes por nombre o documento (con un límite de resultados). */
     public List<Student> search(String text) {
         return transactions.read(connection -> studentDao.search(connection, text, SEARCH_LIMIT));
     }
@@ -139,11 +142,15 @@ public class StudentService {
         });
     }
 
+    /** Busca el estudiante o lanza un error si no existe. */
     private Student findOrFail(Connection connection, int studentId) throws SQLException {
         return ServiceChecks.require(studentDao.findById(connection, studentId),
                 "No existe un estudiante con id " + studentId + ".");
     }
 
+    /**
+     * Verifica que ningún otro estudiante tenga el mismo documento ({@code ownId} es el propio, al actualizar).
+     */
     private void ensureDocumentIsFree(Connection connection, String documentNumber, Integer ownId)
             throws SQLException {
         studentDao.findByDocument(connection, documentNumber)
@@ -154,6 +161,7 @@ public class StudentService {
                 });
     }
 
+    /** Limpia los datos: documento en mayúsculas, textos sin espacios sobrantes y vacíos como null. */
     private Student normalize(Student student) {
         return new Student(student.id(), student.documentType(),
                 InputValidator.validateDocumentNumber(student.documentNumber()),
@@ -166,6 +174,10 @@ public class StudentService {
                 student.admissionDate(), student.status());
     }
 
+    /**
+     * Valida los datos del estudiante: campos obligatorios, fechas no futuras, edad al ingreso
+     * dentro del rango permitido, teléfono y tipo de sangre (A, B, AB u O con + o -).
+     */
     private void validate(Student student) {
         LocalDate today = LocalDate.now(clock);
         if (student.documentType() == null || student.gender() == null) {
@@ -189,6 +201,7 @@ public class StudentService {
         }
     }
 
+    /** Convierte un texto vacío en null; si no, lo devuelve sin espacios a los lados. */
     private static String blankToNull(String value) {
         return value == null || value.isBlank() ? null : value.strip();
     }

@@ -47,6 +47,7 @@ public class JdbcSystemDao implements SystemDao {
         }
     }
 
+    /** Lista los nombres de las tablas de la base de datos indicada (desde information_schema). */
     private static List<String> findTableNames(Connection connection, String databaseName) throws SQLException {
         List<String> tableNames = new ArrayList<>();
         try (PreparedStatement statement = connection.prepareStatement(SQL_TABLE_NAMES)) {

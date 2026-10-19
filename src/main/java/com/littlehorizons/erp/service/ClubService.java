@@ -51,6 +51,7 @@ public class ClubService {
         this.clock = Objects.requireNonNull(clock, "clock");
     }
 
+    /** Crea un club después de validar sus datos, su supervisor y que el nombre no esté repetido. */
     public Club create(Club draft) {
         Club club = normalize(draft);
         return transactions.inTransaction(connection -> {
@@ -85,10 +86,12 @@ public class ClubService {
         });
     }
 
+    /** Lista los clubes; {@code onlyActive} excluye los inactivos. */
     public List<Club> findAll(boolean onlyActive) {
         return transactions.read(connection -> clubDao.findAll(connection, onlyActive));
     }
 
+    /** Busca un club por id o lanza un error si no existe. */
     public Club findById(int clubId) {
         return transactions.read(connection -> ServiceChecks.require(clubDao.findById(connection, clubId),
                 "No existe un club con id " + clubId + "."));
@@ -143,14 +146,17 @@ public class ClubService {
         });
     }
 
+    /** Miembros de un club; {@code onlyActive} excluye los retirados. */
     public List<ClubMembership> findMembers(int clubId, boolean onlyActive) {
         return transactions.read(connection -> clubDao.findMembers(connection, clubId, onlyActive));
     }
 
+    /** Historial de clubes de un estudiante. */
     public List<ClubMembership> findByStudent(int studentId) {
         return transactions.read(connection -> clubDao.findByStudent(connection, studentId));
     }
 
+    /** Si hay supervisor, verifica que el profesor exista y esté activo. */
     private void checkSupervisor(Connection connection, Integer teacherId) throws SQLException {
         if (teacherId == null) {
             return;
@@ -162,6 +168,7 @@ public class ClubService {
         }
     }
 
+    /** Valida y limpia los datos del club (nombre obligatorio, cupo dentro del rango permitido). */
     private static Club normalize(Club club) {
         String name = InputValidator.requireText(club.name(), "nombre del club", MAX_NAME_LENGTH);
         if (club.capacity() < 1 || club.capacity() > MAX_CAPACITY) {

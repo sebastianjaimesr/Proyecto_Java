@@ -12,6 +12,11 @@ import java.util.Objects;
  * Coordina los reportes agregados de "Reportes y estadísticas". Los reportes
  * que ya existen en otros módulos se usan a través de sus propios
  * controladores desde la vista de reportes.
+ *
+ * <p>Patrón de todos sus métodos: llaman al servicio correspondiente dentro de
+ * {@code execute(...)} (heredado de {@link BaseController}), que devuelve un
+ * {@link OperationResult} con el dato y un mensaje en español; si el servicio lanza
+ * una excepción, la convierte en un mensaje de error para la vista.</p>
  */
 public class ReportController extends BaseController {
 

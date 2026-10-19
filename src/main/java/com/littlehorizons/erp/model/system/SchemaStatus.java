@@ -15,10 +15,12 @@ public record SchemaStatus(DatabaseInfo databaseInfo, int expectedTables, List<S
         missingTables = List.copyOf(missingTables);
     }
 
+    /** Indica si la base de datos tiene todas las tablas oficiales. */
     public boolean isComplete() {
         return missingTables.isEmpty();
     }
 
+    /** Cantidad de tablas oficiales que sí se encontraron. */
     public int foundOfficialTables() {
         return expectedTables - missingTables.size();
     }

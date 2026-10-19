@@ -46,6 +46,7 @@ public class EventService {
         this.teacherDao = Objects.requireNonNull(teacherDao, "teacherDao");
     }
 
+    /** Crea un evento después de validar sus datos y su organizador. */
     public Event create(Event draft) {
         Event event = normalize(draft);
         return transactions.inTransaction(connection -> {
@@ -73,15 +74,18 @@ public class EventService {
         });
     }
 
+    /** Busca un evento por id o lanza un error si no existe. */
     public Event findById(int eventId) {
         return transactions.read(connection -> ServiceChecks.require(eventDao.findById(connection, eventId),
                 "No existe un evento con id " + eventId + "."));
     }
 
+    /** Eventos de un año; {@code type} null significa todos los tipos. */
     public List<Event> findByYear(int year, EventType type) {
         return transactions.read(connection -> eventDao.findByYear(connection, year, type));
     }
 
+    /** Inscribe a un estudiante en un evento con un rol (la base de datos impide inscribirlo dos veces). */
     public EventParticipant addParticipant(int eventId, int studentId, ParticipationRole role, String notes) {
         if (role == null) {
             throw new ValidationException("El rol de participación es obligatorio.");
@@ -131,6 +135,7 @@ public class EventService {
         });
     }
 
+    /** Participantes de un evento. */
     public List<EventParticipant> findParticipants(int eventId) {
         return transactions.read(connection -> {
             requireEvent(connection, eventId);
@@ -138,18 +143,22 @@ public class EventService {
         });
     }
 
+    /** Historial de eventos de un estudiante. */
     public List<EventParticipant> findByStudent(int studentId) {
         return transactions.read(connection -> eventDao.findByStudent(connection, studentId));
     }
 
+    /** Resultados de competencias de un año (posiciones registradas). */
     public List<EventParticipant> findResults(int year) {
         return transactions.read(connection -> eventDao.findResults(connection, year));
     }
 
+    /** Busca el evento o lanza un error si no existe. */
     private Event requireEvent(Connection connection, int eventId) throws SQLException {
         return ServiceChecks.require(eventDao.findById(connection, eventId), "No existe un evento con id " + eventId + ".");
     }
 
+    /** Si hay organizador, verifica que el profesor exista. */
     private void checkOrganizer(Connection connection, Integer teacherId) throws SQLException {
         if (teacherId != null) {
             ServiceChecks.require(teacherDao.findById(connection, teacherId),
@@ -157,6 +166,7 @@ public class EventService {
         }
     }
 
+    /** Valida y limpia los datos del evento (tipo y fecha obligatorios, nombre válido). */
     private static Event normalize(Event event) {
         if (event.type() == null || event.date() == null) {
             throw new ValidationException("El tipo y la fecha del evento son obligatorios.");

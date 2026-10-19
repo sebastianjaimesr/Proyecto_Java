@@ -22,6 +22,7 @@ public record Event(
         String organizerName,
         boolean active) {
 
+    /** Copia del evento con el id asignado por la base de datos. */
     public Event withId(int newId) {
         return new Event(newId, name, description, type, date, place, competition, organizerId, organizerName, active);
     }

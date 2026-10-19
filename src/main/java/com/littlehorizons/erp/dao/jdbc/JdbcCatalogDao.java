@@ -30,6 +30,7 @@ public class JdbcCatalogDao implements CatalogDao {
                 JdbcCatalogDao::map);
     }
 
+    /** Convierte una fila de {@code grados} en un objeto {@link Grade}. */
     private static Grade map(ResultSet resultSet) throws SQLException {
         return new Grade(resultSet.getInt("id_grado"), resultSet.getString("nombre_grado"),
                 resultSet.getInt("nivel_numerico"));

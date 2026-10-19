@@ -139,9 +139,11 @@ public class PaymentService {
         return new PaymentReceipt(registered.payment(), pdf.invoice(), registered.expected(), pdf);
     }
 
+    /** Datos que se guardan dentro de la transacción: el pago, su factura y el valor esperado. */
     private record Registered(Payment payment, Invoice invoice, BigDecimal expected) {
     }
 
+    /** Pagos de un estudiante; {@code academicYear} null significa todos los años. */
     public List<Payment> historyByStudent(int studentId, Integer academicYear) {
         return transactions.read(connection -> {
             ServiceChecks.require(studentDao.findById(connection, studentId),
@@ -150,6 +152,7 @@ public class PaymentService {
         });
     }
 
+    /** Pagos hechos por un acudiente o para los estudiantes a su cargo. */
     public List<Payment> historyByGuardian(int guardianId) {
         return transactions.read(connection -> {
             ServiceChecks.require(guardianDao.findById(connection, guardianId),
@@ -184,9 +187,11 @@ public class PaymentService {
         });
     }
 
+    /** Clave para agrupar pagos: concepto y mes (el mes es null en conceptos no recurrentes). */
     private record ChargeKey(int conceptId, Integer month) {
     }
 
+    /** Compara lo esperado con lo pagado y arma el {@link ChargeStatus} (pago completo o parcial). */
     private ChargeStatus toStatus(PaymentConcept concept, int year, Integer month, List<Payment> payments,
                                   List<PriceAdjustment> adjustments) {
         BigDecimal expected = calculator.expectedAmount(concept, adjustments);
@@ -198,6 +203,10 @@ public class PaymentService {
                 balance.max(BigDecimal.ZERO), state);
     }
 
+    /**
+     * Decide qué acudiente aparece como quien pagó: el indicado por el usuario (si está vinculado al
+     * estudiante) o, si no se indicó, el responsable financiero principal.
+     */
     private Guardian resolvePayer(Connection connection, Student student, Integer guardianId) throws SQLException {
         List<GuardianLink> links = guardianDao.findGuardiansOfStudent(connection, student.id());
         if (guardianId != null) {
@@ -216,6 +225,7 @@ public class PaymentService {
                         + "financiero. Registre uno antes de recibir pagos."));
     }
 
+    /** Valida los datos del pago: método obligatorio, monto mayor que cero, fecha no futura y año académico válido. */
     private void validate(PaymentRequest request) {
         if (request.method() == null) {
             throw new ValidationException("El método de pago es obligatorio.");

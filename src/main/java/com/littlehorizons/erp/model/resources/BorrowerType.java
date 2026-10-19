@@ -20,14 +20,17 @@ public enum BorrowerType {
         this.borrowerColumn = borrowerColumn;
     }
 
+    /** Etiqueta en español para mostrar en pantalla. */
     public String label() {
         return label;
     }
 
+    /** Nombre de la tabla de préstamos de este tipo. */
     public String table() {
         return table;
     }
 
+    /** Nombre de la columna que guarda el id de quien pidió prestado. */
     public String borrowerColumn() {
         return borrowerColumn;
     }

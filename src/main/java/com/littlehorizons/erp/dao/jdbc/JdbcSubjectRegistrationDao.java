@@ -101,6 +101,7 @@ public class JdbcSubjectRegistrationDao implements SubjectRegistrationDao {
         }, JdbcStudentDao::map);
     }
 
+    /** Convierte una fila de {@code inscripciones_materia} en un objeto {@link SubjectRegistration}. */
     private static SubjectRegistration map(ResultSet resultSet) throws SQLException {
         return new SubjectRegistration(
                 resultSet.getInt("id_inscripcion"),

@@ -108,6 +108,7 @@ public class JdbcPaymentConceptDao implements PaymentConceptDao {
         JdbcSupport.update(connection, SQL_DELETE_ADJUSTMENT, statement -> statement.setInt(1, adjustmentId));
     }
 
+    /** Asigna los campos del concepto a los parámetros ? del INSERT/UPDATE, en orden. */
     private static void bindFields(PreparedStatement statement, PaymentConcept concept) throws SQLException {
         statement.setString(1, concept.code());
         statement.setString(2, concept.name());
@@ -117,6 +118,7 @@ public class JdbcPaymentConceptDao implements PaymentConceptDao {
         statement.setBoolean(6, concept.active());
     }
 
+    /** Convierte una fila de {@code conceptos_pago} en un objeto {@link PaymentConcept}. */
     private static PaymentConcept map(ResultSet resultSet) throws SQLException {
         return new PaymentConcept(
                 resultSet.getInt("id_concepto"),
@@ -128,6 +130,7 @@ public class JdbcPaymentConceptDao implements PaymentConceptDao {
                 resultSet.getBoolean("esta_activo"));
     }
 
+    /** Convierte una fila de {@code valores_estudiante_concepto} en un objeto {@link PriceAdjustment}. */
     private static PriceAdjustment mapAdjustment(ResultSet resultSet) throws SQLException {
         return new PriceAdjustment(
                 resultSet.getInt("id_valor"),

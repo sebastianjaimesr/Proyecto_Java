@@ -134,6 +134,7 @@ public final class ApplicationFactory {
         this.clock = Clock.systemDefaultZone();
     }
 
+    /** Construye la vista del menú "Configuración y estado del sistema" con su controlador y servicio. */
     public SystemMenuView systemMenuView() {
         SystemService systemService = new SystemService(new JdbcSystemDao(connectionProvider), configurationSummary);
         return new SystemMenuView(console, new SystemController(systemService));

@@ -30,6 +30,7 @@ public record Loan(
         return returnDate == null && status != LoanStatus.RETURNED && dueDate.isBefore(today);
     }
 
+    /** Días de atraso del préstamo a la fecha indicada; 0 si no está vencido. */
     public long daysOverdue(LocalDate today) {
         return isOverdueOn(today) ? ChronoUnit.DAYS.between(dueDate, today) : 0;
     }

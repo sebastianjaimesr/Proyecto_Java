@@ -39,6 +39,7 @@ public class TeacherMenuView {
         this.controller = Objects.requireNonNull(controller, "controller");
     }
 
+    /** Muestra el submenú de "Gestión de profesores". */
     public void show() {
         Menu.submenu(console, List.of(
                         new Menu.Item("Registrar profesor", this::registerTeacher),
@@ -52,6 +53,7 @@ public class TeacherMenuView {
                 "GESTIÓN DE PROFESORES").run();
     }
 
+    /** Busca profesores y deja elegir uno (también lo usan otras vistas). */
     Optional<Teacher> pickTeacher() {
         return support.pick("profesor", controller::searchTeachers, Teacher::id, TEACHER_HEADERS,
                 teacher -> List.of(String.valueOf(teacher.id()), Formats.maskDocument(teacher.documentNumber()),
@@ -59,12 +61,14 @@ public class TeacherMenuView {
                         teacher.status().dbValue()));
     }
 
+    /** Pantalla para registrar un profesor. */
     private void registerTeacher() {
         console.printTitle("Registrar profesor");
         support.show(controller.registerTeacher(readTeacher(null)));
         console.pause();
     }
 
+    /** Pantalla para actualizar los datos o el estado de un profesor. */
     private void updateTeacher() {
         console.printTitle("Actualizar profesor");
         Optional<Teacher> selected = pickTeacher();
@@ -77,6 +81,7 @@ public class TeacherMenuView {
         console.pause();
     }
 
+    /** Pide los datos de un profesor; si {@code current} existe, Enter conserva cada valor actual. */
     private Teacher readTeacher(Teacher current) {
         PersonDocumentType documentType = support.readEnum("Tipo de documento", PersonDocumentType.class);
         String document = console.readValid(prompt("Número de documento", current == null ? null
@@ -98,6 +103,7 @@ public class TeacherMenuView {
                 specialization, hireDate, status);
     }
 
+    /** Muestra los profesores, con filtro opcional por texto. */
     private void listTeachers() {
         console.printTitle("Profesores");
         String text = console.readLine("Filtrar por nombre, documento o especialización (Enter para todos): ");
@@ -128,6 +134,7 @@ public class TeacherMenuView {
                 "materia"));
     }
 
+    /** Asigna una materia y una sección a un profesor para un año. */
     private void assign() {
         console.printTitle("Asignar materia");
         Optional<Teacher> teacher = pickTeacher();
@@ -146,6 +153,7 @@ public class TeacherMenuView {
         console.pause();
     }
 
+    /** Muestra las asignaciones de un profesor en un año. */
     private void listAssignments() {
         console.printTitle("Asignaciones");
         Optional<Teacher> teacher = pickTeacher();
@@ -158,6 +166,7 @@ public class TeacherMenuView {
         console.pause();
     }
 
+    /** Imprime una tabla de asignaciones. */
     private void printAssignments(List<TeacherAssignment> assignments) {
         console.printTable(List.of("Id", "Materia", "Año", "Sección"), assignments.stream()
                 .map(assignment -> List.of(String.valueOf(assignment.id()), assignment.subjectName(),
@@ -165,6 +174,7 @@ public class TeacherMenuView {
                 .collect(Collectors.toList()));
     }
 
+    /** Elige un profesor y luego una de sus asignaciones. */
     private Optional<TeacherAssignment> pickAssignment() {
         Optional<Teacher> teacher = pickTeacher();
         if (teacher.isEmpty()) {
@@ -182,6 +192,7 @@ public class TeacherMenuView {
                 "asignación"));
     }
 
+    /** Agrega una franja de horario a una asignación (el servicio rechaza los cruces). */
     private void addSchedule() {
         console.printTitle("Registrar horario de clase");
         Optional<TeacherAssignment> assignment = pickAssignment();
@@ -197,6 +208,7 @@ public class TeacherMenuView {
         console.pause();
     }
 
+    /** Muestra el horario semanal de un profesor. */
     private void showTimetable() {
         console.printTitle("Horario semanal");
         Optional<Teacher> teacher = pickTeacher();
@@ -209,6 +221,7 @@ public class TeacherMenuView {
         console.pause();
     }
 
+    /** Imprime una tabla de franjas de horario. */
     private void printSchedules(List<ClassSchedule> schedules) {
         console.printTable(List.of("Id", "Día", "Inicio", "Fin", "Clase", "Aula"), schedules.stream()
                 .map(slot -> List.of(String.valueOf(slot.id()), slot.day().dbValue(), slot.startTime().toString(),
@@ -216,6 +229,7 @@ public class TeacherMenuView {
                 .collect(Collectors.toList()));
     }
 
+    /** Elimina una franja del horario de un profesor. */
     private void removeSchedule() {
         console.printTitle("Eliminar bloque de horario");
         Optional<Teacher> teacher = pickTeacher();
@@ -241,6 +255,7 @@ public class TeacherMenuView {
         console.pause();
     }
 
+    /** Texto de la pregunta; si hay un valor actual, lo muestra entre corchetes (Enter lo conserva). */
     private static String prompt(String label, String current) {
         return current == null ? label + ": " : label + " [" + current + "]: ";
     }

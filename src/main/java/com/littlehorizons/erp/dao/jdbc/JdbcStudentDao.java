@@ -92,6 +92,7 @@ public class JdbcStudentDao implements StudentDao {
         }, JdbcStudentDao::map);
     }
 
+    /** Asigna los campos del estudiante a los parámetros ? del INSERT/UPDATE, en orden. */
     private static void bindFields(PreparedStatement statement, Student student) throws SQLException {
         setEnum(statement, 1, student.documentType());
         statement.setString(2, student.documentNumber());

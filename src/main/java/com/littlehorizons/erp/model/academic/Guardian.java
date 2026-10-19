@@ -20,10 +20,12 @@ public record Guardian(
         String occupation,
         boolean financialResponsible) {
 
+    /** Nombre completo del acudiente. */
     public String fullName() {
         return name.fullName();
     }
 
+    /** Copia del acudiente con el id asignado por la base de datos (los records son inmutables). */
     public Guardian withId(int newId) {
         return new Guardian(newId, documentType, documentNumber, name, relationship, mainPhone,
                 secondaryPhone, email, address, occupation, financialResponsible);

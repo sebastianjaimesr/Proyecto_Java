@@ -75,6 +75,7 @@ public class ConsoleUtils implements AutoCloseable {
         }
     }
 
+    /** Codificación de caracteres usada por la consola. */
     public Charset getCharset() {
         return charset;
     }
@@ -102,26 +103,32 @@ public class ConsoleUtils implements AutoCloseable {
         out.println("─".repeat(title.length()));
     }
 
+    /** Imprime una línea de texto. */
     public void println(String text) {
         out.println(text);
     }
 
+    /** Imprime una línea vacía. */
     public void println() {
         out.println();
     }
 
+    /** Imprime un mensaje de éxito con el prefijo [OK]. */
     public void printSuccess(String message) {
         out.println("[OK] " + message);
     }
 
+    /** Imprime un mensaje de error con el prefijo [ERROR]. */
     public void printError(String message) {
         out.println("[ERROR] " + message);
     }
 
+    /** Imprime una advertencia con el prefijo [AVISO]. */
     public void printWarning(String message) {
         out.println("[AVISO] " + message);
     }
 
+    /** Imprime un mensaje informativo con el prefijo [INFO]. */
     public void printInfo(String message) {
         out.println("[INFO] " + message);
     }
@@ -184,50 +191,62 @@ public class ConsoleUtils implements AutoCloseable {
         }
     }
 
+    /** Lee una opción de menú entre {@code min} y {@code max}, repitiendo la pregunta si no es válida. */
     public int readMenuOption(String prompt, int min, int max) {
         return readValid(prompt, raw -> InputValidator.parseMenuOption(raw, min, max));
     }
 
+    /** Lee un texto obligatorio, repitiendo la pregunta si está vacío o es demasiado largo. */
     public String readRequiredText(String prompt, String fieldName, int maxLength) {
         return readValid(prompt, raw -> InputValidator.requireText(raw, fieldName, maxLength));
     }
 
+    /** Lee un texto opcional (puede quedar vacío). */
     public String readOptionalText(String prompt, String fieldName, int maxLength) {
         return readValid(prompt, raw -> InputValidator.optionalText(raw, fieldName, maxLength));
     }
 
+    /** Lee un entero dentro de un rango. */
     public int readInt(String prompt, String fieldName, int min, int max) {
         return readValid(prompt, raw -> InputValidator.parseInt(raw, fieldName, min, max));
     }
 
+    /** Lee un id (entero positivo). */
     public int readId(String prompt, String fieldName) {
         return readValid(prompt, raw -> InputValidator.parseId(raw, fieldName));
     }
 
+    /** Lee una nota entre 0.0 y 5.0. */
     public BigDecimal readGrade(String prompt) {
         return readValid(prompt, InputValidator::parseGrade);
     }
 
+    /** Lee un monto en pesos. */
     public BigDecimal readMoney(String prompt, String fieldName) {
         return readValid(prompt, raw -> InputValidator.parseMoney(raw, fieldName));
     }
 
+    /** Lee una fecha en formato AAAA-MM-DD. */
     public LocalDate readDate(String prompt, String fieldName) {
         return readValid(prompt, raw -> InputValidator.parseDate(raw, fieldName));
     }
 
+    /** Lee un correo electrónico válido. */
     public String readEmail(String prompt, String fieldName) {
         return readValid(prompt, raw -> InputValidator.validateEmail(raw, fieldName));
     }
 
+    /** Lee un número de teléfono válido. */
     public String readPhone(String prompt, String fieldName) {
         return readValid(prompt, raw -> InputValidator.validatePhone(raw, fieldName));
     }
 
+    /** Lee un número de documento de identidad válido. */
     public String readDocumentNumber(String prompt) {
         return readValid(prompt, InputValidator::validateDocumentNumber);
     }
 
+    /** Lee un código de catálogo válido (letras mayúsculas, números, - y _). */
     public String readCode(String prompt, String fieldName, int maxLength) {
         return readValid(prompt, raw -> InputValidator.validateCode(raw, fieldName, maxLength));
     }
@@ -238,10 +257,12 @@ public class ConsoleUtils implements AutoCloseable {
         return readValid(prompt, raw -> InputValidator.parseChoice(raw, options, labelOf, fieldName));
     }
 
+    /** Hace una pregunta de sí o no y devuelve true si la respuesta es sí. */
     public boolean confirm(String question) {
         return readValid(question + " (S/N): ", InputValidator::parseYesNo);
     }
 
+    /** Espera a que el usuario presione Enter. */
     public void pause() {
         readLine("Presione Enter para continuar...");
     }
@@ -257,12 +278,16 @@ public class ConsoleUtils implements AutoCloseable {
         }
     }
 
+    /**
+     * Arma una fila de la tabla: cada valor relleno con espacios hasta el ancho de su columna, separado por "|".
+     */
     private static String formatRow(List<String> values, int[] widths) {
         return IntStream.range(0, widths.length)
                 .mapToObj(column -> " " + padRight(valueAt(values, column), widths[column]) + " ")
                 .collect(Collectors.joining("|", "|", "|"));
     }
 
+    /** Valor de la columna indicada, o texto vacío si la fila no tiene esa columna. */
     private static String valueAt(List<String> row, int column) {
         if (column >= row.size() || row.get(column) == null) {
             return "";
@@ -270,6 +295,7 @@ public class ConsoleUtils implements AutoCloseable {
         return row.get(column);
     }
 
+    /** Completa el texto con espacios a la derecha hasta el ancho indicado. */
     private static String padRight(String value, int width) {
         return value + " ".repeat(width - value.length());
     }

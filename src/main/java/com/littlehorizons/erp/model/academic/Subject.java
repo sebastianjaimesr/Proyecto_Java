@@ -16,6 +16,7 @@ public record Subject(
         int weeklyHours,
         boolean active) {
 
+    /** Copia de la materia con el id asignado por la base de datos. */
     public Subject withId(int newId) {
         return new Subject(newId, code, name, description, gradeId, gradeName, weeklyHours, active);
     }

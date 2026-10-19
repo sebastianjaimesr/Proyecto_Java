@@ -40,6 +40,7 @@ public class EnrollmentService {
         this.clock = Objects.requireNonNull(clock, "clock");
     }
 
+    /** Lista los grados del catálogo (Preescolar a Once). */
     public List<Grade> findGrades() {
         return transactions.read(catalogDao::findAllGrades);
     }
@@ -100,6 +101,7 @@ public class EnrollmentService {
         });
     }
 
+    /** Historial de matrículas de un estudiante; lanza un error si el estudiante no existe. */
     public List<Enrollment> history(int studentId) {
         return transactions.read(connection -> {
             ServiceChecks.require(studentDao.findById(connection, studentId),

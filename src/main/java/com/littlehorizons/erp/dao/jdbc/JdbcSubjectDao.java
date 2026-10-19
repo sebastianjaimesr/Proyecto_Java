@@ -66,6 +66,7 @@ public class JdbcSubjectDao implements SubjectDao {
         return JdbcSupport.queryList(connection, SELECT + ORDER, JdbcSupport.NO_PARAMETERS, JdbcSubjectDao::map);
     }
 
+    /** Asigna los campos de la materia a los parámetros ? del INSERT/UPDATE, en orden. */
     private static void bindFields(PreparedStatement statement, Subject subject) throws SQLException {
         statement.setString(1, subject.code());
         statement.setString(2, subject.name());
@@ -75,6 +76,7 @@ public class JdbcSubjectDao implements SubjectDao {
         statement.setBoolean(6, subject.active());
     }
 
+    /** Convierte una fila de {@code materias} en un objeto {@link Subject}; otros DAOs lo reutilizan. */
     static Subject map(ResultSet resultSet) throws SQLException {
         return new Subject(
                 resultSet.getInt("id_materia"),

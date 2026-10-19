@@ -89,6 +89,7 @@ public class AverageCalculator {
                 .collect(Collectors.toList());
     }
 
+    /** Promedio del curso: media de los promedios de los estudiantes que tienen notas. */
     public BigDecimal courseAverage(Collection<CourseAverageReport.StudentGrade> students) {
         return strategy.average(students.stream()
                 .map(CourseAverageReport.StudentGrade::average)
@@ -96,14 +97,17 @@ public class AverageCalculator {
                 .collect(Collectors.toList()));
     }
 
+    /** Promedio más alto del curso, si hay alguno. */
     public Optional<BigDecimal> highest(Collection<CourseAverageReport.StudentGrade> students) {
         return extreme(students, Comparator.naturalOrder());
     }
 
+    /** Promedio más bajo del curso, si hay alguno. */
     public Optional<BigDecimal> lowest(Collection<CourseAverageReport.StudentGrade> students) {
         return extreme(students, Comparator.reverseOrder());
     }
 
+    /** Busca el valor extremo (máximo según {@code order}) entre los promedios que existen. */
     private static Optional<BigDecimal> extreme(Collection<CourseAverageReport.StudentGrade> students,
                                                 Comparator<BigDecimal> order) {
         return students.stream()

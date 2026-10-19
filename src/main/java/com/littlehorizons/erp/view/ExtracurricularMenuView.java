@@ -41,6 +41,7 @@ public class ExtracurricularMenuView {
         this.teacherView = Objects.requireNonNull(teacherView, "teacherView");
     }
 
+    /** Muestra el submenú de "Actividades extracurriculares". */
     public void show() {
         Menu.submenu(console, List.of(
                         new Menu.Item("Clubes", this::showClubsMenu),
@@ -48,6 +49,7 @@ public class ExtracurricularMenuView {
                 "ACTIVIDADES EXTRACURRICULARES").run();
     }
 
+    /** Submenú de clubes. */
     private void showClubsMenu() {
         Menu.submenu(console, List.of(
                         new Menu.Item("Crear club", this::createClub),
@@ -60,6 +62,7 @@ public class ExtracurricularMenuView {
                 "CLUBES").run();
     }
 
+    /** Submenú de eventos y competencias. */
     private void showEventsMenu() {
         Menu.submenu(console, List.of(
                         new Menu.Item("Registrar evento", this::createEvent),
@@ -74,6 +77,7 @@ public class ExtracurricularMenuView {
 
     // ----------------------------------------------------------------- clubes
 
+    /** Muestra los clubes y deja elegir uno por su id. */
     private Optional<Club> pickClub(boolean onlyActive) {
         Optional<List<Club>> clubs = support.quiet(controller.findClubs(onlyActive));
         if (clubs.isEmpty() || clubs.get().isEmpty()) {
@@ -86,6 +90,7 @@ public class ExtracurricularMenuView {
                         + (club.active() ? "" : " - inactivo"), "club"));
     }
 
+    /** Pregunta si se asigna un profesor encargado y, si es así, deja elegirlo. */
     private Integer pickSupervisor(Integer current) {
         if (!console.confirm("¿Asignar profesor encargado?")) {
             return current;
@@ -93,6 +98,7 @@ public class ExtracurricularMenuView {
         return teacherView.pickTeacher().map(Teacher::id).orElse(current);
     }
 
+    /** Pantalla para crear un club. */
     private void createClub() {
         console.printTitle("Crear club");
         String name = console.readRequiredText("Nombre del club: ", "nombre", 100);
@@ -108,6 +114,7 @@ public class ExtracurricularMenuView {
         console.pause();
     }
 
+    /** Pantalla para actualizar un club. */
     private void updateClub() {
         console.printTitle("Actualizar club");
         Optional<Club> selected = pickClub(false);
@@ -131,6 +138,7 @@ public class ExtracurricularMenuView {
         console.pause();
     }
 
+    /** Muestra el catálogo de clubes con su ocupación. */
     private void listClubs() {
         console.printTitle("Catálogo de clubes");
         support.show(controller.findClubs(false)).ifPresent(clubs -> console.printTable(
@@ -142,6 +150,7 @@ public class ExtracurricularMenuView {
         console.pause();
     }
 
+    /** Inscribe a un estudiante en un club. */
     private void enroll() {
         console.printTitle("Inscribir en club");
         Optional<Student> student = studentView.pickStudent();
@@ -159,6 +168,7 @@ public class ExtracurricularMenuView {
         console.pause();
     }
 
+    /** Retira a un estudiante de un club, con fecha y motivo. */
     private void withdraw() {
         console.printTitle("Retirar de un club");
         Optional<Student> student = studentView.pickStudent();
@@ -183,6 +193,7 @@ public class ExtracurricularMenuView {
         console.pause();
     }
 
+    /** Muestra los miembros de un club. */
     private void listMembers() {
         console.printTitle("Miembros del club");
         Optional<Club> club = pickClub(false);
@@ -195,6 +206,7 @@ public class ExtracurricularMenuView {
         console.pause();
     }
 
+    /** Muestra los clubes de un estudiante (historial). */
     private void clubsOfStudent() {
         console.printTitle("Clubes del estudiante");
         Optional<Student> student = studentView.pickStudent();
@@ -206,6 +218,7 @@ public class ExtracurricularMenuView {
         console.pause();
     }
 
+    /** Imprime una tabla de membresías. */
     private void printMemberships(List<ClubMembership> memberships) {
         console.printTable(List.of("Id", "Estudiante", "Club", "Ingreso", "Estado", "Retiro", "Motivo"),
                 memberships.stream().map(membership -> List.of(String.valueOf(membership.id()),
@@ -216,6 +229,7 @@ public class ExtracurricularMenuView {
 
     // ---------------------------------------------------------------- eventos
 
+    /** Pide el año, muestra sus eventos y deja elegir uno. */
     private Optional<Event> pickEvent() {
         int year = support.readYear("Año del evento");
         Optional<List<Event>> events = support.quiet(controller.findEvents(year, null));
@@ -229,6 +243,7 @@ public class ExtracurricularMenuView {
                 "evento"));
     }
 
+    /** Pide los datos de un evento; si {@code current} existe, Enter conserva cada valor actual. */
     private Event readEvent(Event current) {
         String name = support.readTextOrKeep("Nombre del evento", current == null ? null : current.name(), true);
         String description = support.readOptional("Descripción", current == null ? null : current.description(),
@@ -249,12 +264,14 @@ public class ExtracurricularMenuView {
                 organizer, null, active);
     }
 
+    /** Pantalla para registrar un evento. */
     private void createEvent() {
         console.printTitle("Registrar evento");
         support.show(controller.createEvent(readEvent(null)));
         console.pause();
     }
 
+    /** Pantalla para actualizar un evento. */
     private void updateEvent() {
         console.printTitle("Actualizar evento");
         Optional<Event> event = pickEvent();
@@ -267,6 +284,7 @@ public class ExtracurricularMenuView {
         console.pause();
     }
 
+    /** Muestra los eventos de un año, opcionalmente de un tipo. */
     private void listEvents() {
         console.printTitle("Eventos");
         int year = support.readYear("Año");
@@ -280,6 +298,7 @@ public class ExtracurricularMenuView {
         console.pause();
     }
 
+    /** Inscribe a un estudiante como participante de un evento. */
     private void addParticipant() {
         console.printTitle("Registrar participante");
         Optional<Event> event = pickEvent();
@@ -299,6 +318,7 @@ public class ExtracurricularMenuView {
         console.pause();
     }
 
+    /** Registra la posición de un participante en una competencia. */
     private void recordResult() {
         console.printTitle("Registrar posición");
         Optional<Event> event = pickEvent();
@@ -322,6 +342,7 @@ public class ExtracurricularMenuView {
         console.pause();
     }
 
+    /** Muestra los participantes y resultados de un evento. */
     private void listParticipants() {
         console.printTitle("Participantes y resultados");
         Optional<Event> event = pickEvent();
@@ -333,6 +354,7 @@ public class ExtracurricularMenuView {
         console.pause();
     }
 
+    /** Muestra los eventos en los que ha participado un estudiante. */
     private void eventsOfStudent() {
         console.printTitle("Participación histórica");
         Optional<Student> student = studentView.pickStudent();
@@ -344,6 +366,7 @@ public class ExtracurricularMenuView {
         console.pause();
     }
 
+    /** Imprime una tabla de participaciones (también la usa la vista de reportes). */
     void printParticipants(List<EventParticipant> participants) {
         console.printTable(List.of("Fecha", "Evento", "Tipo", "Estudiante", "Rol", "Posición"),
                 participants.stream().map(item -> List.of(Formats.date(item.eventDate()), item.eventName(),

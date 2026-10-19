@@ -74,6 +74,7 @@ public class JdbcEnrollmentDao implements EnrollmentDao {
                 statement -> statement.setInt(1, studentId), JdbcEnrollmentDao::map);
     }
 
+    /** Convierte una fila de {@code matriculas} en un objeto {@link Enrollment}. */
     private static Enrollment map(ResultSet resultSet) throws SQLException {
         return new Enrollment(
                 resultSet.getInt("id_matricula"),

@@ -57,6 +57,10 @@ public class LoanService {
         this.clock = Objects.requireNonNull(clock, "clock");
     }
 
+    /**
+     * Presta un recurso: valida las fechas (máximo 90 días), bloquea el recurso, verifica que esté
+     * "Disponible" y que quien pide esté activo, y registra el préstamo y el cambio de estado en una transacción.
+     */
     public Loan lend(BorrowerType type, int resourceId, int borrowerId, LocalDate loanDate, LocalDate dueDate,
                      String notes) {
         Objects.requireNonNull(type, "type");
@@ -123,18 +127,22 @@ public class LoanService {
                 .collect(Collectors.toList());
     }
 
+    /** Préstamos sin devolver (activos o vencidos). */
     public List<Loan> findOpen() {
         return transactions.read(loanDao::findOpen);
     }
 
+    /** Historial de préstamos de un estudiante o profesor. */
     public List<Loan> findByBorrower(BorrowerType type, int borrowerId) {
         return transactions.read(connection -> loanDao.findByBorrower(connection, type, borrowerId));
     }
 
+    /** Días de atraso de un préstamo según la fecha actual. */
     public long daysOverdue(Loan loan) {
         return loan.daysOverdue(LocalDate.now(clock));
     }
 
+    /** Verifica que el estudiante o profesor exista y esté activo; devuelve su nombre. */
     private String requireActiveBorrower(Connection connection, BorrowerType type, int borrowerId)
             throws SQLException {
         if (type == BorrowerType.STUDENT) {

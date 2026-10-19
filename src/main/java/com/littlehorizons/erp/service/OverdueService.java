@@ -87,10 +87,15 @@ public class OverdueService {
         });
     }
 
+    /** Ajustes de precio del estudiante en el año. */
     private List<PriceAdjustment> adjustments(Connection connection, int studentId, int year) throws SQLException {
         return conceptDao.findAdjustments(connection, studentId, year);
     }
 
+    /**
+     * Revisa un concepto de un estudiante y devuelve la obligación vencida, si la hay,
+     * aplicando la regla D-07 (recurrente: último pago con más de un mes; no recurrente: pago incompleto).
+     */
     private Optional<OverdueObligation> evaluate(PaymentDao.BillableStudent student, PaymentConcept concept,
                                                  List<Payment> payments, List<PriceAdjustment> adjustments,
                                                  LocalDate cutoff, LocalDate today) {

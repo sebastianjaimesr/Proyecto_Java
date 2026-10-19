@@ -65,6 +65,7 @@ public class ReportMenuView {
         this.resourceView = Objects.requireNonNull(resourceView, "resourceView");
     }
 
+    /** Muestra el submenú de "Reportes y estadísticas". */
     public void show() {
         Menu.submenu(console, List.of(
                         new Menu.Item("Estudiantes matriculados por grado", this::enrollmentsByGrade),
@@ -84,6 +85,7 @@ public class ReportMenuView {
                 "REPORTES Y ESTADÍSTICAS").run();
     }
 
+    /** Reporte de estudiantes matriculados por grado. */
     private void enrollmentsByGrade() {
         console.printTitle("Estudiantes matriculados por grado");
         int year = support.readYear("Año académico");
@@ -96,6 +98,7 @@ public class ReportMenuView {
         console.pause();
     }
 
+    /** Reporte de promedios de un estudiante. */
     private void studentAverages() {
         console.printTitle("Promedios de un estudiante");
         Optional<Student> student = studentView.pickStudent();
@@ -108,6 +111,7 @@ public class ReportMenuView {
         console.pause();
     }
 
+    /** Reporte del promedio del curso en una materia. */
     private void courseAverage() {
         console.printTitle("Promedio del curso por materia");
         Optional<Subject> subject = teacherView.pickSubject(false);
@@ -121,6 +125,7 @@ public class ReportMenuView {
         console.pause();
     }
 
+    /** Reporte de los mejores promedios generales del año. */
     private void ranking() {
         console.printTitle("Mejores promedios generales");
         int year = support.readYear("Año académico");
@@ -132,6 +137,7 @@ public class ReportMenuView {
         console.pause();
     }
 
+    /** Reporte del historial académico de un estudiante. */
     private void history() {
         console.printTitle("Historial académico");
         Optional<Student> student = studentView.pickStudent();
@@ -143,6 +149,7 @@ public class ReportMenuView {
         console.pause();
     }
 
+    /** Reporte de inasistencias por estudiante en un rango de fechas. */
     private void absences() {
         console.printTitle("Inasistencias por estudiante");
         console.printInfo("Indique el período a analizar (por ejemplo las fechas de un período académico).");
@@ -152,6 +159,7 @@ public class ReportMenuView {
         console.pause();
     }
 
+    /** Reporte de ocupación de los clubes y participación en eventos por tipo. */
     private void participation() {
         console.printTitle("Participación en clubes");
         support.show(reports.clubOccupancy()).ifPresent(rows -> console.printTable(
@@ -169,6 +177,7 @@ public class ReportMenuView {
         console.pause();
     }
 
+    /** Reporte de resultados de competencias de un año. */
     private void competitionResults() {
         console.printTitle("Resultados de competencias");
         int year = support.readYear("Año");
@@ -176,6 +185,7 @@ public class ReportMenuView {
         console.pause();
     }
 
+    /** Reporte de pagos de un estudiante o de un acudiente. */
     private void paymentsByPerson() {
         console.printTitle("Pagos por estudiante o acudiente");
         if (console.confirm("¿Consultar por estudiante? (N = por acudiente)")) {
@@ -192,6 +202,7 @@ public class ReportMenuView {
         console.pause();
     }
 
+    /** Reporte de recaudo del año: total y totales por concepto, método de pago y mes. */
     private void paymentSummary() {
         console.printTitle("Resumen de pagos del año");
         int year = support.readYear("Año académico");
@@ -207,11 +218,13 @@ public class ReportMenuView {
         console.pause();
     }
 
+    /** Imprime una tabla de etiqueta y valor en pesos. */
     private void printAmounts(String label, Map<String, java.math.BigDecimal> amounts) {
         console.printTable(List.of(label, "Valor"), amounts.entrySet().stream()
                 .map(entry -> List.of(entry.getKey(), Formats.money(entry.getValue()))).collect(Collectors.toList()));
     }
 
+    /** Reporte de obligaciones vencidas (morosidad). */
     private void overdue() {
         console.printTitle("Obligaciones vencidas");
         int year = support.readYear("Año académico");
@@ -219,6 +232,7 @@ public class ReportMenuView {
         console.pause();
     }
 
+    /** Reporte de disponibilidad de recursos y lista de recursos prestados. */
     private void resources() {
         console.printTitle("Recursos disponibles y prestados");
         support.quiet(resources.availability()).ifPresent(resourceView::printAvailability);
@@ -230,12 +244,14 @@ public class ReportMenuView {
         console.pause();
     }
 
+    /** Reporte de préstamos vencidos. */
     private void overdueLoans() {
         console.printTitle("Préstamos vencidos");
         support.show(resources.findOverdue()).ifPresent(resourceView::printLoans);
         console.pause();
     }
 
+    /** Reporte de estadísticas generales del colegio. */
     private void statistics() {
         console.printTitle("Estadísticas generales");
         int year = support.readYear("Año académico");
@@ -243,6 +259,7 @@ public class ReportMenuView {
         console.pause();
     }
 
+    /** Imprime las estadísticas generales como tabla de indicador y valor. */
     private void printStatistics(SchoolStatistics stats) {
         console.printTable(List.of("Indicador", "Valor"), List.of(
                 List.of("Estudiantes activos", String.valueOf(stats.activeStudents())),

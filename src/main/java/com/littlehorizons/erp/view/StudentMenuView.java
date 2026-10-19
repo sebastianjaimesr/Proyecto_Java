@@ -45,6 +45,7 @@ public class StudentMenuView {
         this.controller = Objects.requireNonNull(controller, "controller");
     }
 
+    /** Muestra el submenú de "Gestión de estudiantes y acudientes". */
     public void show() {
         Menu.submenu(console, List.of(
                         new Menu.Item("Registrar estudiante", this::registerStudent),
@@ -70,6 +71,7 @@ public class StudentMenuView {
                         student.name().sortableName(), student.status().dbValue()));
     }
 
+    /** Pantalla para registrar un estudiante. */
     private void registerStudent() {
         console.printTitle("Registrar estudiante");
         Student draft = readStudent(null);
@@ -77,6 +79,7 @@ public class StudentMenuView {
         console.pause();
     }
 
+    /** Pantalla para actualizar los datos de un estudiante. */
     private void updateStudent() {
         console.printTitle("Actualizar estudiante");
         Optional<Student> selected = pickStudent();
@@ -90,6 +93,7 @@ public class StudentMenuView {
         console.pause();
     }
 
+    /** Pide los datos de un estudiante; si {@code current} existe, Enter conserva cada valor actual. */
     private Student readStudent(Student current) {
         StudentDocumentType documentType = support.readEnum("Tipo de documento", StudentDocumentType.class);
         String document = console.readValid(prompt("Número de documento", current == null ? null
@@ -120,6 +124,7 @@ public class StudentMenuView {
                 current == null ? StudentStatus.ACTIVE : current.status());
     }
 
+    /** Muestra la ficha de un estudiante; los datos médicos solo si el usuario confirma. */
     private void showProfile() {
         console.printTitle("Ficha del estudiante");
         Optional<Student> selected = pickStudent();
@@ -131,6 +136,7 @@ public class StudentMenuView {
         console.pause();
     }
 
+    /** Imprime la ficha: datos personales, acudientes, matrículas y hermanos. */
     private void printProfile(StudentProfile profile) {
         Student student = profile.student();
         console.printTable(List.of("Campo", "Valor"), List.of(
@@ -175,6 +181,7 @@ public class StudentMenuView {
         }
     }
 
+    /** Cambia el estado de un estudiante o lo retira. */
     private void changeStatus() {
         console.printTitle("Cambiar estado o retirar");
         Optional<Student> selected = pickStudent();
@@ -201,12 +208,14 @@ public class StudentMenuView {
 
     // ------------------------------------------------------------ acudientes
 
+    /** Busca acudientes y deja elegir uno (también lo usan otras vistas). */
     Optional<Guardian> pickGuardian() {
         return support.pick("acudiente", controller::searchGuardians, Guardian::id, GUARDIAN_HEADERS,
                 guardian -> List.of(String.valueOf(guardian.id()), Formats.maskDocument(guardian.documentNumber()),
                         guardian.name().sortableName(), guardian.relationship(), guardian.mainPhone()));
     }
 
+    /** Pide los datos de un acudiente; si {@code current} existe, Enter conserva cada valor actual. */
     private Guardian readGuardian(Guardian current) {
         PersonDocumentType documentType = support.readEnum("Tipo de documento", PersonDocumentType.class);
         String document = console.readValid(prompt("Número de documento", current == null ? null
@@ -232,6 +241,7 @@ public class StudentMenuView {
                 mainPhone, secondaryPhone, email, address, occupation, financial);
     }
 
+    /** Registra un acudiente nuevo y lo vincula al estudiante elegido. */
     private void registerGuardianForStudent() {
         console.printTitle("Registrar acudiente");
         Optional<Student> student = pickStudent();
@@ -246,6 +256,7 @@ public class StudentMenuView {
         console.pause();
     }
 
+    /** Vincula un acudiente ya registrado a un estudiante. */
     private void linkGuardian() {
         console.printTitle("Relacionar acudiente existente");
         Optional<Student> student = pickStudent();
@@ -264,6 +275,7 @@ public class StudentMenuView {
         console.pause();
     }
 
+    /** Quita la relación entre un estudiante y un acudiente. */
     private void unlinkGuardian() {
         console.printTitle("Quitar relación con acudiente");
         Optional<Student> student = pickStudent();
@@ -287,6 +299,7 @@ public class StudentMenuView {
         console.pause();
     }
 
+    /** Pantalla para actualizar los datos de un acudiente. */
     private void updateGuardian() {
         console.printTitle("Actualizar acudiente");
         Optional<Guardian> guardian = pickGuardian();
@@ -299,6 +312,7 @@ public class StudentMenuView {
         console.pause();
     }
 
+    /** Muestra los datos de un acudiente y los estudiantes a su cargo. */
     private void showGuardian() {
         console.printTitle("Consultar acudiente");
         Optional<Guardian> selected = pickGuardian();
@@ -330,6 +344,7 @@ public class StudentMenuView {
 
     // ---------------------------------------------------------- matrículas
 
+    /** Matricula a un estudiante en un grado para un año. */
     private void enroll() {
         console.printTitle("Matricular estudiante");
         Optional<Student> student = pickStudent();
@@ -352,6 +367,7 @@ public class StudentMenuView {
         console.pause();
     }
 
+    /** Cierra la matrícula activa de un estudiante como completada o retirada. */
     private void closeEnrollment() {
         console.printTitle("Cerrar matrícula");
         Optional<Student> student = pickStudent();
@@ -377,6 +393,7 @@ public class StudentMenuView {
         console.pause();
     }
 
+    /** Texto de la pregunta; si hay un valor actual, lo muestra entre corchetes (Enter lo conserva). */
     private static String prompt(String label, String current) {
         return current == null ? label + ": " : label + " [" + current + "]: ";
     }

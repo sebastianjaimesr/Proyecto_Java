@@ -20,10 +20,12 @@ public record Teacher(
         LocalDate hireDate,
         TeacherStatus status) {
 
+    /** Nombre completo del profesor. */
     public String fullName() {
         return name.fullName();
     }
 
+    /** Copia del profesor con el id asignado por la base de datos. */
     public Teacher withId(int newId) {
         return new Teacher(newId, documentType, documentNumber, name, email, phone, specialization, hireDate, status);
     }

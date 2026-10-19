@@ -103,6 +103,7 @@ public class JdbcGradeRecordDao implements GradeRecordDao {
         }, JdbcGradeRecordDao::map);
     }
 
+    /** Convierte una fila de {@code registros_academicos} en un objeto {@link GradeRecord}. */
     private static GradeRecord map(ResultSet resultSet) throws SQLException {
         return new GradeRecord(
                 resultSet.getInt("id_registro"),

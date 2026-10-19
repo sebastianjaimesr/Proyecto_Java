@@ -127,6 +127,9 @@ public class JdbcLoanDao implements LoanDao {
                 statement -> statement.setInt(1, borrowerId), resultSet -> map(resultSet, type));
     }
 
+    /**
+     * Convierte una fila de cualquiera de las dos tablas de préstamos en un {@link Loan} del tipo indicado.
+     */
     private static Loan map(ResultSet resultSet, BorrowerType type) throws SQLException {
         return new Loan(
                 resultSet.getInt("id_prestamo"),

@@ -43,10 +43,12 @@ public class PaymentConceptService {
         this.clock = Objects.requireNonNull(clock, "clock");
     }
 
+    /** Lista los conceptos de pago; {@code onlyActive} excluye los inactivos. */
     public List<PaymentConcept> findConcepts(boolean onlyActive) {
         return transactions.read(connection -> conceptDao.findAll(connection, onlyActive));
     }
 
+    /** Crea un concepto de pago después de validar sus datos y que el código no esté repetido. */
     public PaymentConcept create(PaymentConcept draft) {
         PaymentConcept concept = normalize(draft);
         return transactions.inTransaction(connection -> {
@@ -106,10 +108,12 @@ public class PaymentConceptService {
         });
     }
 
+    /** Elimina un ajuste de precio; los pagos ya hechos no cambian. */
     public void removeAdjustment(int adjustmentId) {
         transactions.inTransactionVoid(connection -> conceptDao.deleteAdjustment(connection, adjustmentId));
     }
 
+    /** Ajustes de precio de un estudiante en un año. */
     public List<PriceAdjustment> findAdjustments(int studentId, int academicYear) {
         return transactions.read(connection -> conceptDao.findAdjustments(connection, studentId, academicYear));
     }
@@ -123,6 +127,10 @@ public class PaymentConceptService {
         });
     }
 
+    /**
+     * Valida un ajuste: tipo y año obligatorios; si es valor personalizado, el monto es obligatorio;
+     * si es beca o descuento, el porcentaje debe ser mayor que 0 y máximo 100.
+     */
     private PriceAdjustment validate(PriceAdjustment adjustment) {
         if (adjustment.type() == null) {
             throw new ValidationException("El tipo de ajuste es obligatorio.");
@@ -145,6 +153,7 @@ public class PaymentConceptService {
                 adjustment.type(), InputValidator.parseDecimal(percent.toPlainString(), "porcentaje", 2), null, notes);
     }
 
+    /** Valida y limpia los datos del concepto (código, nombre y monto base). */
     private static PaymentConcept normalize(PaymentConcept concept) {
         String code = InputValidator.validateCode(concept.code(), "código del concepto", 20);
         String name = InputValidator.requireText(concept.name(), "nombre del concepto", 100);

@@ -50,6 +50,7 @@ public class TeacherService {
 
     // --------------------------------------------------------------- profesores
 
+    /** Registra un profesor nuevo con estado "Activo" después de validar sus datos. */
     public Teacher register(Teacher draft) {
         Teacher teacher = normalize(draft);
         validate(teacher);
@@ -78,10 +79,12 @@ public class TeacherService {
         });
     }
 
+    /** Busca un profesor por id o lanza un error si no existe. */
     public Teacher findById(int teacherId) {
         return transactions.read(connection -> requireTeacher(connection, teacherId));
     }
 
+    /** Busca profesores por nombre o documento (con un límite de resultados). */
     public List<Teacher> search(String text) {
         return transactions.read(connection -> teacherDao.search(connection, text, SEARCH_LIMIT));
     }
@@ -112,6 +115,7 @@ public class TeacherService {
         });
     }
 
+    /** Asignaciones de un profesor en un año. */
     public List<TeacherAssignment> findAssignments(int teacherId, int academicYear) {
         return transactions.read(connection -> {
             requireTeacher(connection, teacherId);
@@ -119,6 +123,7 @@ public class TeacherService {
         });
     }
 
+    /** Profesores asignados a una materia en un año. */
     public List<TeacherAssignment> findAssignmentsBySubject(int subjectId, int academicYear) {
         return transactions.read(connection -> assignmentDao.findBySubject(connection, subjectId, academicYear));
     }
@@ -157,10 +162,12 @@ public class TeacherService {
         });
     }
 
+    /** Elimina una franja del horario. */
     public void removeSchedule(int scheduleId) {
         transactions.inTransactionVoid(connection -> assignmentDao.deleteSchedule(connection, scheduleId));
     }
 
+    /** Horario semanal completo de un profesor en un año. */
     public List<ClassSchedule> findTimetable(int teacherId, int academicYear) {
         return transactions.read(connection -> {
             requireTeacher(connection, teacherId);
@@ -168,10 +175,12 @@ public class TeacherService {
         });
     }
 
+    /** Franjas de horario de una asignación. */
     public List<ClassSchedule> findSchedulesByAssignment(int assignmentId) {
         return transactions.read(connection -> assignmentDao.findSchedulesByAssignment(connection, assignmentId));
     }
 
+    /** Valida que el día y las horas existan y que la hora de fin sea posterior a la de inicio. */
     static void validateTimes(WeekDay day, LocalTime start, LocalTime end) {
         if (day == null || start == null || end == null) {
             throw new ValidationException("El día, la hora de inicio y la hora de fin son obligatorios.");
@@ -185,15 +194,20 @@ public class TeacherService {
         }
     }
 
+    /**
+     * Texto legible de una franja para los mensajes de conflicto, por ejemplo "Matemáticas - A - Ana (Lunes 07:00-08:00)".
+     */
     private static String describe(ClassSchedule slot) {
         return slot.description() + " (" + slot.day().dbValue() + " " + slot.startTime() + "-" + slot.endTime() + ")";
     }
 
+    /** Busca el profesor o lanza un error si no existe. */
     private Teacher requireTeacher(Connection connection, int teacherId) throws SQLException {
         return ServiceChecks.require(teacherDao.findById(connection, teacherId),
                 "No existe un profesor con id " + teacherId + ".");
     }
 
+    /** Verifica que ningún otro profesor tenga el mismo documento ni el mismo correo. */
     private void ensureUnique(Connection connection, Teacher teacher, Integer ownId) throws SQLException {
         Optional<Teacher> sameDocument = teacherDao.findByDocument(connection, teacher.documentNumber())
                 .filter(existing -> !existing.id().equals(ownId));
@@ -207,6 +221,7 @@ public class TeacherService {
         }
     }
 
+    /** Limpia los datos: documento en mayúsculas, correo validado y textos vacíos como null. */
     private static Teacher normalize(Teacher teacher) {
         return new Teacher(teacher.id(), teacher.documentType(),
                 InputValidator.validateDocumentNumber(teacher.documentNumber()), teacher.name(),
@@ -217,6 +232,7 @@ public class TeacherService {
                 teacher.hireDate(), teacher.status());
     }
 
+    /** Valida nombres, teléfono y especialización, y que la fecha de contratación no sea futura. */
     private void validate(Teacher teacher) {
         if (teacher.documentType() == null) {
             throw new ValidationException("El tipo de documento es obligatorio.");

@@ -35,6 +35,7 @@ public class GuardianService {
         this.studentDao = Objects.requireNonNull(studentDao, "studentDao");
     }
 
+    /** Registra un acudiente nuevo después de validar sus datos y que el documento no esté repetido. */
     public Guardian register(Guardian draft) {
         Guardian guardian = normalize(draft);
         validate(guardian);
@@ -63,6 +64,7 @@ public class GuardianService {
         });
     }
 
+    /** Actualiza los datos de un acudiente existente. */
     public Guardian update(Guardian changes) {
         Objects.requireNonNull(changes.id(), "id");
         Guardian guardian = normalize(changes);
@@ -106,14 +108,17 @@ public class GuardianService {
         });
     }
 
+    /** Busca un acudiente por id o lanza un error si no existe. */
     public Guardian findById(int guardianId) {
         return transactions.read(connection -> requireGuardian(connection, guardianId));
     }
 
+    /** Busca acudientes por nombre o documento (con un límite de resultados). */
     public List<Guardian> search(String text) {
         return transactions.read(connection -> guardianDao.search(connection, text, SEARCH_LIMIT));
     }
 
+    /** Acudientes de un estudiante, con su parentesco y si son principales o contacto de emergencia. */
     public List<GuardianLink> findGuardiansOfStudent(int studentId) {
         return transactions.read(connection -> {
             requireStudent(connection, studentId);
@@ -121,6 +126,7 @@ public class GuardianService {
         });
     }
 
+    /** Estudiantes a cargo de un acudiente. */
     public List<StudentLink> findStudentsOfGuardian(int guardianId) {
         return transactions.read(connection -> {
             requireGuardian(connection, guardianId);
@@ -128,16 +134,21 @@ public class GuardianService {
         });
     }
 
+    /** Verifica que el estudiante exista. */
     private void requireStudent(Connection connection, int studentId) throws SQLException {
         ServiceChecks.require(studentDao.findById(connection, studentId),
                 "No existe un estudiante con id " + studentId + ".");
     }
 
+    /** Busca el acudiente o lanza un error si no existe. */
     private Guardian requireGuardian(Connection connection, int guardianId) throws SQLException {
         return ServiceChecks.require(guardianDao.findById(connection, guardianId),
                 "No existe un acudiente con id " + guardianId + ".");
     }
 
+    /**
+     * Verifica que ningún otro acudiente tenga el mismo documento ({@code ownId} es el propio, al actualizar).
+     */
     private void ensureDocumentIsFree(Connection connection, String documentNumber, Integer ownId)
             throws SQLException {
         guardianDao.findByDocument(connection, documentNumber)
@@ -148,6 +159,7 @@ public class GuardianService {
                 });
     }
 
+    /** Limpia los datos: documento en mayúsculas, textos sin espacios sobrantes y vacíos como null. */
     private static Guardian normalize(Guardian guardian) {
         return new Guardian(guardian.id(), guardian.documentType(),
                 InputValidator.validateDocumentNumber(guardian.documentNumber()), guardian.name(),
@@ -160,6 +172,7 @@ public class GuardianService {
                 guardian.financialResponsible());
     }
 
+    /** Valida los campos obligatorios y el formato de correo y teléfonos. */
     private static void validate(Guardian guardian) {
         if (guardian.documentType() == null) {
             throw new ValidationException("El tipo de documento es obligatorio.");
@@ -175,6 +188,7 @@ public class GuardianService {
         ServiceChecks.optionalText(guardian.occupation(), "ocupación", MAX_NAME_LENGTH);
     }
 
+    /** Convierte un texto vacío en null; si no, lo devuelve sin espacios a los lados. */
     private static String blankToNull(String value) {
         return value == null || value.isBlank() ? null : value.strip();
     }

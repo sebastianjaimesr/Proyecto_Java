@@ -103,6 +103,7 @@ public class JdbcResourceDao implements ResourceDao {
         }, JdbcResourceDao::map);
     }
 
+    /** Asigna los campos del recurso a los parámetros ? del INSERT/UPDATE, en orden. */
     private static void bindFields(PreparedStatement statement, Resource resource) throws SQLException {
         statement.setString(1, resource.code());
         statement.setString(2, resource.name());
@@ -113,6 +114,7 @@ public class JdbcResourceDao implements ResourceDao {
         setEnum(statement, 7, resource.status());
     }
 
+    /** Convierte una fila de {@code recursos} en un objeto {@link Resource}. */
     private static Resource map(ResultSet resultSet) throws SQLException {
         return new Resource(
                 resultSet.getInt("id_recurso"),

@@ -86,10 +86,12 @@ public final class DatabaseConnection implements ConnectionProvider {
         return url;
     }
 
+    /** Usuario de MySQL configurado. */
     public String getUser() {
         return user;
     }
 
+    /** Nombre de la base de datos configurada. */
     public String getDatabaseName() {
         return databaseName;
     }

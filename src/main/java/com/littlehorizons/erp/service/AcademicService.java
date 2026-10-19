@@ -135,10 +135,12 @@ public class AcademicService {
         });
     }
 
+    /** Inscripciones de un estudiante en un año. */
     public List<SubjectRegistration> findRegistrations(int studentId, int academicYear) {
         return transactions.read(connection -> registrationDao.findByStudent(connection, studentId, academicYear));
     }
 
+    /** Estudiantes inscritos en una materia y año; {@code section} null significa todas las secciones. */
     public List<Student> findStudentsInSubject(int subjectId, int academicYear, String section) {
         String normalized = ServiceChecks.normalizeSection(section);
         return transactions.read(connection ->
@@ -228,6 +230,7 @@ public class AcademicService {
         });
     }
 
+    /** Notas de un estudiante; {@code academicYear} null significa todos los años. */
     public List<GradeRecord> findGradesByStudent(int studentId, Integer academicYear) {
         return transactions.read(connection -> gradeRecordDao.findByStudent(connection, studentId, academicYear));
     }
@@ -305,6 +308,9 @@ public class AcademicService {
 
     // ----------------------------------------------------------------- auxiliares
 
+    /**
+     * Valida año, período y fecha antes de inscribir; lanza ValidationException con el mensaje para el usuario.
+     */
     private void validateRegistrationInput(int academicYear, AcademicPeriod period, LocalDate date) {
         if (period == null) {
             throw new ValidationException("El período es obligatorio.");
@@ -314,6 +320,7 @@ public class AcademicService {
         ServiceChecks.notInFuture(date, today, "fecha de inscripción");
     }
 
+    /** Inserta una inscripción (estado "Inscrito") y la devuelve con su id. */
     private SubjectRegistration insertRegistration(Connection connection, int studentId, Subject subject,
                                                    int academicYear, AcademicPeriod period, String section,
                                                    LocalDate date) throws SQLException {
@@ -324,6 +331,9 @@ public class AcademicService {
                 date, RegistrationStatus.ACTIVE);
     }
 
+    /**
+     * Devuelve la matrícula activa del estudiante en el año o lanza un error de regla de negocio si no tiene.
+     */
     private Enrollment requireActiveEnrollment(Connection connection, int studentId, int academicYear)
             throws SQLException {
         requireStudent(connection, studentId);
@@ -337,6 +347,7 @@ public class AcademicService {
         return enrollment;
     }
 
+    /** Verifica que la materia esté activa y pertenezca al grado en que está matriculado el estudiante. */
     private static void checkSubjectForEnrollment(Subject subject, Enrollment enrollment) {
         if (!subject.active()) {
             throw new BusinessRuleException("La materia " + subject.name() + " está inactiva.");
@@ -347,6 +358,7 @@ public class AcademicService {
         }
     }
 
+    /** Verifica que el profesor esté asignado a la materia en ese año antes de permitirle poner notas. */
     private void requireAssignedTeacher(Connection connection, int teacherId, Subject subject, int academicYear)
             throws SQLException {
         if (!assignmentDao.isAssigned(connection, teacherId, subject.id(), academicYear)) {
@@ -355,11 +367,13 @@ public class AcademicService {
         }
     }
 
+    /** Busca el estudiante o lanza un error si no existe. */
     private Student requireStudent(Connection connection, int studentId) throws SQLException {
         return ServiceChecks.require(studentDao.findById(connection, studentId),
                 "No existe un estudiante con id " + studentId + ".");
     }
 
+    /** Busca la materia o lanza un error si no existe. */
     private Subject requireSubject(Connection connection, int subjectId) throws SQLException {
         return ServiceChecks.require(subjectDao.findById(connection, subjectId),
                 "No existe una materia con id " + subjectId + ".");

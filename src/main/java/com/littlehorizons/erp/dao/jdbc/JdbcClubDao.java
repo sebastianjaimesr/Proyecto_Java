@@ -143,6 +143,7 @@ public class JdbcClubDao implements ClubDao {
                 statement -> statement.setInt(1, studentId), JdbcClubDao::mapMembership);
     }
 
+    /** Asigna los campos del club a los parámetros ? del INSERT/UPDATE, en orden. */
     private static void bindFields(PreparedStatement statement, Club club) throws SQLException {
         statement.setString(1, club.name());
         setString(statement, 2, club.description());
@@ -152,6 +153,7 @@ public class JdbcClubDao implements ClubDao {
         statement.setBoolean(6, club.active());
     }
 
+    /** Convierte una fila de {@code clubes} en un objeto {@link Club}. */
     private static Club map(ResultSet resultSet) throws SQLException {
         Integer capacity = getInteger(resultSet, "capacidad_maxima");
         return new Club(
@@ -166,6 +168,7 @@ public class JdbcClubDao implements ClubDao {
                 resultSet.getInt("miembros_activos"));
     }
 
+    /** Convierte una fila de {@code membresias_club} en un objeto {@link ClubMembership}. */
     private static ClubMembership mapMembership(ResultSet resultSet) throws SQLException {
         return new ClubMembership(
                 resultSet.getInt("id_membresia"),

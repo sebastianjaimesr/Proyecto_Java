@@ -23,6 +23,7 @@ public record Club(
     /** Valor por defecto de {@code clubes.capacidad_maxima} en el esquema oficial. */
     public static final int DEFAULT_CAPACITY = 30;
 
+    /** Cupos libres del club (nunca negativo). */
     public int availableSeats() {
         return Math.max(0, capacity - activeMembers);
     }

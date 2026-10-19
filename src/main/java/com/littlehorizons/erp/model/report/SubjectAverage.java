@@ -24,6 +24,7 @@ public record SubjectAverage(
         grades = Map.copyOf(grades);
     }
 
+    /** Indica si el estudiante tiene al menos una nota en la materia. */
     public boolean hasGrades() {
         return average != null;
     }

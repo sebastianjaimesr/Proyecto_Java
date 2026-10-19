@@ -33,6 +33,10 @@ public record FinanceSettings(
         mandatoryConcepts = Set.copyOf(mandatoryConcepts);
     }
 
+    /**
+     * Lee la configuración financiera de config.properties: datos del emisor, carpeta de facturas,
+     * porcentajes de IVA por concepto y conceptos obligatorios.
+     */
     public static FinanceSettings from(AppConfig config) {
         IssuerInfo issuer = new IssuerInfo(
                 config.getOptional("issuer.name", DEFAULT_BUSINESS_NAME),
@@ -58,6 +62,7 @@ public record FinanceSettings(
                 Set.of("MAT", "PENSION"));
     }
 
+    /** Convierte el porcentaje de IVA configurado a número y verifica que esté entre 0 y 100. */
     private static BigDecimal parsePercent(String key, String raw) {
         try {
             BigDecimal value = new BigDecimal(raw.strip());

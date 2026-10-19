@@ -118,6 +118,7 @@ public class JdbcAttendanceDao implements AttendanceDao {
                 }, JdbcAttendanceDao::mapSummary);
     }
 
+    /** Convierte una fila de {@code asistencias} en un objeto {@link Attendance}. */
     private static Attendance map(ResultSet resultSet) throws SQLException {
         return new Attendance(
                 resultSet.getInt("id_asistencia"),
@@ -130,6 +131,7 @@ public class JdbcAttendanceDao implements AttendanceDao {
                 resultSet.getString("nombre_materia"));
     }
 
+    /** Convierte una fila del reporte de inasistencias en un {@link AbsenceReportRow}. */
     private static AbsenceReportRow mapSummary(ResultSet resultSet) throws SQLException {
         return new AbsenceReportRow(
                 resultSet.getInt("id_estudiante"),

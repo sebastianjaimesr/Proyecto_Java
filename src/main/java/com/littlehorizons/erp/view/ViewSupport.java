@@ -32,6 +32,7 @@ public class ViewSupport {
         this.console = Objects.requireNonNull(console, "console");
     }
 
+    /** Consola compartida por las vistas. */
     public ConsoleUtils console() {
         return console;
     }
@@ -146,6 +147,7 @@ public class ViewSupport {
         return console.readChoice("Opción: ", options, DbEnum::dbValue, label.toLowerCase(java.util.Locale.ROOT));
     }
 
+    /** Lee un año; Enter usa el año actual. */
     public int readYear(String label) {
         int current = LocalDate.now().getYear();
         return console.readValid(label + " [" + current + "]: ", raw -> raw.isBlank()
@@ -159,6 +161,7 @@ public class ViewSupport {
                 raw -> raw.isBlank() ? today : InputValidator.parseDate(raw, label.toLowerCase(java.util.Locale.ROOT)));
     }
 
+    /** Lee una fecha en formato AAAA-MM-DD. */
     public LocalDate readDate(String label) {
         return console.readDate(label + " (" + InputValidator.DATE_PATTERN_LABEL + "): ",
                 label.toLowerCase(java.util.Locale.ROOT));
@@ -176,11 +179,13 @@ public class ViewSupport {
         });
     }
 
+    /** Lee una sección opcional (por ejemplo, A); vacío significa sin sección. */
     public String readSection(String label) {
         String raw = console.readLine(label + " (opcional, ej: A): ").strip();
         return raw.isEmpty() ? null : raw;
     }
 
+    /** Avisa que la operación se canceló (por ejemplo, cuando no se eligió ningún registro). */
     public void notFound() {
         console.printWarning("Operación cancelada.");
     }

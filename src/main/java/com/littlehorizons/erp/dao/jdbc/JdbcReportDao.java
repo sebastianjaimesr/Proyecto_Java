@@ -95,6 +95,7 @@ public class JdbcReportDao implements ReportDao {
                         resultSet.getString("nombre_materia"), null));
     }
 
+    /** Ejecuta una consulta COUNT sin parámetros y devuelve el número. */
     private static int count(Connection connection, String sql) throws SQLException {
         return JdbcSupport.queryInt(connection, sql, JdbcSupport.NO_PARAMETERS);
     }

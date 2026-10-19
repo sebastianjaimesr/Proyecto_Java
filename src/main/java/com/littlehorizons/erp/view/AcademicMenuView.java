@@ -59,6 +59,7 @@ public class AcademicMenuView {
         this.teacherView = Objects.requireNonNull(teacherView, "teacherView");
     }
 
+    /** Muestra el submenú de "Gestión académica". */
     public void show() {
         Menu.submenu(console, List.of(
                         new Menu.Item("Materias", this::showSubjectsMenu),
@@ -68,6 +69,7 @@ public class AcademicMenuView {
                 "GESTIÓN ACADÉMICA").run();
     }
 
+    /** Submenú de materias: registrar, actualizar y consultar por grado. */
     private void showSubjectsMenu() {
         Menu.submenu(console, List.of(
                         new Menu.Item("Registrar materia", this::registerSubject),
@@ -76,6 +78,7 @@ public class AcademicMenuView {
                 "MATERIAS").run();
     }
 
+    /** Submenú de inscripciones: individual, todas las del grado, retiro y consulta. */
     private void showRegistrationsMenu() {
         Menu.submenu(console, List.of(
                         new Menu.Item("Inscribir estudiante en una materia", this::registerOne),
@@ -85,6 +88,7 @@ public class AcademicMenuView {
                 "INSCRIPCIONES").run();
     }
 
+    /** Submenú de notas y promedios. */
     private void showGradesMenu() {
         Menu.submenu(console, List.of(
                         new Menu.Item("Registrar o corregir nota (períodos I a IV)", this::recordGrade),
@@ -97,6 +101,7 @@ public class AcademicMenuView {
                 "CALIFICACIONES Y PROMEDIOS").run();
     }
 
+    /** Submenú de asistencia: por grupo, individual, historial y reporte semanal. */
     private void showAttendanceMenu() {
         Menu.submenu(console, List.of(
                         new Menu.Item("Tomar asistencia de un grupo", this::recordGroupAttendance),
@@ -108,6 +113,7 @@ public class AcademicMenuView {
 
     // -------------------------------------------------------------- materias
 
+    /** Pantalla para registrar una materia: elige el grado y pide código, nombre y horas semanales. */
     private void registerSubject() {
         console.printTitle("Registrar materia");
         Optional<List<Grade>> grades = support.quiet(teacherController.findGrades());
@@ -127,6 +133,7 @@ public class AcademicMenuView {
         console.pause();
     }
 
+    /** Pantalla para actualizar, activar o desactivar una materia. */
     private void updateSubject() {
         console.printTitle("Actualizar materia");
         Optional<Subject> selected = teacherView.pickSubject(false);
@@ -149,6 +156,7 @@ public class AcademicMenuView {
         console.pause();
     }
 
+    /** Muestra las materias de un grado elegido. */
     private void listSubjects() {
         console.printTitle("Materias por grado");
         Optional<List<Grade>> grades = support.quiet(teacherController.findGrades());
@@ -168,6 +176,7 @@ public class AcademicMenuView {
 
     // --------------------------------------------------------- inscripciones
 
+    /** Inscribe a un estudiante en una materia y período. */
     private void registerOne() {
         console.printTitle("Inscribir en una materia");
         Optional<Student> student = studentView.pickStudent();
@@ -188,6 +197,7 @@ public class AcademicMenuView {
         console.pause();
     }
 
+    /** Inscribe a un estudiante en todas las materias de su grado para un período. */
     private void registerAll() {
         console.printTitle("Inscribir en todas las materias del grado");
         Optional<Student> student = studentView.pickStudent();
@@ -204,6 +214,7 @@ public class AcademicMenuView {
         console.pause();
     }
 
+    /** Retira una inscripción de un estudiante (las notas se conservan). */
     private void withdrawRegistration() {
         console.printTitle("Retirar inscripción");
         Optional<Student> student = studentView.pickStudent();
@@ -229,6 +240,7 @@ public class AcademicMenuView {
         console.pause();
     }
 
+    /** Muestra las inscripciones de un estudiante en un año. */
     private void listRegistrations() {
         console.printTitle("Inscripciones");
         Optional<Student> student = studentView.pickStudent();
@@ -241,6 +253,7 @@ public class AcademicMenuView {
         console.pause();
     }
 
+    /** Imprime una tabla con las inscripciones. */
     private void printRegistrations(List<SubjectRegistration> registrations) {
         console.printTable(List.of("Id", "Materia", "Período", "Sección", "Fecha", "Estado"), registrations.stream()
                 .map(item -> List.of(String.valueOf(item.id()), item.subjectName(), item.period().dbValue(),
@@ -250,6 +263,7 @@ public class AcademicMenuView {
 
     // ---------------------------------------------------------------- notas
 
+    /** Registra o corrige una nota; si ya existe, pide confirmación antes de reemplazarla. */
     private void recordGrade() {
         console.printTitle("Registrar nota");
         Optional<Student> student = studentView.pickStudent();
@@ -290,6 +304,7 @@ public class AcademicMenuView {
         console.pause();
     }
 
+    /** Calcula y guarda la nota Final de una materia; avisa si faltan períodos. */
     private void computeFinal() {
         console.printTitle("Calcular nota final");
         Optional<Student> student = studentView.pickStudent();
@@ -314,6 +329,7 @@ public class AcademicMenuView {
         console.pause();
     }
 
+    /** Muestra las notas de un estudiante. */
     private void gradesByStudent() {
         console.printTitle("Notas de un estudiante");
         Optional<Student> student = studentView.pickStudent();
@@ -329,6 +345,7 @@ public class AcademicMenuView {
         console.pause();
     }
 
+    /** Muestra las notas de una materia, filtrando por sección y período. */
     private void gradesBySubject() {
         console.printTitle("Notas por materia, grupo y período");
         Optional<Subject> subject = teacherView.pickSubject(false);
@@ -344,6 +361,7 @@ public class AcademicMenuView {
         console.pause();
     }
 
+    /** Pregunta si se quiere filtrar por período y, si es así, lo pide. */
     private Optional<GradingPeriod> readOptionalPeriod() {
         if (!console.confirm("¿Filtrar por un período?")) {
             return Optional.empty();
@@ -351,6 +369,9 @@ public class AcademicMenuView {
         return Optional.of(support.readEnum("Período", GradingPeriod.class));
     }
 
+    /**
+     * Imprime una tabla de notas; {@code showStudent} decide si se muestra la columna del estudiante o la del año y la materia.
+     */
     private void printGrades(List<GradeRecord> records, boolean showStudent) {
         console.printTable(showStudent
                         ? List.of("Estudiante", "Período", "Nota", "Profesor", "Fecha")
@@ -363,6 +384,7 @@ public class AcademicMenuView {
                         .collect(Collectors.toList()));
     }
 
+    /** Muestra los promedios por materia y el promedio general de un estudiante. */
     private void studentAverages() {
         console.printTitle("Promedios del estudiante");
         Optional<Student> student = studentView.pickStudent();
@@ -375,6 +397,7 @@ public class AcademicMenuView {
         console.pause();
     }
 
+    /** Imprime el reporte de promedios de un estudiante (también lo usa la vista de reportes). */
     void printStudentAverages(StudentAverageReport report) {
         console.println(report.studentName() + " · " + report.academicYear()
                 + (report.gradeName() == null ? "" : " · " + report.gradeName()));
@@ -384,6 +407,7 @@ public class AcademicMenuView {
                 ? " (" + report.subjectsWithoutGrades() + " materia(s) sin calificaciones no se incluyen)" : ""));
     }
 
+    /** Imprime una tabla con las notas I a IV, Final y promedio de cada materia. */
     private void printSubjectAverages(List<SubjectAverage> subjects) {
         console.printTable(List.of("Materia", "I", "II", "III", "IV", "Final", "Promedio"), subjects.stream()
                 .map(subject -> List.of(subject.subjectName(),
@@ -396,6 +420,7 @@ public class AcademicMenuView {
                 .collect(Collectors.toList()));
     }
 
+    /** Muestra el promedio de una materia para todo el curso. */
     private void courseAverage() {
         console.printTitle("Promedio del curso por materia");
         Optional<Subject> subject = teacherView.pickSubject(false);
@@ -409,6 +434,7 @@ public class AcademicMenuView {
         console.pause();
     }
 
+    /** Imprime el promedio del curso con el promedio de cada estudiante, el más alto y el más bajo. */
     void printCourseAverage(CourseAverageReport report) {
         console.println(report.subjectName() + " · " + report.gradeName() + " · " + report.academicYear()
                 + (report.section() == null ? "" : " · sección " + report.section()));
@@ -421,6 +447,7 @@ public class AcademicMenuView {
                 + " · Estudiantes con notas: " + report.students().size());
     }
 
+    /** Muestra el historial académico de un estudiante. */
     private void history() {
         console.printTitle("Historial académico");
         Optional<Student> student = studentView.pickStudent();
@@ -432,6 +459,7 @@ public class AcademicMenuView {
         console.pause();
     }
 
+    /** Imprime el historial académico año por año. */
     void printHistory(AcademicHistory history) {
         console.println(history.studentName());
         if (history.years().isEmpty()) {
@@ -452,6 +480,9 @@ public class AcademicMenuView {
 
     // ------------------------------------------------------------ asistencia
 
+    /**
+     * Toma la asistencia de todo un grupo: pide una letra por estudiante (P, A, T, E) y guarda todo en una transacción.
+     */
     private void recordGroupAttendance() {
         console.printTitle("Tomar asistencia de un grupo");
         Optional<Subject> subject = teacherView.pickSubject(false);
@@ -496,6 +527,7 @@ public class AcademicMenuView {
         console.pause();
     }
 
+    /** Convierte la letra digitada (P, A, T, E) en el estado de asistencia correspondiente. */
     static AttendanceStatus parseAttendanceLetter(String raw) {
         switch (raw.strip().toUpperCase(java.util.Locale.ROOT)) {
             case "P":
@@ -512,6 +544,7 @@ public class AcademicMenuView {
         }
     }
 
+    /** Registra o corrige la asistencia de un estudiante en un día y materia. */
     private void recordAttendance() {
         console.printTitle("Asistencia de un estudiante");
         Optional<Student> student = studentView.pickStudent();
@@ -551,6 +584,7 @@ public class AcademicMenuView {
         console.pause();
     }
 
+    /** Muestra la asistencia de un estudiante entre dos fechas. */
     private void attendanceHistory() {
         console.printTitle("Asistencia histórica");
         Optional<Student> student = studentView.pickStudent();
@@ -574,6 +608,7 @@ public class AcademicMenuView {
         console.pause();
     }
 
+    /** Muestra los estudiantes con más de 3 ausencias en la semana de la fecha indicada. */
     private void weeklyReport() {
         console.printTitle("Reporte semanal de inasistencias");
         console.printInfo("Semana de lunes a domingo que contiene la fecha indicada. Solo cuenta \"Ausente\".");
@@ -582,6 +617,7 @@ public class AcademicMenuView {
         console.pause();
     }
 
+    /** Imprime una tabla con los conteos de ausencias, tardanzas y excusas. */
     void printAbsenceRows(List<AbsenceReportRow> rows) {
         console.printTable(List.of("Documento", "Estudiante", "Grado", "Ausencias", "Tardanzas", "Excusas"),
                 rows.stream().map(row -> List.of(Formats.maskDocument(row.documentNumber()), row.studentName(),

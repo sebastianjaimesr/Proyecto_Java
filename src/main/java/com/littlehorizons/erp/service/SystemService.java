@@ -51,6 +51,7 @@ public class SystemService {
         return new SchemaStatus(info, OFFICIAL_TABLES.size(), missing);
     }
 
+    /** Configuración activa para mostrar en pantalla (sin contraseña). */
     public ConfigurationSummary getConfigurationSummary() {
         return configurationSummary;
     }

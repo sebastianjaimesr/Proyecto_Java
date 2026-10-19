@@ -19,6 +19,7 @@ public record Resource(
         String location,
         ResourceStatus status) {
 
+    /** Copia del recurso con otro estado. */
     public Resource withStatus(ResourceStatus newStatus) {
         return new Resource(id, code, name, categoryId, categoryName, description, acquisitionDate, location, newStatus);
     }

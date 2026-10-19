@@ -242,6 +242,7 @@ public final class InputValidator {
         }
     }
 
+    /** Lanza un error si el texto supera la longitud máxima; si no, lo devuelve. */
     private static String checkLength(String value, String fieldName, int maxLength) {
         if (value.length() > maxLength) {
             throw new ValidationException("El campo " + fieldName + " admite como máximo "
@@ -250,6 +251,7 @@ public final class InputValidator {
         return value;
     }
 
+    /** Quita espacios a los lados; convierte null en texto vacío. */
     private static String trimToEmpty(String raw) {
         return raw == null ? "" : raw.strip();
     }

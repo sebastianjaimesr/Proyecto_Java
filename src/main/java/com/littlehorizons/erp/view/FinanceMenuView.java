@@ -47,6 +47,7 @@ public class FinanceMenuView {
         this.studentView = Objects.requireNonNull(studentView, "studentView");
     }
 
+    /** Muestra el submenú de "Gestión financiera". */
     public void show() {
         Menu.submenu(console, List.of(
                         new Menu.Item("Conceptos de pago y valores por estudiante", this::showConceptsMenu),
@@ -59,6 +60,7 @@ public class FinanceMenuView {
                 "GESTIÓN FINANCIERA").run();
     }
 
+    /** Submenú de conceptos de pago y valores por estudiante. */
     private void showConceptsMenu() {
         Menu.submenu(console, List.of(
                         new Menu.Item("Consultar catálogo de conceptos", this::listConcepts),
@@ -71,6 +73,7 @@ public class FinanceMenuView {
 
     // -------------------------------------------------------------- conceptos
 
+    /** Muestra los conceptos de pago y deja elegir uno. */
     private Optional<PaymentConcept> pickConcept(boolean onlyActive) {
         Optional<List<PaymentConcept>> concepts = support.quiet(controller.findConcepts(onlyActive));
         if (concepts.isEmpty() || concepts.get().isEmpty()) {
@@ -83,6 +86,7 @@ public class FinanceMenuView {
                 "concepto"));
     }
 
+    /** Muestra el catálogo de conceptos de pago. */
     private void listConcepts() {
         console.printTitle("Catálogo de conceptos de pago");
         support.show(controller.findConcepts(false)).ifPresent(concepts -> console.printTable(
@@ -93,6 +97,7 @@ public class FinanceMenuView {
         console.pause();
     }
 
+    /** Pantalla para registrar un concepto de pago. */
     private void createConcept() {
         console.printTitle("Registrar concepto");
         String code = console.readCode("Código (ej: SALIDA): ", "código", 20);
@@ -105,6 +110,7 @@ public class FinanceMenuView {
         console.pause();
     }
 
+    /** Pantalla para actualizar un concepto de pago. */
     private void updateConcept() {
         console.printTitle("Actualizar concepto");
         Optional<PaymentConcept> selected = pickConcept(false);
@@ -126,6 +132,7 @@ public class FinanceMenuView {
         console.pause();
     }
 
+    /** Registra un valor personalizado, una beca o un descuento por hermanos para un estudiante. */
     private void addAdjustment() {
         console.printTitle("Valor personalizado, beca o descuento");
         Optional<Student> student = studentView.pickStudent();
@@ -163,6 +170,7 @@ public class FinanceMenuView {
         console.pause();
     }
 
+    /** Muestra los ajustes de precio de un estudiante en un año. */
     private void listAdjustments() {
         console.printTitle("Ajustes de un estudiante");
         Optional<Student> student = studentView.pickStudent();
@@ -194,6 +202,7 @@ public class FinanceMenuView {
 
     // -------------------------------------------------------------- pagos
 
+    /** Registra un pago: pide los datos, maneja la confirmación de pagos duplicados y muestra el recibo. */
     private void registerPayment() {
         console.printTitle("Registrar pago");
         Optional<Student> student = studentView.pickStudent();
@@ -241,6 +250,7 @@ public class FinanceMenuView {
         console.pause();
     }
 
+    /** Imprime el resultado del pago: saldo pendiente si fue parcial, número de factura y ruta del PDF. */
     private void printReceipt(PaymentService.PaymentReceipt receipt) {
         BigDecimal balance = receipt.expectedAmount().subtract(receipt.payment().amount());
         if (balance.signum() > 0) {
@@ -255,6 +265,7 @@ public class FinanceMenuView {
         console.printInfo("CUFE simulado: " + receipt.invoice().cufe());
     }
 
+    /** Muestra el historial de pagos de un estudiante. */
     private void historyByStudent() {
         console.printTitle("Historial de pagos del estudiante");
         Optional<Student> student = studentView.pickStudent();
@@ -267,6 +278,7 @@ public class FinanceMenuView {
         console.pause();
     }
 
+    /** Muestra el historial de pagos de un acudiente. */
     private void historyByGuardian() {
         console.printTitle("Historial de pagos del acudiente");
         Optional<Guardian> guardian = studentView.pickGuardian();
@@ -278,6 +290,7 @@ public class FinanceMenuView {
         console.pause();
     }
 
+    /** Imprime una tabla de pagos (también la usa la vista de reportes). */
     void printPayments(List<Payment> payments) {
         console.printTable(List.of("Recibo", "Fecha", "Estudiante", "Concepto", "Monto", "Método", "Año/Período", "Pagó"),
                 payments.stream().map(payment -> List.of(Formats.text(payment.receiptNumber()),
@@ -290,6 +303,7 @@ public class FinanceMenuView {
         console.println("Total pagado: " + Formats.money(total));
     }
 
+    /** Muestra el estado de cuenta de un estudiante: esperado frente a pagado por concepto. */
     private void statement() {
         console.printTitle("Estado de cuenta");
         Optional<Student> student = studentView.pickStudent();
@@ -309,6 +323,7 @@ public class FinanceMenuView {
         console.pause();
     }
 
+    /** Muestra las obligaciones vencidas del año y explica la regla de morosidad. */
     private void overdue() {
         console.printTitle("Obligaciones vencidas");
         int year = support.readYear("Año académico");
@@ -318,6 +333,7 @@ public class FinanceMenuView {
         console.pause();
     }
 
+    /** Imprime una tabla de obligaciones vencidas (también la usa la vista de reportes). */
     void printOverdue(List<OverdueObligation> rows) {
         console.printTable(List.of("Documento", "Estudiante", "Grado", "Concepto", "Último pago / matrícula",
                         "Días de mora", "Pendiente", "Acudiente", "Teléfono"),
@@ -327,6 +343,7 @@ public class FinanceMenuView {
                         Formats.text(row.guardianPhone()))).collect(Collectors.toList()));
     }
 
+    /** Vuelve a generar los PDF de las facturas que quedaron sin archivo. */
     private void regenerate() {
         console.printTitle("Regenerar facturas PDF pendientes");
         Optional<List<com.littlehorizons.erp.model.finance.Invoice>> pending = support.show(controller.pendingInvoices());

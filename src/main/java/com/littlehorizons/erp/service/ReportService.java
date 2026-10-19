@@ -61,14 +61,17 @@ public class ReportService {
                                 boolean active) {
     }
 
+    /** Matrículas por grado en un año, separadas por estado. */
     public List<GradeEnrollmentCount> enrollmentsByGrade(int academicYear) {
         return transactions.read(connection -> reportDao.enrollmentsByGrade(connection, academicYear));
     }
 
+    /** Cifras generales del colegio en un año. */
     public SchoolStatistics statistics(int academicYear) {
         return transactions.read(connection -> reportDao.statistics(connection, academicYear));
     }
 
+    /** Eventos y participaciones por tipo de evento en un año. */
     public List<EventTypeParticipation> eventParticipationByType(int year) {
         return transactions.read(connection -> reportDao.eventParticipationByType(connection, year));
     }
@@ -101,6 +104,9 @@ public class ReportService {
                 .collect(Collectors.toList());
     }
 
+    /**
+     * Total recaudado en un año y el mismo total agrupado por concepto, método de pago y mes (con Streams).
+     */
     public PaymentSummary paymentSummary(int academicYear) {
         List<Payment> payments = transactions.read(connection -> paymentDao.findByYear(connection, academicYear));
         BigDecimal total = payments.stream().map(Payment::amount).reduce(BigDecimal.ZERO, BigDecimal::add);
@@ -115,6 +121,7 @@ public class ReportService {
         return new PaymentSummary(academicYear, total, payments.size(), byConcept, byMethod, byMonth);
     }
 
+    /** Ocupación de cada club: miembros activos, cupo y porcentaje de ocupación. */
     public List<ClubOccupancy> clubOccupancy() {
         List<Club> clubs = transactions.read(connection -> clubDao.findAll(connection, false));
         return clubs.stream()

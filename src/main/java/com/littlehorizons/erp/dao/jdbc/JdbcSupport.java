@@ -42,6 +42,9 @@ final class JdbcSupport {
 
     static final Binder NO_PARAMETERS = statement -> { };
 
+    /**
+     * Ejecuta un SELECT y convierte cada fila en un objeto con {@code mapper}; devuelve la lista completa.
+     */
     static <T> List<T> queryList(java.sql.Connection connection, String sql, Binder binder, RowMapper<T> mapper)
             throws SQLException {
         try (PreparedStatement statement = connection.prepareStatement(sql)) {
@@ -56,6 +59,7 @@ final class JdbcSupport {
         }
     }
 
+    /** Ejecuta un SELECT que devuelve como máximo una fila; {@code Optional.empty()} si no hay resultados. */
     static <T> Optional<T> queryOne(java.sql.Connection connection, String sql, Binder binder, RowMapper<T> mapper)
             throws SQLException {
         try (PreparedStatement statement = connection.prepareStatement(sql)) {
@@ -66,14 +70,17 @@ final class JdbcSupport {
         }
     }
 
+    /** Ejecuta una consulta que devuelve un solo número (por ejemplo, COUNT); 0 si no hay filas. */
     static int queryInt(java.sql.Connection connection, String sql, Binder binder) throws SQLException {
         return queryOne(connection, sql, binder, resultSet -> resultSet.getInt(1)).orElse(0);
     }
 
+    /** Devuelve true si la consulta encuentra al menos una fila. */
     static boolean exists(java.sql.Connection connection, String sql, Binder binder) throws SQLException {
         return queryOne(connection, sql, binder, resultSet -> Boolean.TRUE).isPresent();
     }
 
+    /** Ejecuta un INSERT, UPDATE o DELETE y devuelve cuántas filas cambió. */
     static int update(java.sql.Connection connection, String sql, Binder binder) throws SQLException {
         try (PreparedStatement statement = connection.prepareStatement(sql)) {
             binder.bind(statement);
@@ -97,6 +104,7 @@ final class JdbcSupport {
 
     // ------------------------------------------------------------ parámetros
 
+    /** Asigna un texto al parámetro; si es null guarda NULL en la base de datos. */
     static void setString(PreparedStatement statement, int index, String value) throws SQLException {
         if (value == null) {
             statement.setNull(index, Types.VARCHAR);
@@ -105,6 +113,7 @@ final class JdbcSupport {
         }
     }
 
+    /** Asigna un entero al parámetro; si es null guarda NULL en la base de datos. */
     static void setInteger(PreparedStatement statement, int index, Integer value) throws SQLException {
         if (value == null) {
             statement.setNull(index, Types.INTEGER);
@@ -113,6 +122,7 @@ final class JdbcSupport {
         }
     }
 
+    /** Asigna una fecha (LocalDate) al parámetro; si es null guarda NULL en la base de datos. */
     static void setDate(PreparedStatement statement, int index, LocalDate value) throws SQLException {
         if (value == null) {
             statement.setNull(index, Types.DATE);
@@ -121,14 +131,17 @@ final class JdbcSupport {
         }
     }
 
+    /** Asigna una hora (LocalTime) al parámetro. */
     static void setTime(PreparedStatement statement, int index, LocalTime value) throws SQLException {
         statement.setTime(index, Time.valueOf(value));
     }
 
+    /** Asigna una fecha y hora (LocalDateTime) al parámetro. */
     static void setTimestamp(PreparedStatement statement, int index, LocalDateTime value) throws SQLException {
         statement.setTimestamp(index, Timestamp.valueOf(value));
     }
 
+    /** Asigna un decimal (BigDecimal, usado para dinero) al parámetro; si es null guarda NULL. */
     static void setDecimal(PreparedStatement statement, int index, BigDecimal value) throws SQLException {
         if (value == null) {
             statement.setNull(index, Types.DECIMAL);
@@ -137,27 +150,32 @@ final class JdbcSupport {
         }
     }
 
+    /** Asigna el valor en español de un enum ({@link DbEnum#dbValue()}); si es null guarda NULL. */
     static void setEnum(PreparedStatement statement, int index, DbEnum value) throws SQLException {
         setString(statement, index, value == null ? null : value.dbValue());
     }
 
     // --------------------------------------------------------------- resultados
 
+    /** Lee un entero que puede ser NULL: JDBC devuelve 0 para NULL, por eso se revisa {@code wasNull()}. */
     static Integer getInteger(ResultSet resultSet, String column) throws SQLException {
         int value = resultSet.getInt(column);
         return resultSet.wasNull() ? null : value;
     }
 
+    /** Lee una fecha y la convierte a LocalDate; null si la columna es NULL. */
     static LocalDate getDate(ResultSet resultSet, String column) throws SQLException {
         Date value = resultSet.getDate(column);
         return value == null ? null : value.toLocalDate();
     }
 
+    /** Lee una hora y la convierte a LocalTime; null si la columna es NULL. */
     static LocalTime getTime(ResultSet resultSet, String column) throws SQLException {
         Time value = resultSet.getTime(column);
         return value == null ? null : value.toLocalTime();
     }
 
+    /** Lee una fecha y hora y la convierte a LocalDateTime; null si la columna es NULL. */
     static LocalDateTime getTimestamp(ResultSet resultSet, String column) throws SQLException {
         Timestamp value = resultSet.getTimestamp(column);
         return value == null ? null : value.toLocalDateTime();

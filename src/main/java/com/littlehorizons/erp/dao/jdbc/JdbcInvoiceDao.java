@@ -78,6 +78,7 @@ public class JdbcInvoiceDao implements InvoiceDao {
                 JdbcSupport.NO_PARAMETERS, JdbcInvoiceDao::map);
     }
 
+    /** Convierte una fila de {@code facturas} en un objeto {@link Invoice}. */
     private static Invoice map(ResultSet resultSet) throws SQLException {
         return new Invoice(
                 resultSet.getInt("id_factura"),

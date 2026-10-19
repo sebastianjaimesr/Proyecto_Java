@@ -23,6 +23,7 @@ public record StudentProfile(
         siblings = List.copyOf(siblings);
     }
 
+    /** Acudientes marcados como contacto de emergencia. */
     public List<GuardianLink> emergencyContacts() {
         return guardians.stream().filter(GuardianLink::emergencyContact).toList();
     }

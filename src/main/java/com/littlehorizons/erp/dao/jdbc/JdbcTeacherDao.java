@@ -84,6 +84,7 @@ public class JdbcTeacherDao implements TeacherDao {
         }, JdbcTeacherDao::map);
     }
 
+    /** Asigna los campos del profesor a los parámetros ? del INSERT/UPDATE, en orden. */
     private static void bindFields(PreparedStatement statement, Teacher teacher) throws SQLException {
         setEnum(statement, 1, teacher.documentType());
         statement.setString(2, teacher.documentNumber());
@@ -98,6 +99,7 @@ public class JdbcTeacherDao implements TeacherDao {
         setEnum(statement, 11, teacher.status());
     }
 
+    /** Convierte una fila de {@code profesores} en un objeto {@link Teacher}; otros DAOs lo reutilizan. */
     static Teacher map(ResultSet resultSet) throws SQLException {
         return new Teacher(
                 resultSet.getInt("id_profesor"),

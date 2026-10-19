@@ -20,6 +20,10 @@ public class ChargeCalculator {
 
     private static final BigDecimal HUNDRED = BigDecimal.valueOf(100);
 
+    /**
+     * Valor que debe pagar el estudiante: valor personalizado o valor base, menos la suma de beca y
+     * descuento por hermanos (máximo 100 %), redondeado a pesos.
+     */
     public BigDecimal expectedAmount(PaymentConcept concept, Collection<PriceAdjustment> adjustments) {
         BigDecimal base = adjustments.stream()
                 .filter(adjustment -> adjustment.conceptId() == concept.id())

@@ -33,6 +33,7 @@ public class SubjectService {
         this.catalogDao = Objects.requireNonNull(catalogDao, "catalogDao");
     }
 
+    /** Registra una materia en un grado después de validar sus datos y que el código no esté repetido. */
     public Subject register(Subject draft) {
         Subject subject = normalize(draft);
         return transactions.inTransaction(connection -> {
@@ -44,6 +45,7 @@ public class SubjectService {
         });
     }
 
+    /** Actualiza una materia existente. */
     public Subject update(Subject changes) {
         Objects.requireNonNull(changes.id(), "id");
         Subject subject = normalize(changes);
@@ -61,11 +63,13 @@ public class SubjectService {
         });
     }
 
+    /** Busca una materia por id o lanza un error si no existe. */
     public Subject findById(int subjectId) {
         return transactions.read(connection -> ServiceChecks.require(subjectDao.findById(connection, subjectId),
                 "No existe una materia con id " + subjectId + "."));
     }
 
+    /** Materias de un grado; {@code onlyActive} excluye las desactivadas. */
     public List<Subject> findByGrade(int gradeId, boolean onlyActive) {
         return transactions.read(connection -> {
             requireGrade(connection, gradeId);
@@ -73,19 +77,23 @@ public class SubjectService {
         });
     }
 
+    /** Todas las materias de todos los grados. */
     public List<Subject> findAll() {
         return transactions.read(subjectDao::findAll);
     }
 
+    /** Lista los grados del catálogo. */
     public List<Grade> findGrades() {
         return transactions.read(catalogDao::findAllGrades);
     }
 
+    /** Busca el grado o lanza un error si no existe. */
     private Grade requireGrade(Connection connection, int gradeId) throws SQLException {
         return ServiceChecks.require(catalogDao.findGradeById(connection, gradeId),
                 "No existe un grado con id " + gradeId + ".");
     }
 
+    /** Verifica que ninguna otra materia tenga el mismo código. */
     private void ensureCodeIsFree(Connection connection, String code, Integer ownId) throws SQLException {
         subjectDao.findByCode(connection, code)
                 .filter(existing -> !existing.id().equals(ownId))
@@ -95,6 +103,7 @@ public class SubjectService {
                 });
     }
 
+    /** Valida y limpia los datos de la materia (código, nombre y horas semanales dentro del rango). */
     private static Subject normalize(Subject subject) {
         String code = InputValidator.validateCode(subject.code(), "código de materia", MAX_CODE_LENGTH);
         String name = InputValidator.requireText(subject.name(), "nombre de la materia", MAX_NAME_LENGTH);

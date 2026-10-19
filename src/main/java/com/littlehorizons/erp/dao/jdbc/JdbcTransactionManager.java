@@ -62,6 +62,10 @@ public class JdbcTransactionManager implements TransactionManager {
         }
     }
 
+    /**
+     * Deshace la transacción sin ocultar el error original: si el rollback también falla,
+     * se agrega como error "suprimido" y se registra en el log.
+     */
     private static void rollbackQuietly(Connection connection, Exception cause) {
         try {
             connection.rollback();

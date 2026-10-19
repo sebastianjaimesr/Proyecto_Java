@@ -166,6 +166,7 @@ public class JdbcTeacherAssignmentDao implements TeacherAssignmentDao {
                 }, JdbcTeacherAssignmentDao::mapSchedule);
     }
 
+    /** Convierte una fila de {@code asignaciones_profesor} en un objeto {@link TeacherAssignment}. */
     private static TeacherAssignment map(ResultSet resultSet) throws SQLException {
         return new TeacherAssignment(
                 resultSet.getInt("id_asignacion"),
@@ -178,6 +179,7 @@ public class JdbcTeacherAssignmentDao implements TeacherAssignmentDao {
                 resultSet.getInt("id_grado"));
     }
 
+    /** Convierte una fila de {@code horarios_clase} en un objeto {@link ClassSchedule}. */
     private static ClassSchedule mapSchedule(ResultSet resultSet) throws SQLException {
         return new ClassSchedule(
                 resultSet.getInt("id_horario"),

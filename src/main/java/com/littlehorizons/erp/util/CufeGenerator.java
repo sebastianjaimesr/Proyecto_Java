@@ -36,6 +36,7 @@ public final class CufeGenerator {
                 total.setScale(2, RoundingMode.HALF_UP).toPlainString());
     }
 
+    /** Calcula el CUFE simulado: hash SHA-384 del texto de entrada, en hexadecimal. */
     public static String generate(String invoiceNumber, String nit, LocalDateTime issuedAt, BigDecimal total) {
         try {
             MessageDigest digest = MessageDigest.getInstance(ALGORITHM);

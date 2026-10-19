@@ -62,6 +62,7 @@ public class ErrorLogFormatter extends Formatter {
         return entry.toString();
     }
 
+    /** Clase y método que generaron el registro, en formato Clase#metodo. */
     private static String sourceOf(LogRecord logRecord) {
         String className = logRecord.getSourceClassName() != null
                 ? logRecord.getSourceClassName()

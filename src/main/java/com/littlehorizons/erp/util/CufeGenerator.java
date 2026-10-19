@@ -14,8 +14,8 @@ import java.util.HexFormat;
  *
  * <p>Documented input (fields joined with "|"):</p>
  * <pre>
- * numero_factura | NIT configurado | fecha y hora ISO (yyyy-MM-dd'T'HH:mm:ss) | total con 2 decimales
- * ejemplo: FE-000123|900000000-0|2026-10-15T14:30:00|350000.00
+ * invoice number | configured NIT | ISO date and time (yyyy-MM-dd'T'HH:mm:ss) | total with 2 decimals
+ * example: FE-000123|900000000-0|2026-10-15T14:30:00|350000.00
  * </pre>
  * <p>The value is the SHA-384 hash of that text in lower-case hexadecimal (96
  * characters, fits in {@code facturas.cufe VARCHAR(100)}). It only imitates

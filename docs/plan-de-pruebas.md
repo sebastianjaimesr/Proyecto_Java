@@ -1,8 +1,8 @@
 # Plan y resultados de pruebas
 
-Proyecto: ERP Colegio Internacional Little Horizons · Ejecución verificada: 2026-10-18 con `mvn clean test` (JUnit 5.14.4, MySQL 8.0.46, Java 17.0.12).
+Proyecto: ERP Colegio Internacional Little Horizons · Ejecución verificada: 2026-10-19 con `mvn clean test` (JUnit 5.14.4, MySQL 8.0.46, Java 17.0.12).
 
-**Resultado global: 114 pruebas ejecutadas, 114 aprobadas, 0 fallidas, 0 omitidas.**
+**Resultado global: 115 pruebas ejecutadas, 115 aprobadas, 0 fallidas, 0 omitidas.**
 
 Las pruebas de integración usan una base desechable `erp_little_horizons_test`, creada desde las secciones DDL de `docs/database.sql`, con el reloj fijado en 2026-10-15 (`TestDatabase.CLOCK`).
 
@@ -26,7 +26,8 @@ Las pruebas de integración usan una base desechable `erp_little_horizons_test`,
 | 16 | Errores de conexión | `DatabaseConnectionTest` · `unreachableServerRaisesDataAccessExceptionWithoutPassword`; `SystemServiceTest` · `controllerHidesTechnicalErrorsFromTheUser` | Fallo de conexión controlado, sin revelar la contraseña ni el SQL | Servidor `127.0.0.1:1` | `DataAccessException` registrada; el usuario ve un mensaje genérico en español | Igual al esperado | Aprobada |
 | 17 | Configuración y logs | `AppConfigTest` (5), `AppLoggerTest` (3), `ConsoleUtilsTest` · `accentedInputIsReadCorrectly`, `boxIsDrawnWithSameWidthOnEveryLine` | Configuración UTF-8, `error_log.txt` con todos los campos, consola con tildes | Archivos temporales y una excepción simulada | Fecha, nivel, clase#método, mensaje y *stack trace* | Igual al esperado | Aprobada |
 | 18 | Reportes agregados | `ReportIntegrationTest` (4) | Matriculados por grado, ranking, resumen de pagos y estadísticas | Datos de prueba insertados con SQL | Los 12 grados listados; ranking 4.5 y 3.2; total 1 200 000 | Igual al esperado | Aprobada |
-| 19 | Conexión real | `JdbcSystemDaoIntegrationTest` · `readsServerVersionAndOfficialTables` | Conexión con `config.properties` y verificación de las 22 tablas oficiales | Base `erp_little_horizons` | MySQL 8.x y 22 tablas presentes | MySQL 8.0.46, 22 de 22 tablas | Aprobada |
+| 19 | Búsqueda de personas | `AcademicModuleIntegrationTest` · `searchMatchesUsualNameOrders` | Encontrar por nombre y apellido aunque haya segundo nombre | `Antonella Búsqueda`, nombre completo, apellidos primero, parte del documento | El estudiante aparece en las cuatro búsquedas | Igual al esperado | Aprobada |
+| 20 | Conexión real | `JdbcSystemDaoIntegrationTest` · `readsServerVersionAndOfficialTables` | Conexión con `config.properties` y verificación de las 22 tablas oficiales | Base `erp_little_horizons` | MySQL 8.x y 22 tablas presentes | MySQL 8.0.46, 22 de 22 tablas | Aprobada |
 
 ## Verificaciones manuales realizadas
 
@@ -38,6 +39,8 @@ Las pruebas de integración usan una base desechable `erp_little_horizons_test`,
 | Menú 7 → 14 | Estadísticas: 58 estudiantes activos, 38 profesores activos, 634 pagos por $ 213.085.000, promedio 3.8 |
 | Menú 7 → 11 | 7 obligaciones vencidas (pensión de los estudiantes 8, 12, 19, 27 y 44; matrícula incompleta de los estudiantes 15 y 38) |
 | Menú 7 → 13 | 4 préstamos vencidos |
+| Pago real desde el menú 5 → 2 (estudiante Antonella Moreno, Actividad Especial, $ 50.000) | Recibo `RC-2026-000635`, factura `FE-000001` y PDF en `invoices/factura_000001.pdf` |
+| Conexión fallida a propósito (puerto 1) | Entrada SEVERE con *stack trace* en `logs/error_log.txt`; en pantalla solo el aviso en español |
 | `mvn compile exec:java` y acción Run de NetBeans simulada | Menú interactivo funcional; salida ordenada con la opción 9 |
 
 ## Pendiente de verificar por el usuario

@@ -22,13 +22,24 @@ El Colegio Internacional Little Horizons (preescolar a grado 11.º) necesita un 
 
 Una aplicación de consola en español, organizada en siete módulos y un menú de configuración, que trabaja sobre el esquema oficial `erp_little_horizons`. Las reglas de negocio están en la capa de servicios, todas las consultas usan `PreparedStatement` y las operaciones que modifican varias tablas se ejecutan en transacciones con *rollback*.
 
+### Funcionalidades principales
+
+- **Gestión académica:** estudiantes, acudientes, matrículas, materias, inscripciones, notas, promedios, historial y asistencia.
+- **Profesores:** registro, asignación de materias y horarios con detección de conflictos.
+- **Actividades extracurriculares:** clubes con control de cupo, eventos y resultados de competencias.
+- **Gestión financiera:** conceptos de pago, becas y descuentos, pagos, morosidad y factura PDF con CUFE y código QR simulados.
+- **Recursos:** inventario y préstamos a estudiantes y profesores con control de vencimientos.
+- **Reportes y estadísticas:** 14 reportes del colegio.
+
+El detalle por módulo está en la sección 10.
+
 ---
 
 ## 3. Autores
 
-| Nombre | Perfil | Correo | GitHub |
+| Nombre completo | Perfil | Correo electrónico | GitHub |
 |---|---|---|---|
-| Sebastian Jaimes | Desarrollador Full Stack en formación | [jsrolon01@gmail.com](mailto:jsrolon01@gmail.com) | [github.com/sebastianjaimesr](https://github.com/sebastianjaimesr) |
+| Juan Sebastián Jaimes | Desarrollador Full Stack en formación | [jsrolon01@gmail.com](mailto:jsrolon01@gmail.com) | [github.com/sebastianjaimesr](https://github.com/sebastianjaimesr) |
 
 ---
 
@@ -39,7 +50,7 @@ Versiones verificadas en el equipo de desarrollo (Windows 11):
 | Tecnología | Versión | Uso |
 |---|---|---|
 | Java (JDK) | 17.0.12 LTS | Lenguaje; el proyecto compila con `release 17` |
-| Apache NetBeans | Incluido en el equipo (perfil 31) | IDE del proyecto |
+| Apache NetBeans | 31 (compilación del 5 de agosto de 2026) | IDE utilizado (indicado por el trainer) |
 | Apache Maven | 3.9.16 (incluido en NetBeans) | Construcción y dependencias |
 | MySQL Server | 8.0.46 Community | Base de datos |
 | MySQL Connector/J | 8.4.0 | Driver JDBC (línea LTS para MySQL 8.0/8.4) |
@@ -55,7 +66,7 @@ No se usan otras librerías.
 ## 5. Requerimientos previos
 
 - JDK 17 o superior.
-- MySQL Server 8.0 o superior en ejecución (los `CHECK` del esquema requieren MySQL 8).
+- **Importante: se requiere MySQL Server 8.0 o superior**, en ejecución. Las restricciones `CHECK` del esquema (por ejemplo, notas entre 0.0 y 5.0) solo se aplican desde MySQL 8.0.
 - Apache NetBeans con soporte Java y Maven (o Maven 3.9+ en la línea de comandos).
 - Un usuario de MySQL con permisos para crear la base `erp_little_horizons`.
 - Conexión a Internet la primera vez que se compila, para que Maven descargue las dependencias.
@@ -75,7 +86,7 @@ El archivo [`docs/database.sql`](docs/database.sql) contiene:
 
 > **Advertencia:** la sección 1 empieza con `DROP DATABASE IF EXISTS erp_little_horizons`. Ejecutar el archivo borra esa base y la crea de nuevo.
 
-### Crear la base
+### 6.1 Creación de la base de datos
 
 Con la consola de MySQL (desde la carpeta del proyecto):
 
@@ -83,7 +94,7 @@ Con la consola de MySQL (desde la carpeta del proyecto):
 mysql -u USUARIO -p --default-character-set=utf8mb4 < docs\database.sql
 ```
 
-También se puede abrir `docs/database.sql` en MySQL Workbench o DBeaver y ejecutarlo completo.
+También se puede abrir `docs/database.sql` en MySQL Workbench, DBeaver o la pestaña *Services → Databases* de NetBeans y ejecutarlo completo.
 
 Conteos verificados después de cargar el archivo (sección 3):
 
@@ -97,6 +108,19 @@ Conteos verificados después de cargar el archivo (sección 3):
 | pagos | 634 |
 | clubes | 30 |
 | recursos | 37 |
+
+### 6.2 Configuración de credenciales
+
+Las credenciales se leen de un archivo local `config.properties`, fuera del código fuente:
+
+1. Copiar `config.example.properties` como `config.properties` en la carpeta raíz del proyecto.
+2. Completar `db.user` y `db.password` con un usuario de MySQL que tenga permisos sobre `erp_little_horizons`.
+
+`config.properties` está en `.gitignore` y no se sube al repositorio. Todas las propiedades disponibles se describen en la sección 7.
+
+### 6.3 Instalación del driver JDBC
+
+No hay que instalar nada a mano. El driver **MySQL Connector/J 8.4.0** está declarado en `pom.xml` (`com.mysql:mysql-connector-j`) y Maven lo descarga automáticamente la primera vez que se compila, en NetBeans o en la consola. Queda guardado en `%USERPROFILE%\.m2\repository\com\mysql\mysql-connector-j\8.4.0\`. Para conectarse desde NetBeans (*Services → Databases → New Connection*), se puede seleccionar ese mismo JAR como driver.
 
 ### Cambios autorizados al esquema
 
@@ -118,13 +142,7 @@ git clone https://github.com/sebastianjaimesr/Proyecto_Java.git
 cd Proyecto_Java
 ```
 
-### 7.2 Configurar las credenciales
-
-1. Copiar `config.example.properties` como `config.properties` en la carpeta raíz del proyecto.
-2. Completar `db.user` y `db.password` con un usuario real de MySQL.
-3. Opcional: completar los datos legales del emisor (`issuer.nit`, `issuer.address`, `issuer.phone`, `issuer.email`). Si se dejan vacíos, la factura muestra "PENDIENTE DE CONFIGURACIÓN".
-
-`config.properties` está en `.gitignore` y nunca debe subirse al repositorio. La contraseña no se muestra en pantalla ni se escribe en los registros.
+Antes de continuar, crear la base (6.1) y `config.properties` (6.2). Opcional: completar los datos legales del emisor (`issuer.nit`, `issuer.address`, `issuer.phone`, `issuer.email`); si se dejan vacíos, la factura muestra "PENDIENTE DE CONFIGURACIÓN". La contraseña no se muestra en pantalla ni se escribe en los registros.
 
 | Propiedad | Ejemplo | Descripción |
 |---|---|---|
@@ -138,18 +156,28 @@ cd Proyecto_Java
 | `finance.tax.percent.CODIGO` | `finance.tax.percent.UNIFORME=19` | IVA por concepto (sin línea, no aplica) |
 | `finance.mandatory.concepts` | `MAT,PENSION` | Conceptos que todo matriculado debe pagar |
 
-### 7.3 Ejecutar desde NetBeans
+### 7.2 Abrir el proyecto en el IDE
 
-1. *File → Open Project* y elegir la carpeta `Proyecto_Java` (NetBeans la reconoce como proyecto Maven por el `pom.xml`).
-2. *Run → Run Project* (F6). La configuración de ejecución está en `nbactions.xml` (clase `com.littlehorizons.erp.Main`).
-3. La aplicación se ejecuta en la ventana *Output*, donde se escriben las opciones.
+1. En NetBeans: *File → Open Project…*
+2. Elegir la carpeta `Proyecto_Java`. NetBeans la reconoce como proyecto Maven por el `pom.xml`.
+3. Pulsar *Open Project*.
 
-### 7.4 Ejecutar desde la línea de comandos
+### 7.3 Compilar
 
-Con el Maven incluido en NetBeans (Windows):
+- En NetBeans: clic derecho en el proyecto → *Clean and Build* (Shift+F11). La primera vez Maven descarga las dependencias; debe terminar con `BUILD SUCCESS`.
+- En la consola, con el Maven incluido en NetBeans:
 
 ```
-"C:\Program Files\Apache NetBeans\java\maven\bin\mvn" clean compile exec:java
+"C:\Program Files\Apache NetBeans\java\maven\bin\mvn" clean package
+```
+
+### 7.4 Ejecutar
+
+- En NetBeans: *Run → Run Project* (F6). La configuración está en `nbactions.xml` (clase principal `com.littlehorizons.erp.Main`). La aplicación se usa desde la ventana *Output*.
+- En la consola:
+
+```
+"C:\Program Files\Apache NetBeans\java\maven\bin\mvn" compile exec:java
 ```
 
 En la consola de Windows (`cmd`) los acentos se muestran bien con la opción `console.encoding=AUTO`, que usa la página de códigos de la terminal.
@@ -199,7 +227,7 @@ Ninguna vista usa DAOs, ningún controlador escribe en la consola y solo los DAO
 
 ## 9. Principios y patrones de diseño aplicados
 
-### Principios SOLID con ejemplos del código
+### 9.1 Principios SOLID
 
 | Principio | Dónde | Explicación |
 |---|---|---|
@@ -209,9 +237,9 @@ Ninguna vista usa DAOs, ningún controlador escribe en la consola y solo los DAO
 | **I**nterface Segregation | `CatalogDao`, `ReportDao`, `SystemDao` | Los catálogos de solo lectura (grados) y los reportes tienen interfaces sin métodos de escritura; cada DAO expone solo lo que su tabla necesita. |
 | **D**ependency Inversion | Constructores de todos los servicios | `PaymentService` depende de `PaymentDao`, `TransactionManager` y `Clock` (abstracciones), recibidos por constructor. Solo `ApplicationFactory` conoce las clases `Jdbc*`. |
 
-### Patrones
+### 9.2 Patrones de diseño
 
-| Patrón | Dónde | Problema que resuelve |
+| Patrón | Dónde | Justificación de su uso |
 |---|---|---|
 | MVC | Paquetes `view`, `controller`, `model` | Separa la consola de las reglas y de los datos. |
 | DAO | `dao` y `dao.jdbc` | Los servicios no conocen SQL; las pruebas pueden cambiar la persistencia. |
@@ -357,7 +385,7 @@ No se ha definido una licencia para este proyecto. Es un trabajo académico; su 
 
 ## 16. Contacto
 
-- Sebastian Jaimes · [jsrolon01@gmail.com](mailto:jsrolon01@gmail.com)
+- Juan Sebastián Jaimes · [jsrolon01@gmail.com](mailto:jsrolon01@gmail.com)
 - GitHub: [https://github.com/sebastianjaimesr](https://github.com/sebastianjaimesr)
 
 ---
@@ -374,4 +402,4 @@ Desde la línea de comandos:
 
 - Las pruebas unitarias no necesitan base de datos.
 - Las pruebas de integración crean y borran su propia base `erp_little_horizons_test` a partir de `docs/database.sql`; nunca modifican `erp_little_horizons`. Si no existe `config.properties`, se omiten.
-- Resultado verificado el 2026-10-18: **114 pruebas, 0 fallos, 0 errores, 0 omitidas**. El detalle de cada prueba está en [`docs/plan-de-pruebas.md`](docs/plan-de-pruebas.md).
+- Resultado verificado el 2026-10-19: **115 pruebas, 0 fallos, 0 errores, 0 omitidas**. El detalle de cada prueba está en [`docs/plan-de-pruebas.md`](docs/plan-de-pruebas.md).

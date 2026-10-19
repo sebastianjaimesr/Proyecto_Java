@@ -139,6 +139,19 @@ class AcademicModuleIntegrationTest {
     }
 
     @Test
+    @DisplayName("Search finds a student by first name and surname even with a middle name")
+    void searchMatchesUsualNameOrders() {
+        Student student = students.register(new Student(null, StudentDocumentType.TI, "TI8880001",
+                new PersonName("Antonella", "Lucía", "Búsqueda", "Rojas"), LocalDate.of(2014, 2, 2), Gender.FEMALE,
+                null, null, null, null, null, null, LocalDate.of(2021, 1, 20), StudentStatus.ACTIVE));
+
+        for (String text : List.of("Antonella Búsqueda", "Antonella Lucía Búsqueda", "Búsqueda Rojas Antonella",
+                "8880001")) {
+            assertTrue(students.search(text).stream().anyMatch(found -> found.id().equals(student.id())), text);
+        }
+    }
+
+    @Test
     void invalidStudentDataIsRejectedBeforeTheDatabase() {
         Student futureBirth = new Student(null, StudentDocumentType.TI, "TI7777777",
                 new PersonName("Ana", null, "Ruiz", null), TestDatabase.TODAY.plusDays(1), Gender.FEMALE, null,

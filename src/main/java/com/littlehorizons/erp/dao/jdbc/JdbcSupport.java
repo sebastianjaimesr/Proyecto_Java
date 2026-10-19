@@ -163,6 +163,30 @@ final class JdbcSupport {
         return value == null ? null : value.toLocalDateTime();
     }
 
+    /** Number of {@code ?} placeholders used by {@link #nameMatches(String)}. */
+    static final int NAME_MATCH_PARAMETERS = 3;
+
+    /**
+     * SQL fragment that matches a person's name written in any usual order:
+     * full name, first name plus surnames (without middle name), or surnames
+     * first. The alias is a constant of the calling DAO, never user input.
+     */
+    static String nameMatches(String alias) {
+        return "(CONCAT_WS(' ', " + alias + ".primer_nombre, " + alias + ".segundo_nombre, " + alias
+                + ".primer_apellido, " + alias + ".segundo_apellido) LIKE ? "
+                + "OR CONCAT_WS(' ', " + alias + ".primer_nombre, " + alias + ".primer_apellido, " + alias
+                + ".segundo_apellido) LIKE ? "
+                + "OR CONCAT_WS(' ', " + alias + ".primer_apellido, " + alias + ".segundo_apellido, " + alias
+                + ".primer_nombre, " + alias + ".segundo_nombre) LIKE ?)";
+    }
+
+    /** Binds the same pattern to the placeholders of {@link #nameMatches(String)}, starting at {@code index}. */
+    static void bindNameMatches(PreparedStatement statement, int index, String pattern) throws SQLException {
+        for (int i = 0; i < NAME_MATCH_PARAMETERS; i++) {
+            statement.setString(index + i, pattern);
+        }
+    }
+
     /** Escapes LIKE wildcards in user text and wraps it as a "contains" pattern. */
     static String containsPattern(String text) {
         String escaped = text.replace("\\", "\\\\").replace("%", "\\%").replace("_", "\\_");

@@ -37,7 +37,7 @@ public class JdbcTeacherDao implements TeacherDao {
     private static final String SELECT = "SELECT " + COLUMNS + " FROM profesores p ";
     private static final String SQL_SEARCH = SELECT
             + "WHERE ? = '' OR p.numero_documento LIKE ? OR p.especializacion LIKE ? "
-            + "OR CONCAT_WS(' ', p.primer_nombre, p.segundo_nombre, p.primer_apellido, p.segundo_apellido) LIKE ? "
+            + "OR " + JdbcSupport.nameMatches("p") + " "
             + "ORDER BY p.primer_apellido, p.segundo_apellido, p.primer_nombre LIMIT ?";
 
     @Override
@@ -79,8 +79,8 @@ public class JdbcTeacherDao implements TeacherDao {
             statement.setString(1, filter);
             statement.setString(2, pattern);
             statement.setString(3, pattern);
-            statement.setString(4, pattern);
-            statement.setInt(5, limit);
+            JdbcSupport.bindNameMatches(statement, 4, pattern);
+            statement.setInt(4 + JdbcSupport.NAME_MATCH_PARAMETERS, limit);
         }, JdbcTeacherDao::map);
     }
 

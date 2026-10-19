@@ -44,7 +44,7 @@ public class JdbcStudentDao implements StudentDao {
             "SELECT " + COLUMNS + " FROM estudiantes e WHERE e.numero_documento = ?";
     private static final String SQL_SEARCH = "SELECT " + COLUMNS + " FROM estudiantes e "
             + "WHERE ? = '' OR e.numero_documento LIKE ? "
-            + "OR CONCAT_WS(' ', e.primer_nombre, e.segundo_nombre, e.primer_apellido, e.segundo_apellido) LIKE ? "
+            + "OR " + JdbcSupport.nameMatches("e") + " "
             + "ORDER BY e.primer_apellido, e.segundo_apellido, e.primer_nombre LIMIT ?";
 
     @Override
@@ -87,8 +87,8 @@ public class JdbcStudentDao implements StudentDao {
         return JdbcSupport.queryList(connection, SQL_SEARCH, statement -> {
             statement.setString(1, filter);
             statement.setString(2, pattern);
-            statement.setString(3, pattern);
-            statement.setInt(4, limit);
+            JdbcSupport.bindNameMatches(statement, 3, pattern);
+            statement.setInt(3 + JdbcSupport.NAME_MATCH_PARAMETERS, limit);
         }, JdbcStudentDao::map);
     }
 

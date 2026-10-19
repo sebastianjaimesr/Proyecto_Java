@@ -40,7 +40,7 @@ public class JdbcGuardianDao implements GuardianDao {
             "SELECT " + COLUMNS + " FROM acudientes a WHERE a.numero_documento = ?";
     private static final String SQL_SEARCH = "SELECT " + COLUMNS + " FROM acudientes a "
             + "WHERE ? = '' OR a.numero_documento LIKE ? "
-            + "OR CONCAT_WS(' ', a.primer_nombre, a.segundo_nombre, a.primer_apellido, a.segundo_apellido) LIKE ? "
+            + "OR " + JdbcSupport.nameMatches("a") + " "
             + "ORDER BY a.primer_apellido, a.segundo_apellido, a.primer_nombre LIMIT ?";
 
     private static final String SQL_LINK = "INSERT INTO estudiante_acudiente "
@@ -100,8 +100,8 @@ public class JdbcGuardianDao implements GuardianDao {
         return JdbcSupport.queryList(connection, SQL_SEARCH, statement -> {
             statement.setString(1, filter);
             statement.setString(2, pattern);
-            statement.setString(3, pattern);
-            statement.setInt(4, limit);
+            JdbcSupport.bindNameMatches(statement, 3, pattern);
+            statement.setInt(3 + JdbcSupport.NAME_MATCH_PARAMETERS, limit);
         }, JdbcGuardianDao::map);
     }
 

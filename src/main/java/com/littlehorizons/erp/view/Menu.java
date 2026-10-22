@@ -12,6 +12,10 @@ import java.util.Objects;
  *
  * <p>Modules add their screens as {@link Item}s, so new options do not
  * require changes to this class (Open/Closed).</p>
+ *
+ * <p>Every submenu offers "0. Volver al menú anterior" and, as its last
+ * option, "Volver al menú principal", which closes all nested submenus at
+ * once.</p>
  */
 public final class Menu {
 
@@ -25,6 +29,10 @@ public final class Menu {
     }
 
     private static final String PROMPT = "Seleccione una opción: ";
+    private static final String MAIN_MENU_LABEL = "Volver al menú principal";
+
+    /** Set when the user asks to go back to the main menu from a nested submenu. */
+    private static boolean returnToMain;
 
     private final ConsoleUtils console;
     private final String[] header;
@@ -51,16 +59,21 @@ public final class Menu {
         return new Menu(console, header, items, "Volver al menú anterior", false);
     }
 
-    /** Shows the menu until the exit option is chosen. */
+    /** Shows the menu until the exit option (or "Volver al menú principal") is chosen. */
     public void run() {
-        int exitNumber = exitIsLastNumber ? items.size() + 1 : 0;
-        int min = exitIsLastNumber ? 1 : 0;
-        int max = exitIsLastNumber ? exitNumber : items.size();
+        boolean isMain = exitIsLastNumber;
+        int exitNumber = isMain ? items.size() + 1 : 0;
+        int mainMenuNumber = isMain ? -1 : items.size() + 1;
+        int min = isMain ? 1 : 0;
+        int max = isMain ? exitNumber : mainMenuNumber;
         while (true) {
             console.printBox(header);
             List<String> lines = new ArrayList<>();
             for (int i = 0; i < items.size(); i++) {
                 lines.add((i + 1) + ". " + items.get(i).label());
+            }
+            if (!isMain) {
+                lines.add(mainMenuNumber + ". " + MAIN_MENU_LABEL);
             }
             lines.add(exitNumber + ". " + exitLabel);
             lines.forEach(console::println);
@@ -69,7 +82,18 @@ public final class Menu {
             if (option == exitNumber) {
                 return;
             }
+            if (option == mainMenuNumber) {
+                returnToMain = true;
+                return;
+            }
             items.get(option - 1).action().run();
+            if (returnToMain) {
+                if (isMain) {
+                    returnToMain = false;
+                } else {
+                    return;
+                }
+            }
         }
     }
 }

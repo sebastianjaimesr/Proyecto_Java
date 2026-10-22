@@ -72,6 +72,20 @@ class AverageCalculatorTest {
     }
 
     @Test
+    void generalAverageIsAlsoComputedPerPeriod() {
+        Map<GradingPeriod, BigDecimal> averages = calculator.periodAverages(List.of(
+                grade(1, 10, GradingPeriod.I, "3.0"),
+                grade(1, 20, GradingPeriod.I, "4.0"),
+                grade(1, 10, GradingPeriod.II, "4.6"),
+                grade(1, 10, GradingPeriod.FINAL, "1.0")));
+
+        assertEquals(new BigDecimal("3.5"), averages.get(GradingPeriod.I));
+        assertEquals(new BigDecimal("4.6"), averages.get(GradingPeriod.II));
+        assertFalse(averages.containsKey(GradingPeriod.FINAL), "Final is not a period average");
+        assertFalse(averages.containsKey(GradingPeriod.III), "periods without grades are left out");
+    }
+
+    @Test
     void subjectAveragesAreGroupedAndSorted() {
         List<SubjectAverage> averages = calculator.subjectAverages(List.of(
                 grade(1, 20, GradingPeriod.I, "5.0"),

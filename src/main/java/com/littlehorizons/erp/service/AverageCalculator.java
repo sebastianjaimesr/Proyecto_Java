@@ -66,6 +66,22 @@ public class AverageCalculator {
                 .collect(Collectors.toList());
     }
 
+    /**
+     * General average of a student in each regular period (I to IV): mean of
+     * the grades of every subject in that period. Periods without grades are
+     * left out.
+     */
+    public Map<GradingPeriod, BigDecimal> periodAverages(Collection<GradeRecord> records) {
+        Map<GradingPeriod, BigDecimal> averages = new EnumMap<>(GradingPeriod.class);
+        records.stream()
+                .filter(gradeRecord -> gradeRecord.period().isEditable())
+                .collect(Collectors.groupingBy(GradeRecord::period,
+                        () -> new EnumMap<>(GradingPeriod.class),
+                        Collectors.mapping(GradeRecord::value, Collectors.toList())))
+                .forEach((period, values) -> averages.put(period, strategy.average(values)));
+        return averages;
+    }
+
     /** Mean of the subject averages that exist; {@code null} when none has grades. */
     public BigDecimal generalAverage(Collection<SubjectAverage> subjects) {
         return strategy.average(subjects.stream()

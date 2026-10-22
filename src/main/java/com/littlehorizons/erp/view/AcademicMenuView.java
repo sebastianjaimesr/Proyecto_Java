@@ -379,7 +379,13 @@ public class AcademicMenuView {
         console.println(report.studentName() + " · " + report.academicYear()
                 + (report.gradeName() == null ? "" : " · " + report.gradeName()));
         printSubjectAverages(report.subjects());
-        console.println("Promedio general: " + Formats.grade(report.generalAverage())
+        if (!report.periodAverages().isEmpty()) {
+            console.println("Promedio general por período: " + EDITABLE_PERIODS.stream()
+                    .filter(report.periodAverages()::containsKey)
+                    .map(period -> period.dbValue() + " = " + Formats.grade(report.periodAverages().get(period)))
+                    .collect(Collectors.joining(" · ")));
+        }
+        console.println("Promedio general del año: " + Formats.grade(report.generalAverage())
                 + (report.subjectsWithoutGrades() > 0
                 ? " (" + report.subjectsWithoutGrades() + " materia(s) sin calificaciones no se incluyen)" : ""));
     }

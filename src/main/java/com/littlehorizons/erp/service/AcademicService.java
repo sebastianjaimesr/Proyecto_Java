@@ -264,7 +264,7 @@ public class AcademicService {
                     .map(Enrollment::gradeName).orElse(null);
             long withoutGrades = subjects.stream().filter(subject -> !subject.hasGrades()).count();
             return new StudentAverageReport(studentId, student.fullName(), academicYear, gradeName, subjects,
-                    calculator.generalAverage(subjects), withoutGrades);
+                    calculator.periodAverages(records), calculator.generalAverage(subjects), withoutGrades);
         });
     }
 

@@ -1,8 +1,8 @@
 # Plan y resultados de pruebas
 
-Proyecto: ERP Colegio Internacional Little Horizons · Ejecución verificada: 2026-10-19 con `mvn clean test` (JUnit 5.14.4, MySQL 8.0.46, Java 17.0.12).
+Proyecto: ERP Colegio Internacional Little Horizons · Ejecución verificada: 2026-10-22 con `mvn clean test` (JUnit 5.14.4, MySQL 8.0.46, Java 17.0.12).
 
-**Resultado global: 115 pruebas ejecutadas, 115 aprobadas, 0 fallidas, 0 omitidas.**
+**Resultado global: 117 pruebas ejecutadas, 117 aprobadas, 0 fallidas, 0 omitidas.**
 
 Las pruebas de integración usan una base desechable `erp_little_horizons_test`, creada desde las secciones DDL de `docs/database.sql`, con el reloj fijado en 2026-10-15 (`TestDatabase.CLOCK`).
 
@@ -27,7 +27,9 @@ Las pruebas de integración usan una base desechable `erp_little_horizons_test`,
 | 17 | Configuración y logs | `AppConfigTest` (5), `AppLoggerTest` (3), `ConsoleUtilsTest` · `accentedInputIsReadCorrectly`, `boxIsDrawnWithSameWidthOnEveryLine` | Configuración UTF-8, `error_log.txt` con todos los campos, consola con tildes | Archivos temporales y una excepción simulada | Fecha, nivel, clase#método, mensaje y *stack trace* | Igual al esperado | Aprobada |
 | 18 | Reportes agregados | `ReportIntegrationTest` (4) | Matriculados por grado, ranking, resumen de pagos y estadísticas | Datos de prueba insertados con SQL | Los 12 grados listados; ranking 4.5 y 3.2; total 1 200 000 | Igual al esperado | Aprobada |
 | 19 | Búsqueda de personas | `AcademicModuleIntegrationTest` · `searchMatchesUsualNameOrders` | Encontrar por nombre y apellido aunque haya segundo nombre | `Antonella Búsqueda`, nombre completo, apellidos primero, parte del documento | El estudiante aparece en las cuatro búsquedas | Igual al esperado | Aprobada |
-| 20 | Conexión real | `JdbcSystemDaoIntegrationTest` · `readsServerVersionAndOfficialTables` | Conexión con `config.properties` y verificación de las 22 tablas oficiales | Base `erp_little_horizons` | MySQL 8.x y 22 tablas presentes | MySQL 8.0.46, 22 de 22 tablas | Aprobada |
+| 20 | Promedio general por período | `AverageCalculatorTest` · `generalAverageIsAlsoComputedPerPeriod` | Promedio del estudiante en cada período | Período I: 3.0 y 4.0; período II: 4.6; Final 1.0 | I = 3.5, II = 4.6; Final y períodos sin notas no aparecen | Igual al esperado | Aprobada |
+| 21 | Navegación entre menús | `MenuTest` · `mainMenuOptionLeavesEveryNestedSubmenu` | Volver al menú principal desde un submenú anidado | Principal → Módulo → Submódulo → "Volver al menú principal" | Regresa directo al menú principal | Igual al esperado | Aprobada |
+| 22 | Conexión real | `JdbcSystemDaoIntegrationTest` · `readsServerVersionAndOfficialTables` | Conexión con `config.properties` y verificación de las 22 tablas oficiales | Base `erp_little_horizons` | MySQL 8.x y 22 tablas presentes | MySQL 8.0.46, 22 de 22 tablas | Aprobada |
 
 ## Verificaciones manuales realizadas
 

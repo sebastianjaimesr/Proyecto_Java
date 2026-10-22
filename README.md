@@ -290,7 +290,8 @@ Todas las opciones del menú están implementadas.
 |---|---|
 | Promedio de materia | La nota Final si existe; si no, la media simple de los períodos I a IV con nota, redondeada a un decimal (HALF_UP). |
 | Nota Final | Se calcula (no se digita) como la media simple de I a IV. |
-| Promedio general | Media de los promedios de materia. Las materias sin notas aparecen como "Sin calificaciones" y no cuentan como cero. |
+| Promedio general | Por período (I a IV): media de las notas de todas las materias en ese período. Del año: media de los promedios de materia. Las materias sin notas aparecen como "Sin calificaciones" y no cuentan como cero. |
+| Navegación | Cada submenú ofrece "0. Volver al menú anterior" y "Volver al menú principal", que cierra de una vez todos los submenús abiertos. |
 | Corrección de notas o asistencia | Reemplazar un dato existente requiere confirmación explícita. |
 | Inasistencias | Semana ISO de lunes a domingo; solo "Ausente" cuenta; más de 3 en la semana sumando todas las materias. |
 | Cupo de clubes | Se bloquea la fila del club (`SELECT ... FOR UPDATE`) y se cuentan las membresías activas dentro de la misma transacción. |
@@ -402,4 +403,4 @@ Desde la línea de comandos:
 
 - Las pruebas unitarias no necesitan base de datos.
 - Las pruebas de integración crean y borran su propia base `erp_little_horizons_test` a partir de `docs/database.sql`; nunca modifican `erp_little_horizons`. Si no existe `config.properties`, se omiten.
-- Resultado verificado el 2026-10-19: **115 pruebas, 0 fallos, 0 errores, 0 omitidas**. El detalle de cada prueba está en [`docs/plan-de-pruebas.md`](docs/plan-de-pruebas.md).
+- Resultado verificado el 2026-10-22: **117 pruebas, 0 fallos, 0 errores, 0 omitidas**. El detalle de cada prueba está en [`docs/plan-de-pruebas.md`](docs/plan-de-pruebas.md).

@@ -2,10 +2,12 @@ package com.littlehorizons.erp.view;
 
 import com.littlehorizons.erp.controller.OperationResult;
 import com.littlehorizons.erp.model.common.DbEnum;
+import com.littlehorizons.erp.model.common.ImportResult;
 import com.littlehorizons.erp.model.common.PersonName;
 import com.littlehorizons.erp.util.ConsoleUtils;
 import com.littlehorizons.erp.util.InputValidator;
 
+import java.nio.file.Path;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
@@ -179,6 +181,18 @@ public class ViewSupport {
     public String readSection(String label) {
         String raw = console.readLine(label + " (opcional, ej: A): ").strip();
         return raw.isEmpty() ? null : raw;
+    }
+
+    /** Path of a file to read, relative to the project folder or absolute. */
+    public Path readPath(String label) {
+        String raw = console.readValid(label + " (ruta del archivo): ",
+                text -> InputValidator.requireText(text.strip().replaceAll("^\"|\"$", ""), "ruta", 500));
+        return Path.of(raw);
+    }
+
+    /** Shows the import summary and every rejected line. */
+    public void showImport(OperationResult<ImportResult> result) {
+        show(result).ifPresent(importResult -> importResult.errors().forEach(console::printWarning));
     }
 
     public void notFound() {

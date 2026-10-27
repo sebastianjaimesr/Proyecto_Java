@@ -5,6 +5,7 @@ import com.littlehorizons.erp.dao.StudentDao;
 import com.littlehorizons.erp.dao.TeacherDao;
 import com.littlehorizons.erp.dao.TransactionManager;
 import com.littlehorizons.erp.exception.BusinessRuleException;
+import com.littlehorizons.erp.exception.ClubFullException;
 import com.littlehorizons.erp.exception.ValidationException;
 import com.littlehorizons.erp.model.academic.Student;
 import com.littlehorizons.erp.model.academic.StudentStatus;
@@ -13,14 +14,22 @@ import com.littlehorizons.erp.model.academic.TeacherStatus;
 import com.littlehorizons.erp.model.extracurricular.Club;
 import com.littlehorizons.erp.model.extracurricular.ClubMembership;
 import com.littlehorizons.erp.model.extracurricular.MembershipStatus;
+import com.littlehorizons.erp.util.AppLogger;
+import com.littlehorizons.erp.util.FileNames;
 import com.littlehorizons.erp.util.InputValidator;
 
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Path;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.time.Clock;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
+import java.util.Scanner;
 
 /**
  * Clubs and memberships with capacity control.
@@ -116,7 +125,7 @@ public class ClubService {
             }
             int members = clubDao.countActiveMembers(connection, clubId);
             if (members >= club.capacity()) {
-                throw new BusinessRuleException("El club " + club.name() + " no tiene cupos disponibles ("
+                throw new ClubFullException("El club " + club.name() + " no tiene cupos disponibles ("
                         + members + " de " + club.capacity() + ").");
             }
             int id = clubDao.insertMembership(connection, new ClubMembership(null, studentId, student.fullName(),
@@ -149,6 +158,66 @@ public class ClubService {
 
     public List<ClubMembership> findByStudent(int studentId) {
         return transactions.read(connection -> clubDao.findByStudent(connection, studentId));
+    }
+
+    // ------------------------------------------------------ text file exercises
+
+    /** Exercise 19: outcome of a bulk enrollment. {@code waitingListFile} is null when nobody waits. */
+    public record BulkEnrollment(int enrolled, List<String> waiting, List<String> rejected, Path waitingListFile) {
+    }
+
+    /**
+     * Exercise 19: reads one student document per line with {@link Scanner}
+     * and enrolls them in order with {@link #enroll}, which locks the club and
+     * checks the capacity. Once the club is full, the remaining students are
+     * written to exports/lista_espera_&lt;club&gt;.txt with their position.
+     */
+    public BulkEnrollment enrollFromFile(int clubId, Path file, LocalDate joinDate) {
+        Club club = findById(clubId);
+        FileSupport.requireFile(file);
+        int enrolled = 0;
+        List<String> waiting = new ArrayList<>();
+        List<String> rejected = new ArrayList<>();
+        try (Scanner scanner = new Scanner(file, StandardCharsets.UTF_8)) {
+            int number = 0;
+            while (scanner.hasNextLine()) {
+                number++;
+                String document = scanner.nextLine().replace("\uFEFF", "").strip();
+                if (document.isEmpty() || document.startsWith("#")) {
+                    continue;
+                }
+                Optional<Student> student = transactions.read(connection ->
+                        studentDao.findByDocument(connection, document));
+                if (student.isEmpty()) {
+                    rejected.add(FileSupport.lineError(number, "no existe un estudiante con el documento "
+                            + document + "."));
+                    continue;
+                }
+                try {
+                    enroll(student.get().id(), clubId, joinDate);
+                    enrolled++;
+                } catch (ClubFullException e) {
+                    waiting.add(document + ";" + student.get().name().sortableName());
+                } catch (ValidationException | BusinessRuleException e) {
+                    rejected.add(FileSupport.lineError(number, e.getMessage()));
+                }
+            }
+        } catch (IOException e) {
+            AppLogger.logError(ClubService.class, "Could not read " + file, e);
+            throw new BusinessRuleException("No fue posible leer el archivo " + file.getFileName() + ".");
+        }
+        Path waitingFile = null;
+        if (!waiting.isEmpty()) {
+            List<String> lines = new ArrayList<>();
+            lines.add("# Lista de espera - " + club.name() + " - " + joinDate);
+            lines.add("# posicion;documento;estudiante");
+            for (int i = 0; i < waiting.size(); i++) {
+                lines.add((i + 1) + ";" + waiting.get(i));
+            }
+            waitingFile = FileSupport.write(FileSupport.EXPORTS.resolve("lista_espera_" + FileNames.safe(club.name())
+                    + ".txt"), lines, ClubService.class);
+        }
+        return new BulkEnrollment(enrolled, waiting, rejected, waitingFile);
     }
 
     private void checkSupervisor(Connection connection, Integer teacherId) throws SQLException {

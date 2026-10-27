@@ -1,0 +1,7 @@
+# Planilla diligenciada de ejemplo (Matemáticas Décimo)
+# documento;estudiante;asistencia
+1010282121;Martínez González, Ana Fernanda;P
+1010289263;Mejía Hernández, Manuela;a
+1010296405;Ospina Díaz, Salomé;X
+1010292834;Rojas Valencia, Lucas Esteban;T
+9999999999;No existe;P

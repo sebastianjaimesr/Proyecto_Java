@@ -1,5 +1,6 @@
 package com.littlehorizons.erp.controller;
 
+import com.littlehorizons.erp.model.common.FileReport;
 import com.littlehorizons.erp.model.resources.BorrowerType;
 import com.littlehorizons.erp.model.resources.Loan;
 import com.littlehorizons.erp.model.resources.Resource;
@@ -77,5 +78,15 @@ public class ResourceController extends BaseController {
 
     public long daysOverdue(Loan loan) {
         return loanService.daysOverdue(loan);
+    }
+
+    // ------------------------------------------------------ text file exercises
+
+    public OperationResult<FileReport> writeOverdueNotices() {
+        return execute(loanService::writeOverdueNotices, FileReport::summary);
+    }
+
+    public OperationResult<List<String>> journalOf(String resourceCode) {
+        return execute(() -> loanService.journalOf(resourceCode), lines -> lines.size() + " movimiento(s).");
     }
 }

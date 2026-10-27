@@ -6,10 +6,12 @@ import com.littlehorizons.erp.model.extracurricular.CompetitionPosition;
 import com.littlehorizons.erp.model.extracurricular.Event;
 import com.littlehorizons.erp.model.extracurricular.EventParticipant;
 import com.littlehorizons.erp.model.extracurricular.EventType;
+import com.littlehorizons.erp.model.common.FileReport;
 import com.littlehorizons.erp.model.extracurricular.ParticipationRole;
 import com.littlehorizons.erp.service.ClubService;
 import com.littlehorizons.erp.service.EventService;
 
+import java.nio.file.Path;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Objects;
@@ -94,5 +96,17 @@ public class ExtracurricularController extends BaseController {
 
     public OperationResult<List<EventParticipant>> findResults(int year) {
         return execute(() -> eventService.findResults(year), list -> list.size() + " resultado(s).");
+    }
+
+    // ------------------------------------------------------ text file exercises
+
+    public OperationResult<FileReport> generateDiplomas(int eventId) {
+        return execute(() -> eventService.generateDiplomas(eventId), FileReport::summary);
+    }
+
+    public OperationResult<ClubService.BulkEnrollment> enrollFromFile(int clubId, Path file, LocalDate date) {
+        return execute(() -> clubService.enrollFromFile(clubId, file, date),
+                result -> result.enrolled() + " inscrito(s), " + result.waiting().size() + " en lista de espera, "
+                        + result.rejected().size() + " rechazado(s).");
     }
 }

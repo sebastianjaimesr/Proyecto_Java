@@ -54,7 +54,9 @@ public class ResourceMenuView {
                         new Menu.Item("Registrar devolución", this::returnLoan),
                         new Menu.Item("Préstamos sin devolver", this::openLoans),
                         new Menu.Item("Reporte de préstamos vencidos", this::overdue),
-                        new Menu.Item("Historial de préstamos de un estudiante o profesor", this::history)),
+                        new Menu.Item("Historial de préstamos de un estudiante o profesor", this::history),
+                        new Menu.Item("Generar avisos de préstamos vencidos (TXT)", this::writeOverdueNotices),
+                        new Menu.Item("Ver bitácora de préstamos de un recurso", this::journal)),
                 "GESTIÓN DE RECURSOS").run();
     }
 
@@ -220,6 +222,26 @@ public class ResourceMenuView {
                         loan.resourceCode() + " " + loan.resourceName(), loan.borrowerName(),
                         Formats.date(loan.loanDate()), Formats.date(loan.dueDate()), loan.status().dbValue(),
                         String.valueOf(controller.daysOverdue(loan)))).collect(Collectors.toList()));
+    }
+
+    private void writeOverdueNotices() {
+        console.printTitle("Avisos de préstamos vencidos");
+        support.show(controller.writeOverdueNotices())
+                .ifPresent(report -> report.files().forEach(file -> console.println("  " + file.getFileName())));
+        console.pause();
+    }
+
+    private void journal() {
+        console.printTitle("Bitácora de préstamos de un recurso");
+        String code = console.readRequiredText("Código del recurso: ", "código", 50);
+        support.show(controller.journalOf(code)).ifPresent(lines -> {
+            if (lines.isEmpty()) {
+                console.printInfo("No hay movimientos registrados para " + code
+                        + " (la bitácora empieza con los préstamos hechos desde esta versión).");
+            }
+            lines.forEach(line -> console.println("  " + line));
+        });
+        console.pause();
     }
 
     private void history() {

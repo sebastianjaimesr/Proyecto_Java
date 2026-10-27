@@ -19,20 +19,28 @@ import com.littlehorizons.erp.model.academic.RegistrationStatus;
 import com.littlehorizons.erp.model.academic.Student;
 import com.littlehorizons.erp.model.academic.Subject;
 import com.littlehorizons.erp.model.academic.SubjectRegistration;
+import com.littlehorizons.erp.model.common.ImportResult;
 import com.littlehorizons.erp.model.report.AcademicHistory;
 import com.littlehorizons.erp.model.report.CourseAverageReport;
 import com.littlehorizons.erp.model.report.StudentAverageReport;
 import com.littlehorizons.erp.model.report.SubjectAverage;
+import com.littlehorizons.erp.util.FileNames;
+import com.littlehorizons.erp.util.Formats;
 import com.littlehorizons.erp.util.InputValidator;
+import com.littlehorizons.erp.util.TextFileReader;
 
 import java.math.BigDecimal;
+import java.nio.file.Path;
+import java.text.Collator;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.time.Clock;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
@@ -46,6 +54,9 @@ import java.util.stream.Collectors;
 public class AcademicService {
 
     private static final int MAX_NOTES_LENGTH = 1000;
+    private static final BigDecimal PASSING_AVERAGE = new BigDecimal("3.0");
+    private static final List<GradingPeriod> REPORT_COLUMNS = List.of(GradingPeriod.I, GradingPeriod.II,
+            GradingPeriod.III, GradingPeriod.IV, GradingPeriod.FINAL);
 
     private final TransactionManager transactions;
     private final StudentDao studentDao;
@@ -166,32 +177,39 @@ public class AcademicService {
         ServiceChecks.optionalText(notes, "observaciones", MAX_NOTES_LENGTH);
         LocalDate today = LocalDate.now(clock);
         ServiceChecks.academicYear(academicYear, today);
-        return transactions.inTransaction(connection -> {
-            Subject subject = requireSubject(connection, subjectId);
-            AcademicPeriod registrationPeriod = AcademicPeriod.valueOf(period.name());
-            SubjectRegistration registration = ServiceChecks.require(
-                    registrationDao.find(connection, studentId, subjectId, academicYear, registrationPeriod),
-                    "El estudiante no está inscrito en " + subject.name() + " para el período "
-                            + period.dbValue() + " de " + academicYear + ".");
-            if (registration.status() == RegistrationStatus.WITHDRAWN) {
-                throw new BusinessRuleException("La inscripción del estudiante en esa materia y período está retirada.");
+        return transactions.inTransaction(connection -> saveGrade(connection, studentId,
+                requireSubject(connection, subjectId), teacherId, academicYear, period, grade, notes,
+                allowCorrection, today));
+    }
+
+    /** Checks registration and teacher, then inserts or corrects the grade, on the caller's connection. */
+    private GradeResult saveGrade(Connection connection, int studentId, Subject subject, int teacherId,
+                                  int academicYear, GradingPeriod period, BigDecimal grade, String notes,
+                                  boolean allowCorrection, LocalDate today) throws SQLException {
+        int subjectId = subject.id();
+        AcademicPeriod registrationPeriod = AcademicPeriod.valueOf(period.name());
+        SubjectRegistration registration = ServiceChecks.require(
+                registrationDao.find(connection, studentId, subjectId, academicYear, registrationPeriod),
+                "El estudiante no está inscrito en " + subject.name() + " para el período "
+                        + period.dbValue() + " de " + academicYear + ".");
+        if (registration.status() == RegistrationStatus.WITHDRAWN) {
+            throw new BusinessRuleException("La inscripción del estudiante en esa materia y período está retirada.");
+        }
+        requireAssignedTeacher(connection, teacherId, subject, academicYear);
+        Optional<GradeRecord> existing = gradeRecordDao.find(connection, studentId, subjectId, academicYear, period);
+        if (existing.isPresent()) {
+            if (!allowCorrection) {
+                throw new ConfirmationRequiredException("Ya existe una nota de " + existing.get().value()
+                        + " para ese período. Confirme la corrección para reemplazarla.");
             }
-            requireAssignedTeacher(connection, teacherId, subject, academicYear);
-            Optional<GradeRecord> existing = gradeRecordDao.find(connection, studentId, subjectId, academicYear, period);
-            if (existing.isPresent()) {
-                if (!allowCorrection) {
-                    throw new ConfirmationRequiredException("Ya existe una nota de " + existing.get().value()
-                            + " para ese período. Confirme la corrección para reemplazarla.");
-                }
-                gradeRecordDao.updateValue(connection, existing.get().id(), teacherId, grade, notes, today);
-                return new GradeResult(gradeRecordDao.find(connection, studentId, subjectId, academicYear, period)
-                        .orElseThrow(), true, existing.get().value());
-            }
-            gradeRecordDao.insert(connection, new GradeRecord(null, studentId, subjectId, teacherId, academicYear,
-                    period, grade, notes, today, null, null, null));
+            gradeRecordDao.updateValue(connection, existing.get().id(), teacherId, grade, notes, today);
             return new GradeResult(gradeRecordDao.find(connection, studentId, subjectId, academicYear, period)
-                    .orElseThrow(), false, null);
-        });
+                    .orElseThrow(), true, existing.get().value());
+        }
+        gradeRecordDao.insert(connection, new GradeRecord(null, studentId, subjectId, teacherId, academicYear,
+                period, grade, notes, today, null, null, null));
+        return new GradeResult(gradeRecordDao.find(connection, studentId, subjectId, academicYear, period)
+                .orElseThrow(), false, null);
     }
 
     /**
@@ -302,6 +320,152 @@ public class AcademicService {
             return new AcademicHistory(studentId, student.fullName(), summaries);
         });
     }
+
+    // ------------------------------------------------------ text file exercises
+
+    /**
+     * Exercise 5: report card with the grades of periods I to IV, Final and
+     * the average of each subject, in exports/boletines.
+     */
+    public Path exportReportCard(int studentId, int academicYear) {
+        Student student = transactions.read(connection -> requireStudent(connection, studentId));
+        StudentAverageReport report = studentAverages(studentId, academicYear);
+        if (report.subjects().isEmpty()) {
+            throw new BusinessRuleException("El estudiante no tiene materias ni notas en " + academicYear + ".");
+        }
+        String rowFormat = "%-30s %5s %5s %5s %5s %6s %7s";
+        List<String> lines = new ArrayList<>();
+        lines.add("COLEGIO INTERNACIONAL LITTLE HORIZONS");
+        lines.add("BOLETÍN DE CALIFICACIONES " + academicYear);
+        lines.add("Estudiante: " + student.fullName() + " (" + student.documentType().dbValue() + " "
+                + student.documentNumber() + ")");
+        lines.add("Grado: " + Formats.text(report.gradeName()));
+        lines.add("");
+        lines.add(String.format(rowFormat, "Materia", "I", "II", "III", "IV", "Final", "Prom."));
+        lines.add("-".repeat(67));
+        for (SubjectAverage subject : report.subjects()) {
+            List<String> cells = new ArrayList<>();
+            cells.add(FileSupport.fit(subject.subjectName(), 30));
+            REPORT_COLUMNS.forEach(period -> cells.add(Formats.grade(subject.grades().get(period))));
+            cells.add(Formats.grade(subject.average()));
+            lines.add(String.format(rowFormat, cells.toArray()));
+        }
+        lines.add("-".repeat(67));
+        BigDecimal general = report.generalAverage();
+        lines.add("Promedio general: " + Formats.grade(general) + "   Estado: "
+                + (general == null ? "SIN NOTAS" : general.compareTo(PASSING_AVERAGE) >= 0 ? "APROBADO" : "REPROBADO"));
+        if (report.subjectsWithoutGrades() > 0) {
+            lines.add("(" + report.subjectsWithoutGrades() + " materia(s) sin notas no cuentan en el promedio)");
+        }
+        Path file = FileSupport.EXPORTS.resolve("boletines")
+                .resolve("boletin_" + student.documentNumber() + "_" + academicYear + ".txt");
+        return FileSupport.write(file, lines, AcademicService.class);
+    }
+
+    /**
+     * Exercise 6: class list of a subject, alphabetical and numbered, with
+     * each average and the course average, highest and lowest.
+     */
+    public Path exportClassList(int subjectId, int academicYear, String section) {
+        CourseAverageReport report = courseAverage(subjectId, academicYear, section);
+        Subject subject = transactions.read(connection -> requireSubject(connection, subjectId));
+        if (report.students().isEmpty()) {
+            throw new BusinessRuleException("No hay notas de " + report.subjectName() + " en " + academicYear
+                    + (report.section() == null ? "" : " para la sección " + report.section()) + ".");
+        }
+        List<String> lines = new ArrayList<>();
+        lines.add("LISTA DE CLASE - " + report.subjectName() + " (" + subject.code() + ")");
+        lines.add("Grado " + report.gradeName() + " · Año " + academicYear
+                + " · Sección " + (report.section() == null ? "todas" : report.section()));
+        lines.add("");
+        lines.add(String.format("%-4s %-45s %8s", "N°", "Estudiante", "Promedio"));
+        lines.add("-".repeat(59));
+        Collator spanish = Collator.getInstance(Locale.forLanguageTag("es-CO"));
+        List<CourseAverageReport.StudentGrade> sorted = report.students().stream()
+                .sorted(Comparator.comparing(CourseAverageReport.StudentGrade::studentName, spanish))
+                .collect(Collectors.toList());
+        for (int i = 0; i < sorted.size(); i++) {
+            lines.add(String.format("%-4d %-45s %8s", i + 1, FileSupport.fit(sorted.get(i).studentName(), 45),
+                    Formats.grade(sorted.get(i).average())));
+        }
+        lines.add("-".repeat(59));
+        lines.add("Promedio del curso: " + Formats.grade(report.courseAverage())
+                + "   Nota más alta: " + Formats.grade(report.highest())
+                + "   Nota más baja: " + Formats.grade(report.lowest()));
+        String sectionPart = report.section() == null ? "todas" : FileNames.safe(report.section());
+        Path file = FileSupport.EXPORTS.resolve("listas").resolve("lista_" + FileNames.safe(subject.code()) + "_"
+                + academicYear + "_" + sectionPart + ".txt");
+        return FileSupport.write(file, lines, AcademicService.class);
+    }
+
+    /**
+     * Exercise 16: grades of one subject from a file (documento;periodo;nota),
+     * all or nothing. Every line is checked inside one transaction; if any
+     * line fails, the transaction is rolled back and no grade is saved.
+     */
+    public ImportResult importGrades(Path file, int subjectId, int teacherId, int academicYear,
+                                     boolean replaceExisting) {
+        LocalDate today = LocalDate.now(clock);
+        ServiceChecks.academicYear(academicYear, today);
+        List<TextFileReader.Line> lines = FileSupport.readDataLines(file, AcademicService.class);
+        if (lines.isEmpty()) {
+            throw new ValidationException("El archivo no tiene líneas de datos.");
+        }
+        String note = "Importada desde " + file.getFileName();
+        List<String> errors = new ArrayList<>();
+        try {
+            int saved = transactions.inTransaction(connection -> {
+                Subject subject = requireSubject(connection, subjectId);
+                requireAssignedTeacher(connection, teacherId, subject, academicYear);
+                Set<String> seen = new HashSet<>();
+                int count = 0;
+                for (TextFileReader.Line line : lines) {
+                    try {
+                        String[] f = line.fields();
+                        if (f.length < 3) {
+                            throw new ValidationException("se esperaban 3 campos: documento;periodo;nota.");
+                        }
+                        String document = InputValidator.validateDocumentNumber(f[0]);
+                        GradingPeriod period = FileSupport.parseEnum(f[1], GradingPeriod.class, "período");
+                        if (!period.isEditable()) {
+                            throw new ValidationException("el período debe ser I, II, III o IV (la Final se calcula).");
+                        }
+                        BigDecimal grade = InputValidator.parseGrade(f[2]);
+                        if (!seen.add(document + "|" + period)) {
+                            throw new ValidationException("el documento " + document + " ya aparece con el período "
+                                    + period.dbValue() + " en otra línea.");
+                        }
+                        Student student = ServiceChecks.require(studentDao.findByDocument(connection, document),
+                                "no existe un estudiante con el documento " + document + ".");
+                        saveGrade(connection, student.id(), subject, teacherId, academicYear, period, grade, note,
+                                replaceExisting, today);
+                        count++;
+                    } catch (ConfirmationRequiredException e) {
+                        errors.add(FileSupport.lineError(line.number(), "ya tiene una nota en ese período; para "
+                                + "reemplazarla responda S a \"¿Reemplazar las notas que ya existan?\"."));
+                    } catch (ValidationException | BusinessRuleException e) {
+                        errors.add(FileSupport.lineError(line.number(), e.getMessage()));
+                    }
+                }
+                if (!errors.isEmpty()) {
+                    throw new ImportRejectedException(); // rollback: nothing is kept
+                }
+                return count;
+            });
+            return new ImportResult(lines.size(), saved, List.of());
+        } catch (ImportRejectedException e) {
+            throw new ValidationException("No se guardó ninguna nota porque el archivo tiene " + errors.size()
+                    + " línea(s) con error. Corríjalas y vuelva a importar:\n" + String.join("\n", errors));
+        }
+    }
+
+    /** Signals the transaction manager to roll back an import with errors. */
+    private static final class ImportRejectedException extends RuntimeException {
+        ImportRejectedException() {
+            super("Import rejected", null, false, false);
+        }
+    }
+
 
     // ----------------------------------------------------------------- helpers
 

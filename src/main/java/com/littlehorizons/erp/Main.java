@@ -10,6 +10,8 @@ import com.littlehorizons.erp.util.DatabaseConnection;
 import com.littlehorizons.erp.view.MainMenuView;
 import com.littlehorizons.erp.view.SystemMenuView;
 
+import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
@@ -39,7 +41,7 @@ public final class Main {
                 ? config.getOptional("console.encoding", ConsoleUtils.AUTO_ENCODING)
                 : ConsoleUtils.AUTO_ENCODING;
 
-        ConsoleUtils console = ConsoleUtils.forSystemConsole(encoding);
+        ConsoleUtils console = createConsole(args, encoding);
         try {
             AppLogger.init(Paths.get(logsDir));
             Thread.setDefaultUncaughtExceptionHandler((thread, error) ->
@@ -59,6 +61,31 @@ public final class Main {
             console.close();
             AppLogger.shutdown();
         }
+    }
+
+    /**
+     * Exercise 21 (b): with a file as first argument the menu answers are read
+     * from that script (one per line) instead of the keyboard.
+     */
+    private static ConsoleUtils createConsole(String[] args, String encoding) {
+        if (args.length == 0) {
+            return ConsoleUtils.forSystemConsole(encoding);
+        }
+        Path script = Paths.get(args[0]);
+        if (Files.isRegularFile(script)) {
+            try {
+                ConsoleUtils console = ConsoleUtils.forScript(script, encoding);
+                console.printInfo("Modo guion: las respuestas se leen de " + script.toAbsolutePath());
+                return console;
+            } catch (IOException e) {
+                System.err.println("[ERROR] No se pudo abrir el guion " + script + ": " + e.getMessage());
+            }
+        } else {
+            System.err.println("[ERROR] No existe el archivo de guion: " + script.toAbsolutePath());
+        }
+        ConsoleUtils console = ConsoleUtils.forSystemConsole(encoding);
+        console.printWarning("Se usará el teclado.");
+        return console;
     }
 
     private static void run(AppConfig config, ConsoleUtils console) {

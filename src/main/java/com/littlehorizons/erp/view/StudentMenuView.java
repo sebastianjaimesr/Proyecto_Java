@@ -57,7 +57,10 @@ public class StudentMenuView {
                         new Menu.Item("Actualizar datos de un acudiente", this::updateGuardian),
                         new Menu.Item("Consultar acudiente y estudiantes a cargo", this::showGuardian),
                         new Menu.Item("Matricular estudiante", this::enroll),
-                        new Menu.Item("Cerrar una matrícula (completada o retirada)", this::closeEnrollment)),
+                        new Menu.Item("Cerrar una matrícula (completada o retirada)", this::closeEnrollment),
+                        new Menu.Item("Generar constancia de estudio (TXT)", this::exportCertificate),
+                        new Menu.Item("Exportar ficha del estudiante (TXT)", this::exportProfile),
+                        new Menu.Item("Importar estudiantes desde archivo", this::importStudents)),
                 "GESTIÓN DE ESTUDIANTES Y ACUDIENTES").run();
     }
 
@@ -173,6 +176,38 @@ public class StudentMenuView {
                     List.of("Alergias", Formats.text(student.allergies())),
                     List.of("Condiciones médicas", Formats.text(student.medicalConditions()))));
         }
+    }
+
+    private void exportCertificate() {
+        console.printTitle("Constancia de estudio");
+        Optional<Student> selected = pickStudent();
+        if (selected.isEmpty()) {
+            support.notFound();
+            return;
+        }
+        support.show(controller.exportCertificate(selected.get().id()));
+        console.pause();
+    }
+
+    private void exportProfile() {
+        console.printTitle("Exportar ficha del estudiante");
+        Optional<Student> selected = pickStudent();
+        if (selected.isEmpty()) {
+            support.notFound();
+            return;
+        }
+        boolean medical = console.confirm("¿Incluir datos médicos (información sensible) en el archivo?");
+        support.show(controller.exportProfile(selected.get().id(), medical));
+        console.pause();
+    }
+
+    private void importStudents() {
+        console.printTitle("Importar estudiantes desde archivo");
+        console.printInfo("Formato por línea: tipoDoc;documento;primerNombre;segundoNombre;primerApellido;"
+                + "segundoApellido;fechaNacimiento;genero;direccion;telefono");
+        console.printInfo("Las líneas vacías y las que empiezan con # se ignoran.");
+        support.showImport(controller.importStudents(support.readPath("Archivo de estudiantes")));
+        console.pause();
     }
 
     private void changeStatus() {

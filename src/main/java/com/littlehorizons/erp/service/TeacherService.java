@@ -12,16 +12,34 @@ import com.littlehorizons.erp.model.academic.Teacher;
 import com.littlehorizons.erp.model.academic.TeacherAssignment;
 import com.littlehorizons.erp.model.academic.TeacherStatus;
 import com.littlehorizons.erp.model.academic.WeekDay;
+import com.littlehorizons.erp.model.common.ImportResult;
+import com.littlehorizons.erp.util.AppLogger;
+import com.littlehorizons.erp.util.Formats;
 import com.littlehorizons.erp.util.InputValidator;
 
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Path;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.time.Clock;
+import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.EnumMap;
+import java.util.InputMismatchException;
 import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Scanner;
+import java.util.stream.Collectors;
 
 /**
  * Teachers, their subject assignments and weekly class schedule, including
@@ -32,6 +50,7 @@ public class TeacherService {
     private static final int MAX_NAME_LENGTH = 100;
     private static final int MAX_ROOM_LENGTH = 50;
     private static final int SEARCH_LIMIT = 100;
+    private static final DateTimeFormatter HOUR = DateTimeFormatter.ofPattern("H:mm");
 
     private final TransactionManager transactions;
     private final TeacherDao teacherDao;
@@ -170,6 +189,92 @@ public class TeacherService {
 
     public List<ClassSchedule> findSchedulesByAssignment(int assignmentId) {
         return transactions.read(connection -> assignmentDao.findSchedulesByAssignment(connection, assignmentId));
+    }
+
+    // ------------------------------------------------------ text file exercises
+
+    /**
+     * Exercise 7: weekly timetable grouped by day, Monday to Saturday (enum
+     * order, not alphabetical), each day sorted by start time, with the total
+     * weekly hours.
+     */
+    public Path exportTimetable(int teacherId, int academicYear) {
+        Teacher teacher = transactions.read(connection -> requireTeacher(connection, teacherId));
+        List<ClassSchedule> schedules = findTimetable(teacherId, academicYear);
+        if (schedules.isEmpty()) {
+            throw new BusinessRuleException("El profesor no tiene horarios registrados en " + academicYear + ".");
+        }
+        Map<WeekDay, List<ClassSchedule>> byDay = schedules.stream()
+                .collect(Collectors.groupingBy(ClassSchedule::day, () -> new EnumMap<>(WeekDay.class),
+                        Collectors.toList()));
+        List<String> lines = new ArrayList<>();
+        lines.add("HORARIO SEMANAL " + academicYear);
+        lines.add("Profesor: " + teacher.fullName() + " (" + Formats.text(teacher.specialization()) + ")");
+        lines.add("");
+        byDay.forEach((day, slots) -> {
+            lines.add(day.dbValue().toUpperCase(Locale.ROOT));
+            slots.stream().sorted(Comparator.comparing(ClassSchedule::startTime))
+                    .forEach(slot -> lines.add(String.format("  %5s - %5s  %-12s %s", HOUR.format(slot.startTime()),
+                            HOUR.format(slot.endTime()), Formats.text(slot.room()), slot.description())));
+            lines.add("");
+        });
+        long minutes = schedules.stream()
+                .mapToLong(slot -> Duration.between(slot.startTime(), slot.endTime()).toMinutes()).sum();
+        lines.add("Total semanal: " + (minutes / 60) + " h " + (minutes % 60) + " min en " + schedules.size()
+                + " bloque(s).");
+        Path file = FileSupport.EXPORTS.resolve("horarios")
+                .resolve("horario_" + teacher.documentNumber() + "_" + academicYear + ".txt");
+        return FileSupport.write(file, lines, TeacherService.class);
+    }
+
+    /**
+     * Exercise 18: loads idAsignacion;dia;horaInicio;horaFin;aula lines with
+     * {@link Scanner} and {@code useDelimiter} (no split). Each slot goes
+     * through {@link #addSchedule}, which detects teacher and group clashes.
+     */
+    public ImportResult importSchedules(Path file) {
+        FileSupport.requireFile(file);
+        List<String> errors = new ArrayList<>();
+        int processed = 0;
+        int saved = 0;
+        try (Scanner fileScanner = new Scanner(file, StandardCharsets.UTF_8)) {
+            int number = 0;
+            while (fileScanner.hasNextLine()) {
+                number++;
+                String text = fileScanner.nextLine().strip();
+                if (number == 1 && text.startsWith("\uFEFF")) {
+                    text = text.substring(1);
+                }
+                if (text.isEmpty() || text.startsWith("#")) {
+                    continue;
+                }
+                processed++;
+                try (Scanner fields = new Scanner(text).useDelimiter("\\s*;\\s*")) {
+                    int assignmentId = fields.nextInt();
+                    WeekDay day = FileSupport.parseEnum(fields.next(), WeekDay.class, "día");
+                    LocalTime start = LocalTime.parse(fields.next(), HOUR);
+                    LocalTime end = LocalTime.parse(fields.next(), HOUR);
+                    String room = fields.hasNext() ? fields.next() : null;
+                    addSchedule(assignmentId, day, start, end, room);
+                    saved++;
+                } catch (InputMismatchException e) {
+                    // Subclass of NoSuchElementException, so it must be caught first.
+                    errors.add(FileSupport.lineError(number, "el id de la asignación debe ser un número entero."));
+                } catch (NoSuchElementException e) {
+                    errors.add(FileSupport.lineError(number,
+                            "faltan campos (idAsignacion;dia;horaInicio;horaFin;aula)."));
+                } catch (DateTimeParseException e) {
+                    errors.add(FileSupport.lineError(number, "hora no válida '" + e.getParsedString()
+                            + "' (use HH:MM, por ejemplo 7:00 o 14:30)."));
+                } catch (ValidationException | BusinessRuleException e) {
+                    errors.add(FileSupport.lineError(number, e.getMessage()));
+                }
+            }
+        } catch (IOException e) {
+            AppLogger.logError(TeacherService.class, "Could not read " + file, e);
+            throw new BusinessRuleException("No fue posible leer el archivo " + file.getFileName() + ".");
+        }
+        return new ImportResult(processed, saved, errors);
     }
 
     static void validateTimes(WeekDay day, LocalTime start, LocalTime end) {

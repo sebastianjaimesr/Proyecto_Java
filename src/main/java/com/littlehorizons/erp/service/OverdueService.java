@@ -3,13 +3,16 @@ package com.littlehorizons.erp.service;
 import com.littlehorizons.erp.dao.PaymentConceptDao;
 import com.littlehorizons.erp.dao.PaymentDao;
 import com.littlehorizons.erp.dao.TransactionManager;
+import com.littlehorizons.erp.exception.BusinessRuleException;
 import com.littlehorizons.erp.model.finance.OverdueObligation;
 import com.littlehorizons.erp.model.finance.Payment;
 import com.littlehorizons.erp.model.finance.PaymentConcept;
 import com.littlehorizons.erp.model.finance.PriceAdjustment;
+import com.littlehorizons.erp.model.common.FileReport;
 import com.littlehorizons.erp.util.Formats;
 
 import java.math.BigDecimal;
+import java.nio.file.Path;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.time.Clock;
@@ -17,6 +20,7 @@ import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -57,6 +61,52 @@ public class OverdueService {
         this.calculator = Objects.requireNonNull(calculator, "calculator");
         this.settings = Objects.requireNonNull(settings, "settings");
         this.clock = Objects.requireNonNull(clock, "clock");
+    }
+
+    /**
+     * Exercise 9: one collection letter per student with overdue
+     * obligations (several debts, one letter), in exports/cartas.
+     */
+    public FileReport writeCollectionLetters(int academicYear) {
+        LocalDate today = LocalDate.now(clock);
+        Map<Integer, List<OverdueObligation>> byStudent = findOverdue(academicYear).stream()
+                .collect(Collectors.groupingBy(OverdueObligation::studentId, LinkedHashMap::new,
+                        Collectors.toList()));
+        // The report masks the document; the file name needs the real one.
+        Map<Integer, String> documents = transactions.read(connection ->
+                paymentDao.findBillableStudents(connection, academicYear)).stream()
+                .collect(Collectors.toMap(PaymentDao.BillableStudent::studentId, PaymentDao.BillableStudent::document,
+                        (first, second) -> first));
+        if (byStudent.isEmpty()) {
+            throw new BusinessRuleException("No hay obligaciones vencidas en "
+                    + academicYear + "; no se generaron cartas.");
+        }
+        Path folder = FileSupport.EXPORTS.resolve("cartas");
+        List<Path> files = new ArrayList<>();
+        byStudent.forEach((studentId, debts) -> {
+            OverdueObligation first = debts.get(0);
+            String document = documents.getOrDefault(studentId, String.valueOf(studentId));
+            List<String> lines = new ArrayList<>();
+            lines.add("COLEGIO INTERNACIONAL LITTLE HORIZONS - Tesorería");
+            lines.add(Formats.longDate(today));
+            lines.add("");
+            lines.add("Señor(a) " + Formats.text(first.guardianName()));
+            lines.add("Acudiente de " + first.studentName() + " (" + Formats.text(first.gradeName()) + ")");
+            lines.add("");
+            lines.add("Le recordamos que las siguientes obligaciones del año " + academicYear + " están vencidas:");
+            lines.add("");
+            lines.add(String.format("  %-28s %12s %16s", "Concepto", "Días de mora", "Pendiente"));
+            debts.forEach(debt -> lines.add(String.format("  %-28s %12d %16s", debt.conceptName(),
+                    debt.daysOverdue(), Formats.money(debt.pendingAmount()))));
+            BigDecimal total = debts.stream().map(OverdueObligation::pendingAmount)
+                    .reduce(BigDecimal.ZERO, BigDecimal::add);
+            lines.add("  " + "-".repeat(58));
+            lines.add(String.format("  %-28s %12s %16s", "TOTAL ADEUDADO", "", Formats.money(total)));
+            lines.add("");
+            lines.add("Si ya realizó el pago, por favor ignore esta comunicación.");
+            files.add(FileSupport.write(folder.resolve("carta_" + document + ".txt"), lines, OverdueService.class));
+        });
+        return new FileReport(folder, files);
     }
 
     /** Overdue obligations of the year, most overdue first. */

@@ -7,15 +7,26 @@ import com.littlehorizons.erp.dao.TransactionManager;
 import com.littlehorizons.erp.exception.BusinessRuleException;
 import com.littlehorizons.erp.exception.ValidationException;
 import com.littlehorizons.erp.model.academic.StudentStatus;
+import com.littlehorizons.erp.model.common.ImportResult;
 import com.littlehorizons.erp.model.finance.AdjustmentType;
 import com.littlehorizons.erp.model.finance.PaymentConcept;
 import com.littlehorizons.erp.model.finance.PriceAdjustment;
+import com.littlehorizons.erp.util.Formats;
 import com.littlehorizons.erp.util.InputValidator;
+import com.littlehorizons.erp.util.TextFileReader;
 
 import java.math.BigDecimal;
+import java.nio.file.Path;
 import java.time.Clock;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 import java.util.Objects;
 
 /**
@@ -112,6 +123,68 @@ public class PaymentConceptService {
 
     public List<PriceAdjustment> findAdjustments(int studentId, int academicYear) {
         return transactions.read(connection -> conceptDao.findAdjustments(connection, studentId, academicYear));
+    }
+
+    // ------------------------------------------------------ text file exercises
+
+    /** Exercise 20: backup written before the change and the result of applying the file. */
+    public record PriceUpdate(Path backup, ImportResult result) {
+    }
+
+    /**
+     * Exercise 20: writes a backup with the current base value of every
+     * concept, then applies codigoConcepto;nuevoValor lines. Unknown codes
+     * and negative or non-numeric values are rejected; money is BigDecimal.
+     */
+    public PriceUpdate updatePricesFromFile(Path file) {
+        List<TextFileReader.Line> lines = FileSupport.readDataLines(file, PaymentConceptService.class);
+        Path backup = writePriceBackup();
+        return new PriceUpdate(backup, applyPrices(lines));
+    }
+
+    /** Exercise 20 (bonus): puts back the values of a backup file (same format codigo;valor). */
+    public ImportResult restorePrices(Path backupFile) {
+        return applyPrices(FileSupport.readDataLines(backupFile, PaymentConceptService.class));
+    }
+
+    private Path writePriceBackup() {
+        LocalDateTime now = LocalDateTime.now(clock);
+        List<String> lines = new ArrayList<>();
+        lines.add("# Respaldo de precios - " + Formats.dateTime(now.withNano(0)));
+        lines.add("# codigoConcepto;valorBase (se puede restaurar con la opción del menú)");
+        findConcepts(false).forEach(concept -> lines.add(concept.code() + ";" + concept.baseAmount().toPlainString()));
+        Path file = FileSupport.EXPORTS.resolve("respaldos").resolve("precios_"
+                + now.format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss")) + ".txt");
+        return FileSupport.write(file, lines, PaymentConceptService.class);
+    }
+
+    private ImportResult applyPrices(List<TextFileReader.Line> lines) {
+        Map<String, PaymentConcept> byCode = findConcepts(false).stream()
+                .collect(Collectors.toMap(c -> c.code().toUpperCase(Locale.ROOT), Function.identity()));
+        List<String> errors = new ArrayList<>();
+        int updated = 0;
+        for (TextFileReader.Line line : lines) {
+            try {
+                String[] f = line.fields();
+                if (f.length < 2) {
+                    throw new ValidationException("se esperaban 2 campos: codigoConcepto;nuevoValor.");
+                }
+                PaymentConcept old = byCode.get(f[0].toUpperCase(Locale.ROOT));
+                if (old == null) {
+                    throw new ValidationException("no existe un concepto con el código " + f[0] + ".");
+                }
+                if (f[1].startsWith("-")) {
+                    throw new ValidationException("el valor no puede ser negativo.");
+                }
+                BigDecimal amount = InputValidator.parseMoney(f[1], "nuevo valor");
+                update(new PaymentConcept(old.id(), old.code(), old.name(), old.description(), amount,
+                        old.recurring(), old.active()));
+                updated++;
+            } catch (ValidationException | BusinessRuleException e) {
+                errors.add(FileSupport.lineError(line.number(), e.getMessage()));
+            }
+        }
+        return new ImportResult(lines.size(), updated, errors);
     }
 
     /** Value the student must pay for the concept in that year, after adjustments. */

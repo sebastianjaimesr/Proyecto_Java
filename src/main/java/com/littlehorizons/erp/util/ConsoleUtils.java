@@ -3,21 +3,22 @@ package com.littlehorizons.erp.util;
 import com.littlehorizons.erp.exception.InputUnavailableException;
 import com.littlehorizons.erp.exception.ValidationException;
 
-import java.io.BufferedReader;
 import java.io.Console;
 import java.io.FileDescriptor;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.PrintStream;
 import java.math.BigDecimal;
 import java.nio.charset.Charset;
 import java.nio.charset.IllegalCharsetNameException;
 import java.nio.charset.StandardCharsets;
 import java.nio.charset.UnsupportedCharsetException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Scanner;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -28,6 +29,11 @@ import java.util.stream.IntStream;
  * <p>Reading methods keep asking until the value passes the matching
  * {@link InputValidator} rule, printing the validation message in Spanish
  * after each invalid attempt.</p>
+ *
+ * <p>Exercise 21: every line typed in the program is read here, with a
+ * {@link Scanner} (it was a BufferedReader). No view knows how input is read,
+ * so this was the only class that changed. The input can also be a script
+ * file instead of the keyboard (see {@link #forScript}).</p>
  */
 public class ConsoleUtils implements AutoCloseable {
 
@@ -36,14 +42,25 @@ public class ConsoleUtils implements AutoCloseable {
 
     private static final int MIN_BOX_WIDTH = 46;
 
-    private final BufferedReader reader;
+    private final Scanner scanner;
     private final PrintStream out;
     private final Charset charset;
+    private final boolean echoInput;
 
     public ConsoleUtils(InputStream in, PrintStream out, Charset charset) {
-        this.reader = new BufferedReader(new InputStreamReader(in, charset));
+        this(in, out, charset, false);
+    }
+
+    /**
+     * @param echoInput prints each line read after its prompt; used with
+     *                  scripts, where nobody types and the answers would not
+     *                  show otherwise
+     */
+    public ConsoleUtils(InputStream in, PrintStream out, Charset charset, boolean echoInput) {
+        this.scanner = new Scanner(in, charset);
         this.out = out;
         this.charset = charset;
+        this.echoInput = echoInput;
     }
 
     /**
@@ -55,6 +72,18 @@ public class ConsoleUtils implements AutoCloseable {
         Charset charset = resolveCharset(encodingSetting);
         PrintStream stdout = new PrintStream(new FileOutputStream(FileDescriptor.out), true, charset);
         return new ConsoleUtils(System.in, stdout, charset);
+    }
+
+    /**
+     * Exercise 21 (b): console that reads its answers from a UTF-8 script file,
+     * one answer per line, and writes to the standard output. When the script
+     * ends, {@link #readLine} throws {@link InputUnavailableException} and the
+     * program closes as it does when the keyboard input ends.
+     */
+    public static ConsoleUtils forScript(Path script, String encodingSetting) throws IOException {
+        Charset outputCharset = resolveCharset(encodingSetting);
+        PrintStream stdout = new PrintStream(new FileOutputStream(FileDescriptor.out), true, outputCharset);
+        return new ConsoleUtils(Files.newInputStream(script), stdout, StandardCharsets.UTF_8, true);
     }
 
     /**
@@ -161,15 +190,14 @@ public class ConsoleUtils implements AutoCloseable {
     public String readLine(String prompt) {
         out.print(prompt);
         out.flush();
-        try {
-            String line = reader.readLine();
-            if (line == null) {
-                throw new InputUnavailableException();
-            }
-            return line;
-        } catch (IOException e) {
+        if (!scanner.hasNextLine()) { // end of input: Ctrl+Z / Ctrl+D or end of the script
             throw new InputUnavailableException();
         }
+        String line = scanner.nextLine();
+        if (echoInput) {
+            out.println(line);
+        }
+        return line;
     }
 
     /** Asks again until {@code parser} accepts the text. */
@@ -246,15 +274,15 @@ public class ConsoleUtils implements AutoCloseable {
         readLine("Presione Enter para continuar...");
     }
 
-    /** Releases the input reader; called once when the application exits. */
+    /** Releases the input scanner; called once when the application exits. */
     @Override
     public void close() {
         out.flush();
-        try {
-            reader.close();
-        } catch (IOException e) {
-            AppLogger.logError(ConsoleUtils.class, "Could not close console input", e);
+        IOException error = scanner.ioException();
+        if (error != null) {
+            AppLogger.logError(ConsoleUtils.class, "Console input failed", error);
         }
+        scanner.close();
     }
 
     private static String formatRow(List<String> values, int[] widths) {

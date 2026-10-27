@@ -1,5 +1,7 @@
 package com.littlehorizons.erp.controller;
 
+import com.littlehorizons.erp.model.common.FileReport;
+import com.littlehorizons.erp.model.common.ImportResult;
 import com.littlehorizons.erp.model.finance.ChargeStatus;
 import com.littlehorizons.erp.model.finance.Invoice;
 import com.littlehorizons.erp.model.finance.OverdueObligation;
@@ -13,6 +15,7 @@ import com.littlehorizons.erp.service.PaymentService;
 import com.littlehorizons.erp.util.Formats;
 
 import java.math.BigDecimal;
+import java.nio.file.Path;
 import java.util.List;
 import java.util.Objects;
 
@@ -99,5 +102,24 @@ public class FinanceController extends BaseController {
     public OperationResult<List<InvoiceService.PdfResult>> regeneratePending() {
         return execute(invoiceService::regeneratePending, list -> list.stream()
                 .filter(InvoiceService.PdfResult::generated).count() + " de " + list.size() + " PDF generado(s).");
+    }
+
+    // ------------------------------------------------------ text file exercises
+
+    public OperationResult<Path> exportHistoryCsv(int studentId) {
+        return execute(() -> paymentService.exportHistoryCsv(studentId), path -> "Archivo CSV creado en " + path);
+    }
+
+    public OperationResult<FileReport> writeCollectionLetters(int academicYear) {
+        return execute(() -> overdueService.writeCollectionLetters(academicYear), FileReport::summary);
+    }
+
+    public OperationResult<PaymentConceptService.PriceUpdate> updatePricesFromFile(Path file) {
+        return execute(() -> conceptService.updatePricesFromFile(file),
+                update -> "Respaldo guardado en " + update.backup() + ". " + update.result().summary());
+    }
+
+    public OperationResult<ImportResult> restorePrices(Path backupFile) {
+        return execute(() -> conceptService.restorePrices(backupFile), ImportResult::summary);
     }
 }

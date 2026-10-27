@@ -19,11 +19,13 @@ import com.littlehorizons.erp.model.report.CourseAverageReport;
 import com.littlehorizons.erp.model.report.StudentAverageReport;
 import com.littlehorizons.erp.model.report.SubjectAverage;
 import com.littlehorizons.erp.service.AcademicService;
+import com.littlehorizons.erp.service.AttendanceService;
 import com.littlehorizons.erp.util.ConsoleUtils;
 import com.littlehorizons.erp.util.Formats;
 import com.littlehorizons.erp.util.InputValidator;
 
 import java.math.BigDecimal;
+import java.nio.file.Path;
 import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
@@ -93,7 +95,10 @@ public class AcademicMenuView {
                         new Menu.Item("Consultar notas por materia, grupo y período", this::gradesBySubject),
                         new Menu.Item("Promedios de un estudiante (por materia y general)", this::studentAverages),
                         new Menu.Item("Promedio del curso por materia", this::courseAverage),
-                        new Menu.Item("Historial académico desde el ingreso", this::history)),
+                        new Menu.Item("Historial académico desde el ingreso", this::history),
+                        new Menu.Item("Exportar boletín de un estudiante (TXT)", this::exportReportCard),
+                        new Menu.Item("Exportar lista de clase con promedios (TXT)", this::exportClassList),
+                        new Menu.Item("Importar notas desde archivo (todo o nada)", this::importGrades)),
                 "CALIFICACIONES Y PROMEDIOS").run();
     }
 
@@ -102,7 +107,9 @@ public class AcademicMenuView {
                         new Menu.Item("Tomar asistencia de un grupo", this::recordGroupAttendance),
                         new Menu.Item("Registrar o corregir asistencia de un estudiante", this::recordAttendance),
                         new Menu.Item("Consultar asistencia histórica de un estudiante", this::attendanceHistory),
-                        new Menu.Item("Reporte semanal: más de 3 ausencias", this::weeklyReport)),
+                        new Menu.Item("Reporte semanal: más de 3 ausencias", this::weeklyReport),
+                        new Menu.Item("Generar planilla de asistencia (TXT)", this::exportAttendanceSheet),
+                        new Menu.Item("Registrar asistencia desde planilla", this::recordFromSheet)),
                 "ASISTENCIA").run();
     }
 
@@ -584,7 +591,105 @@ public class AcademicMenuView {
         console.printTitle("Reporte semanal de inasistencias");
         console.printInfo("Semana de lunes a domingo que contiene la fecha indicada. Solo cuenta \"Ausente\".");
         LocalDate date = support.readDateOrToday("Cualquier fecha de la semana");
-        support.show(controller.weeklyAbsenceReport(date)).ifPresent(this::printAbsenceRows);
+        support.show(controller.weeklyReportWithHistory(date)).ifPresent(history -> {
+            printAbsenceRows(history.rows());
+            console.printInfo(history.added()
+                    ? "Semana agregada al histórico: " + history.file()
+                    : "Esta semana ya estaba en el histórico (" + history.file() + "); no se repitió.");
+        });
+        console.pause();
+    }
+
+    // ------------------------------------------------------ text file exercises
+
+    private void exportReportCard() {
+        console.printTitle("Exportar boletín");
+        Optional<Student> student = studentView.pickStudent();
+        if (student.isEmpty()) {
+            support.notFound();
+            return;
+        }
+        int year = support.readYear("Año académico");
+        support.show(controller.exportReportCard(student.get().id(), year));
+        console.pause();
+    }
+
+    private void exportClassList() {
+        console.printTitle("Exportar lista de clase");
+        Optional<Subject> subject = teacherView.pickSubject(false);
+        if (subject.isEmpty()) {
+            support.notFound();
+            return;
+        }
+        int year = support.readYear("Año académico");
+        String section = support.readSection("Sección o grupo (Enter para todo el grado)");
+        support.show(controller.exportClassList(subject.get().id(), year, section));
+        console.pause();
+    }
+
+    private void importGrades() {
+        console.printTitle("Importar notas desde archivo");
+        console.printInfo("Formato por línea: documento;periodo;nota  (ejemplo: 1012345678;I;4.5)");
+        console.printInfo("Si alguna línea tiene error no se guarda ninguna nota.");
+        Optional<Subject> subject = teacherView.pickSubject(false);
+        if (subject.isEmpty()) {
+            support.notFound();
+            return;
+        }
+        console.println("Profesor que registra las notas:");
+        Optional<Teacher> teacher = teacherView.pickTeacher();
+        if (teacher.isEmpty()) {
+            support.notFound();
+            return;
+        }
+        int year = support.readYear("Año académico");
+        Path file = support.readPath("Archivo de notas");
+        boolean replace = console.confirm("¿Reemplazar las notas que ya existan?");
+        support.showImport(controller.importGrades(file, subject.get().id(), teacher.get().id(), year, replace));
+        console.pause();
+    }
+
+    private void exportAttendanceSheet() {
+        console.printTitle("Generar planilla de asistencia");
+        Optional<Subject> subject = teacherView.pickSubject(false);
+        if (subject.isEmpty()) {
+            support.notFound();
+            return;
+        }
+        LocalDate date = support.readDateOrToday("Fecha de la clase");
+        String section = support.readSection("Sección o grupo (Enter para todos)");
+        support.show(controller.exportAttendanceSheet(subject.get().id(), section, date));
+        console.pause();
+    }
+
+    private void recordFromSheet() {
+        console.printTitle("Registrar asistencia desde planilla");
+        Optional<Subject> subject = teacherView.pickSubject(false);
+        if (subject.isEmpty()) {
+            support.notFound();
+            return;
+        }
+        console.println("Profesor que toma la asistencia:");
+        Optional<Teacher> teacher = teacherView.pickTeacher();
+        if (teacher.isEmpty()) {
+            support.notFound();
+            return;
+        }
+        LocalDate date = support.readDateOrToday("Fecha de la clase");
+        String section = support.readSection("Sección o grupo (Enter para todos)");
+        Path file = support.readPath("Planilla diligenciada");
+        OperationResult<AttendanceService.SheetResult> result = controller.recordFromSheet(file,
+                subject.get().id(), section, date, teacher.get().id(), false);
+        if (result.confirmationRequired()) {
+            console.printWarning(result.message());
+            if (!console.confirm("¿Reemplazar la asistencia ya registrada de ese día?")) {
+                support.notFound();
+                console.pause();
+                return;
+            }
+            result = controller.recordFromSheet(file, subject.get().id(), section, date, teacher.get().id(), true);
+        }
+        support.show(result).ifPresent(sheet -> sheet.warnings().forEach(console::printWarning));
         console.pause();
     }
 

@@ -19,6 +19,7 @@ import com.littlehorizons.erp.util.Formats;
 import com.littlehorizons.erp.util.InputValidator;
 
 import java.math.BigDecimal;
+import java.nio.file.Path;
 import java.time.LocalDate;
 import java.time.Month;
 import java.time.format.TextStyle;
@@ -55,7 +56,9 @@ public class FinanceMenuView {
                         new Menu.Item("Historial de pagos de un acudiente", this::historyByGuardian),
                         new Menu.Item("Estado de cuenta (pagos parciales y completos)", this::statement),
                         new Menu.Item("Obligaciones vencidas (más de un mes)", this::overdue),
-                        new Menu.Item("Regenerar facturas PDF pendientes", this::regenerate)),
+                        new Menu.Item("Regenerar facturas PDF pendientes", this::regenerate),
+                        new Menu.Item("Exportar historial de pagos a CSV (Excel)", this::exportHistoryCsv),
+                        new Menu.Item("Generar cartas de cobro de obligaciones vencidas", this::writeCollectionLetters)),
                 "GESTIÓN FINANCIERA").run();
     }
 
@@ -65,7 +68,9 @@ public class FinanceMenuView {
                         new Menu.Item("Registrar concepto", this::createConcept),
                         new Menu.Item("Actualizar concepto", this::updateConcept),
                         new Menu.Item("Registrar valor personalizado, beca o descuento por hermanos", this::addAdjustment),
-                        new Menu.Item("Consultar o eliminar ajustes de un estudiante", this::listAdjustments)),
+                        new Menu.Item("Consultar o eliminar ajustes de un estudiante", this::listAdjustments),
+                        new Menu.Item("Actualizar precios desde archivo (con respaldo)", this::updatePrices),
+                        new Menu.Item("Restaurar precios desde un respaldo", this::restorePrices)),
                 "CONCEPTOS DE PAGO").run();
     }
 
@@ -264,6 +269,46 @@ public class FinanceMenuView {
         }
         Integer year = console.confirm("¿Filtrar por año académico?") ? support.readYear("Año") : null;
         support.show(controller.historyByStudent(student.get().id(), year)).ifPresent(this::printPayments);
+        console.pause();
+    }
+
+    private void exportHistoryCsv() {
+        console.printTitle("Exportar historial de pagos a CSV");
+        Optional<Student> student = studentView.pickStudent();
+        if (student.isEmpty()) {
+            support.notFound();
+            return;
+        }
+        support.show(controller.exportHistoryCsv(student.get().id()));
+        console.pause();
+    }
+
+    private void writeCollectionLetters() {
+        console.printTitle("Cartas de cobro");
+        int year = support.readYear("Año académico");
+        support.show(controller.writeCollectionLetters(year));
+        console.pause();
+    }
+
+    private void updatePrices() {
+        console.printTitle("Actualizar precios desde archivo");
+        console.printInfo("Formato por línea: codigoConcepto;nuevoValor  (ejemplo: PENSION;480000)");
+        console.printInfo("Antes de cambiar nada se guarda un respaldo con los valores actuales.");
+        Path file = support.readPath("Archivo de precios");
+        support.show(controller.updatePricesFromFile(file))
+                .ifPresent(update -> update.result().errors().forEach(console::printWarning));
+        console.pause();
+    }
+
+    private void restorePrices() {
+        console.printTitle("Restaurar precios");
+        console.printInfo("Los respaldos están en exports/respaldos.");
+        Path file = support.readPath("Archivo de respaldo");
+        if (console.confirm("Se reemplazarán los valores base actuales por los del respaldo. ¿Continuar?")) {
+            support.showImport(controller.restorePrices(file));
+        } else {
+            support.notFound();
+        }
         console.pause();
     }
 

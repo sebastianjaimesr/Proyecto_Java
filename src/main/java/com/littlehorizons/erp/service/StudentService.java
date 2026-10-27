@@ -8,15 +8,25 @@ import com.littlehorizons.erp.exception.BusinessRuleException;
 import com.littlehorizons.erp.exception.ValidationException;
 import com.littlehorizons.erp.model.academic.Enrollment;
 import com.littlehorizons.erp.model.academic.EnrollmentStatus;
+import com.littlehorizons.erp.model.academic.Gender;
+import com.littlehorizons.erp.model.academic.GuardianLink;
 import com.littlehorizons.erp.model.academic.Student;
+import com.littlehorizons.erp.model.academic.StudentDocumentType;
 import com.littlehorizons.erp.model.academic.StudentStatus;
+import com.littlehorizons.erp.model.common.ImportResult;
+import com.littlehorizons.erp.model.common.PersonName;
 import com.littlehorizons.erp.model.report.StudentProfile;
+import com.littlehorizons.erp.util.Formats;
 import com.littlehorizons.erp.util.InputValidator;
+import com.littlehorizons.erp.util.TextFileReader;
 
+import java.nio.file.Path;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.time.Clock;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -33,6 +43,8 @@ public class StudentService {
     private static final int MAX_ADDRESS_LENGTH = 255;
     private static final int SEARCH_LIMIT = 100;
     private static final Pattern BLOOD_TYPE = Pattern.compile("^(A|B|AB|O)[+-]$");
+    private static final int IMPORT_FIELDS = 10;
+    private static final String SCHOOL_NAME = "COLEGIO INTERNACIONAL LITTLE HORIZONS";
 
     private final TransactionManager transactions;
     private final StudentDao studentDao;
@@ -137,6 +149,146 @@ public class StudentService {
             return new StudentProfile(student, guardianDao.findGuardiansOfStudent(connection, studentId),
                     enrollments, guardianDao.findSiblings(connection, studentId));
         });
+    }
+
+    // ------------------------------------------------------ text file exercises
+
+    /**
+     * Exercise 3: study certificate in exports/constancias. Only for an active
+     * student with an active enrollment in the current year.
+     */
+    public Path exportCertificate(int studentId) {
+        LocalDate today = LocalDate.now(clock);
+        StudentProfile profile = getProfile(studentId);
+        Student student = profile.student();
+        if (student.status() != StudentStatus.ACTIVE) {
+            throw new BusinessRuleException("No se puede expedir la constancia: el estudiante está "
+                    + student.status().dbValue() + ".");
+        }
+        Enrollment enrollment = profile.enrollments().stream()
+                .filter(e -> e.academicYear() == today.getYear() && e.status() == EnrollmentStatus.ACTIVE)
+                .findFirst()
+                .orElseThrow(() -> new BusinessRuleException("No se puede expedir la constancia: el estudiante "
+                        + "no tiene matrícula activa en " + today.getYear() + "."));
+
+        List<String> lines = List.of(
+                SCHOOL_NAME,
+                "Documento sin validez oficial (ejercicio académico)",
+                "",
+                "CONSTANCIA DE ESTUDIO",
+                "",
+                "El colegio Little Horizons hace constar que " + student.fullName().toUpperCase(),
+                "identificado(a) con " + student.documentType().dbValue() + " " + student.documentNumber() + ",",
+                "se encuentra matriculado(a) en el grado " + enrollment.gradeName()
+                        + " para el año académico " + enrollment.academicYear() + ".",
+                "",
+                "Expedida el " + Formats.longDate(today) + ".",
+                "",
+                "",
+                "______________________________",
+                "Secretaría académica");
+        Path file = FileSupport.EXPORTS.resolve("constancias")
+                .resolve("constancia_" + student.documentNumber() + ".txt");
+        return FileSupport.write(file, lines, StudentService.class);
+    }
+
+    /**
+     * Exercise 4: full record in exports/fichas. Medical data only when
+     * {@code includeMedical} is true (the view asks first).
+     */
+    public Path exportProfile(int studentId, boolean includeMedical) {
+        LocalDate today = LocalDate.now(clock);
+        StudentProfile profile = getProfile(studentId);
+        Student student = profile.student();
+        List<String> lines = new ArrayList<>();
+        lines.add(SCHOOL_NAME);
+        lines.add("FICHA DEL ESTUDIANTE - generada el " + Formats.date(today));
+        lines.add("=".repeat(60));
+        lines.add(field("Id", String.valueOf(student.id())));
+        lines.add(field("Documento", student.documentType().dbValue() + " " + student.documentNumber()));
+        lines.add(field("Nombre", student.fullName()));
+        lines.add(field("Nacimiento", Formats.date(student.birthDate()) + " (" + student.ageOn(today) + " años)"));
+        lines.add(field("Género", student.gender().dbValue()));
+        lines.add(field("Dirección", Formats.text(student.address())));
+        lines.add(field("Teléfono", Formats.text(student.phone())));
+        lines.add(field("Correo", Formats.text(student.email())));
+        lines.add(field("Ingreso", Formats.date(student.admissionDate())));
+        lines.add(field("Estado", student.status().dbValue()));
+        if (includeMedical) {
+            lines.add("");
+            lines.add("DATOS MÉDICOS (información sensible)");
+            lines.add(field("Tipo de sangre", Formats.text(student.bloodType())));
+            lines.add(field("Alergias", Formats.text(student.allergies())));
+            lines.add(field("Condiciones", Formats.text(student.medicalConditions())));
+        }
+        lines.add("");
+        lines.add("ACUDIENTES");
+        if (profile.guardians().isEmpty()) {
+            lines.add("  (sin acudientes registrados)");
+        }
+        for (GuardianLink link : profile.guardians()) {
+            lines.add("  - " + link.guardian().fullName() + " (" + link.guardian().relationship() + "), tel. "
+                    + link.guardian().mainPhone()
+                    + (link.primary() ? " [principal]" : "")
+                    + (link.emergencyContact() ? " [contacto de emergencia]" : ""));
+        }
+        lines.add("");
+        lines.add("MATRÍCULAS");
+        if (profile.enrollments().isEmpty()) {
+            lines.add("  (sin matrículas)");
+        }
+        profile.enrollments().stream()
+                .sorted(Comparator.comparingInt(Enrollment::academicYear))
+                .forEach(e -> lines.add("  " + e.academicYear() + "  " + e.gradeName() + "  " + e.status().dbValue()
+                        + "  desde " + Formats.date(e.enrollmentDate())));
+        lines.add("");
+        lines.add("HERMANOS EN EL COLEGIO");
+        if (profile.siblings().isEmpty()) {
+            lines.add("  (ninguno)");
+        }
+        profile.siblings().forEach(s -> lines.add("  - " + s.fullName() + " (id " + s.id() + ")"));
+        Path file = FileSupport.EXPORTS.resolve("fichas").resolve("ficha_" + student.documentNumber() + ".txt");
+        return FileSupport.write(file, lines, StudentService.class);
+    }
+
+    /**
+     * Exercise 15: registers one student per line:
+     * tipoDoc;documento;primerNombre;segundoNombre;primerApellido;segundoApellido;fechaNacimiento;genero;direccion;telefono.
+     * A bad line is reported and the rest continue; the admission date is today.
+     */
+    public ImportResult importFromFile(Path file) {
+        List<TextFileReader.Line> lines = FileSupport.readDataLines(file, StudentService.class);
+        List<String> errors = new ArrayList<>();
+        int saved = 0;
+        for (TextFileReader.Line line : lines) {
+            try {
+                register(toStudent(line.fields()));
+                saved++;
+            } catch (ValidationException | BusinessRuleException e) {
+                errors.add(FileSupport.lineError(line.number(), e.getMessage()));
+            }
+        }
+        return new ImportResult(lines.size(), saved, errors);
+    }
+
+    private Student toStudent(String[] f) {
+        if (f.length < IMPORT_FIELDS) {
+            throw new ValidationException("se esperaban " + IMPORT_FIELDS + " campos separados por ';' y hay "
+                    + f.length + ".");
+        }
+        StudentDocumentType documentType = FileSupport.parseEnum(f[0], StudentDocumentType.class, "tipo de documento");
+        LocalDate birthDate = InputValidator.parseDate(f[6], "fecha de nacimiento");
+        Gender gender = FileSupport.parseEnum(f[7], Gender.class, "género");
+        if (f[2].isEmpty() || f[4].isEmpty()) {
+            throw new ValidationException("el primer nombre y el primer apellido son obligatorios.");
+        }
+        PersonName name = new PersonName(f[2], blankToNull(f[3]), f[4], blankToNull(f[5]));
+        return new Student(null, documentType, f[1], name, birthDate, gender, blankToNull(f[8]),
+                blankToNull(f[9]), null, null, null, null, LocalDate.now(clock), StudentStatus.ACTIVE);
+    }
+
+    private static String field(String label, String value) {
+        return String.format("%-16s %s", label + ":", value);
     }
 
     private Student findOrFail(Connection connection, int studentId) throws SQLException {

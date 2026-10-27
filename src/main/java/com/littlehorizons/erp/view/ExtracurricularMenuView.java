@@ -15,6 +15,7 @@ import com.littlehorizons.erp.util.ConsoleUtils;
 import com.littlehorizons.erp.util.Formats;
 import com.littlehorizons.erp.util.InputValidator;
 
+import java.nio.file.Path;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Objects;
@@ -56,7 +57,8 @@ public class ExtracurricularMenuView {
                         new Menu.Item("Inscribir estudiante en un club", this::enroll),
                         new Menu.Item("Retirar estudiante de un club", this::withdraw),
                         new Menu.Item("Consultar miembros de un club", this::listMembers),
-                        new Menu.Item("Consultar clubes de un estudiante", this::clubsOfStudent)),
+                        new Menu.Item("Consultar clubes de un estudiante", this::clubsOfStudent),
+                        new Menu.Item("Inscripción masiva desde archivo (lista de espera)", this::enrollFromFile)),
                 "CLUBES").run();
     }
 
@@ -68,7 +70,8 @@ public class ExtracurricularMenuView {
                         new Menu.Item("Registrar participante", this::addParticipant),
                         new Menu.Item("Registrar posición en una competencia", this::recordResult),
                         new Menu.Item("Consultar participantes y resultados de un evento", this::listParticipants),
-                        new Menu.Item("Consultar participación histórica de un estudiante", this::eventsOfStudent)),
+                        new Menu.Item("Consultar participación histórica de un estudiante", this::eventsOfStudent),
+                        new Menu.Item("Generar diplomas de los ganadores (TXT)", this::generateDiplomas)),
                 "EVENTOS Y COMPETENCIAS").run();
     }
 
@@ -192,6 +195,25 @@ public class ExtracurricularMenuView {
         }
         boolean onlyActive = console.confirm("¿Mostrar solo miembros activos?");
         support.show(controller.findMembers(club.get().id(), onlyActive)).ifPresent(this::printMemberships);
+        console.pause();
+    }
+
+    private void enrollFromFile() {
+        console.printTitle("Inscripción masiva en un club");
+        console.printInfo("El archivo tiene un documento de estudiante por línea, en orden de prioridad.");
+        Optional<Club> club = pickClub(true);
+        if (club.isEmpty()) {
+            support.notFound();
+            return;
+        }
+        Path file = support.readPath("Archivo de documentos");
+        LocalDate date = support.readDateOrToday("Fecha de ingreso");
+        support.show(controller.enrollFromFile(club.get().id(), file, date)).ifPresent(result -> {
+            result.rejected().forEach(console::printWarning);
+            if (result.waitingListFile() != null) {
+                console.printInfo("Lista de espera guardada en " + result.waitingListFile());
+            }
+        });
         console.pause();
     }
 
@@ -330,6 +352,18 @@ public class ExtracurricularMenuView {
             return;
         }
         support.show(controller.findParticipants(event.get().id())).ifPresent(this::printParticipants);
+        console.pause();
+    }
+
+    private void generateDiplomas() {
+        console.printTitle("Diplomas de los ganadores");
+        Optional<Event> event = pickEvent();
+        if (event.isEmpty()) {
+            support.notFound();
+            return;
+        }
+        support.show(controller.generateDiplomas(event.get().id()))
+                .ifPresent(report -> report.files().forEach(file -> console.println("  " + file.getFileName())));
         console.pause();
     }
 

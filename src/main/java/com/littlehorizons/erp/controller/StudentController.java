@@ -8,11 +8,13 @@ import com.littlehorizons.erp.model.academic.GuardianLink;
 import com.littlehorizons.erp.model.academic.Student;
 import com.littlehorizons.erp.model.academic.StudentLink;
 import com.littlehorizons.erp.model.academic.StudentStatus;
+import com.littlehorizons.erp.model.common.ImportResult;
 import com.littlehorizons.erp.model.report.StudentProfile;
 import com.littlehorizons.erp.service.EnrollmentService;
 import com.littlehorizons.erp.service.GuardianService;
 import com.littlehorizons.erp.service.StudentService;
 
+import java.nio.file.Path;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Objects;
@@ -61,6 +63,18 @@ public class StudentController extends BaseController {
 
     public OperationResult<StudentProfile> getStudentProfile(int studentId) {
         return execute(() -> studentService.getProfile(studentId), "Ficha cargada.");
+    }
+
+    public OperationResult<Path> exportCertificate(int studentId) {
+        return execute(() -> studentService.exportCertificate(studentId), path -> "Constancia creada en " + path);
+    }
+
+    public OperationResult<Path> exportProfile(int studentId, boolean includeMedical) {
+        return execute(() -> studentService.exportProfile(studentId, includeMedical), path -> "Ficha creada en " + path);
+    }
+
+    public OperationResult<ImportResult> importStudents(Path file) {
+        return execute(() -> studentService.importFromFile(file), ImportResult::summary);
     }
 
     // -------------------------------------------------------------- guardians

@@ -11,15 +11,24 @@ import com.littlehorizons.erp.exception.ConfirmationRequiredException;
 import com.littlehorizons.erp.exception.ValidationException;
 import com.littlehorizons.erp.model.academic.Attendance;
 import com.littlehorizons.erp.model.academic.AttendanceStatus;
+import com.littlehorizons.erp.model.academic.Student;
 import com.littlehorizons.erp.model.academic.Subject;
 import com.littlehorizons.erp.model.report.AbsenceReportRow;
+import com.littlehorizons.erp.util.FileNames;
+import com.littlehorizons.erp.util.Formats;
+import com.littlehorizons.erp.util.TextFileReader;
 
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.time.Clock;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.temporal.TemporalAdjusters;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -37,6 +46,8 @@ import java.util.Optional;
 public class AttendanceService {
 
     public static final int MAX_WEEKLY_ABSENCES = 3;
+    /** Exercise 14: weekly report blocks accumulate here. */
+    public static final Path ABSENCE_HISTORY = FileSupport.EXPORTS.resolve("ausencias_historico.txt");
     private static final int MAX_NOTES_LENGTH = 1000;
 
     private final TransactionManager transactions;
@@ -134,6 +145,111 @@ public class AttendanceService {
             throw new ValidationException("La fecha final debe ser igual o posterior a la inicial.");
         }
         return transactions.read(connection -> attendanceDao.summarizeByStudent(connection, from, to));
+    }
+
+    // ------------------------------------------------------ text file exercises
+
+    /** Exercise 14: the weekly report and whether its block was added to the history file. */
+    public record WeeklyHistory(List<AbsenceReportRow> rows, Path file, boolean added) {
+    }
+
+    /**
+     * Exercise 14: runs the weekly report and appends its block to
+     * {@link #ABSENCE_HISTORY}. The file is read first so the same week is
+     * never written twice.
+     */
+    public WeeklyHistory weeklyReportWithHistory(LocalDate anyDayOfWeek) {
+        Week week = Week.containing(Objects.requireNonNull(anyDayOfWeek, "anyDayOfWeek"));
+        List<AbsenceReportRow> rows = weeklyAbsenceReport(anyDayOfWeek);
+        String header = "=== Semana del " + week.monday() + " al " + week.sunday();
+        boolean alreadySaved = Files.exists(ABSENCE_HISTORY)
+                && FileSupport.readAllLines(ABSENCE_HISTORY, AttendanceService.class).stream()
+                .anyMatch(line -> line.startsWith(header));
+        if (alreadySaved) {
+            return new WeeklyHistory(rows, ABSENCE_HISTORY.toAbsolutePath(), false);
+        }
+        List<String> block = new ArrayList<>();
+        block.add(header + " (consultado el " + Formats.dateTime(LocalDateTime.now(clock).withNano(0)) + ") ===");
+        if (rows.isEmpty()) {
+            block.add("Ningún estudiante superó " + MAX_WEEKLY_ABSENCES + " ausencias.");
+        }
+        rows.forEach(row -> block.add(String.join(";", row.documentNumber(), row.studentName(),
+                Formats.text(row.gradeName()), row.absences() + " ausencias")));
+        block.add("");
+        Path file = FileSupport.append(ABSENCE_HISTORY, block, AttendanceService.class);
+        return new WeeklyHistory(rows, file, true);
+    }
+
+    /**
+     * Exercise 17 (a): blank attendance sheet of a group, one line per student
+     * with an empty field for the letter.
+     */
+    public Path exportAttendanceSheet(int subjectId, String section, LocalDate date) {
+        String normalized = ServiceChecks.normalizeSection(section);
+        return transactions.read(connection -> {
+            Subject subject = ServiceChecks.require(subjectDao.findById(connection, subjectId),
+                    "No existe una materia con id " + subjectId + ".");
+            List<Student> students = registrationDao.findStudentsBySubject(connection, subjectId, date.getYear(),
+                    normalized);
+            if (students.isEmpty()) {
+                throw new BusinessRuleException("No hay estudiantes inscritos en " + subject.name() + " en "
+                        + date.getYear() + (normalized == null ? "" : " sección " + normalized) + ".");
+            }
+            List<String> lines = new ArrayList<>();
+            lines.add("# Planilla de asistencia - " + subject.name() + " (" + subject.gradeName() + ")"
+                    + (normalized == null ? "" : " - sección " + normalized) + " - " + date);
+            lines.add("# Escriba después del último ';': P (Presente), A (Ausente), T (Tardanza) o E (Excusa médica)");
+            lines.add("# documento;estudiante;asistencia");
+            students.forEach(student -> lines.add(student.documentNumber() + ";" + student.name().sortableName() + ";"));
+            Path file = FileSupport.EXPORTS.resolve("planillas").resolve("planilla_" + FileNames.safe(subject.code())
+                    + (normalized == null ? "" : "_" + FileNames.safe(normalized)) + "_" + date + ".txt");
+            return FileSupport.write(file, lines, AttendanceService.class);
+        });
+    }
+
+    /** Exercise 17 (b): what was saved from a sheet and what was reported. */
+    public record SheetResult(int recorded, int corrected, List<String> warnings) {
+    }
+
+    /**
+     * Exercise 17 (b): reads a filled sheet and records the group with
+     * {@link #recordForGroup}. Bad lines are reported and skipped; students
+     * of the group missing from the sheet are reported too.
+     */
+    public SheetResult recordFromSheet(Path file, int subjectId, String section, LocalDate date, int teacherId,
+                                       boolean allowCorrection) {
+        String normalized = ServiceChecks.normalizeSection(section);
+        List<TextFileReader.Line> lines = FileSupport.readDataLines(file, AttendanceService.class);
+        List<Student> group = transactions.read(connection ->
+                registrationDao.findStudentsBySubject(connection, subjectId, date.getYear(), normalized));
+        Map<String, Student> byDocument = new LinkedHashMap<>();
+        group.forEach(student -> byDocument.put(student.documentNumber(), student));
+
+        Map<Integer, AttendanceStatus> statuses = new LinkedHashMap<>();
+        List<String> warnings = new ArrayList<>();
+        for (TextFileReader.Line line : lines) {
+            String[] f = line.fields();
+            Student student = byDocument.get(f[0]);
+            AttendanceStatus status = f.length >= 3 ? AttendanceStatus.fromLetter(f[2]) : null;
+            if (student == null) {
+                warnings.add(FileSupport.lineError(line.number(), "el documento " + f[0]
+                        + " no pertenece al grupo de esta materia."));
+            } else if (status == null) {
+                warnings.add(FileSupport.lineError(line.number(), "falta la letra o no es P, A, T ni E ("
+                        + student.name().sortableName() + ")."));
+            } else if (statuses.putIfAbsent(student.id(), status) != null) {
+                warnings.add(FileSupport.lineError(line.number(), "el estudiante está repetido en la planilla."));
+            }
+        }
+        group.stream().filter(student -> !statuses.containsKey(student.id()))
+                .filter(student -> lines.stream().noneMatch(line -> line.fields()[0].equals(student.documentNumber())))
+                .forEach(student -> warnings.add("No aparece en la planilla: " + student.name().sortableName()));
+        if (statuses.isEmpty()) {
+            throw new ValidationException("La planilla no tiene ninguna asistencia válida."
+                    + (warnings.isEmpty() ? "" : "\n" + String.join("\n", warnings)));
+        }
+        int corrected = recordForGroup(subjectId, date, teacherId, statuses, allowCorrection);
+        return new SheetResult(statuses.size(), corrected, warnings);
     }
 
     private void validate(LocalDate date, AttendanceStatus status, String notes) {

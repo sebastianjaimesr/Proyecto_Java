@@ -17,6 +17,7 @@ public final class Formats {
     private static final Locale COLOMBIA = Locale.forLanguageTag("es-CO");
     private static final DateTimeFormatter DATE = DateTimeFormatter.ofPattern("yyyy-MM-dd");
     private static final DateTimeFormatter DATE_TIME = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+    private static final DateTimeFormatter LONG_DATE = DateTimeFormatter.ofPattern("d 'de' MMMM 'de' yyyy", COLOMBIA);
     private static final int VISIBLE_DOCUMENT_DIGITS = 4;
 
     private Formats() {
@@ -42,6 +43,11 @@ public final class Formats {
 
     public static String dateTime(LocalDateTime dateTime) {
         return dateTime == null ? "-" : DATE_TIME.format(dateTime);
+    }
+
+    /** "27 de octubre de 2026". */
+    public static String longDate(LocalDate date) {
+        return date == null ? "-" : LONG_DATE.format(date);
     }
 
     /** Shows only the last digits of a document in lists: "******5678". */

@@ -1,0 +1,7 @@
+# idAsignacion;dia;horaInicio;horaFin;aula
+41;Sábado;7:00;8:00;Aula 101
+abc;Lunes;7:00;8:00;A
+41;Domingo;7:00;8:00;A
+41;Sábado;25:00;26:00;A
+41;Sábado
+41;Sábado;7:30;8:30;Aula 102

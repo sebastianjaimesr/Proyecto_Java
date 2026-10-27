@@ -20,14 +20,17 @@ import com.littlehorizons.erp.model.finance.PaymentPeriod;
 import com.littlehorizons.erp.model.finance.PriceAdjustment;
 import com.littlehorizons.erp.util.Formats;
 import com.littlehorizons.erp.util.InputValidator;
+import com.littlehorizons.erp.util.TextFileWriter;
 
 import java.math.BigDecimal;
+import java.nio.file.Path;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.time.Clock;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
@@ -133,13 +136,62 @@ public class PaymentService {
             Invoice invoice = invoiceService.createInvoice(connection, payment, issuedAt);
             BigDecimal expected = calculator.expectedAmount(concept,
                     conceptDao.findAdjustments(connection, student.id(), request.academicYear()));
-            return new Registered(payment, invoice, expected);
+            return new Registered(payment, invoice, expected, student.documentNumber());
         });
+        // Exercise 12: written after the commit, so a failed payment never leaves a line.
+        appendToJournal(registered.payment(), registered.studentDocument(), issuedAt);
         InvoiceService.PdfResult pdf = invoiceService.generatePdf(registered.invoice().id());
         return new PaymentReceipt(registered.payment(), pdf.invoice(), registered.expected(), pdf);
     }
 
-    private record Registered(Payment payment, Invoice invoice, BigDecimal expected) {
+    private record Registered(Payment payment, Invoice invoice, BigDecimal expected, String studentDocument) {
+    }
+
+    // ------------------------------------------------------ text file exercises
+
+    /** Exercise 12: payment journal, in the logs folder (logs.dir). */
+    public static Path journalFile() {
+        return FileSupport.logsFolder().resolve("bitacora_pagos.txt");
+    }
+
+    /**
+     * Exercise 12: one line per registered payment, appended (the file is
+     * never truncated). A failure is logged and the payment is kept.
+     */
+    private void appendToJournal(Payment payment, String studentDocument, LocalDateTime issuedAt) {
+        String line = String.join(";", Formats.dateTime(issuedAt), payment.receiptNumber(), studentDocument,
+                payment.conceptName(), Formats.money(payment.amount()), payment.method().dbValue());
+        FileSupport.appendQuietly(journalFile(), List.of(line), PaymentService.class);
+    }
+
+    /**
+     * Exercise 8: payment history as CSV that Excel in Spanish opens in
+     * columns: ";" separator, decimal comma and UTF-8 with BOM for tildes.
+     */
+    public Path exportHistoryCsv(int studentId) {
+        Student student = transactions.read(connection -> ServiceChecks.require(
+                studentDao.findById(connection, studentId), "No existe un estudiante con id " + studentId + "."));
+        List<Payment> payments = historyByStudent(studentId, null);
+        if (payments.isEmpty()) {
+            throw new BusinessRuleException(student.fullName() + " no tiene pagos registrados; no se creó el archivo.");
+        }
+        List<String> lines = new ArrayList<>();
+        lines.add(TextFileWriter.UTF8_BOM + FileSupport.csvRow(List.of("Recibo", "Fecha", "Concepto", "Método",
+                "Valor", "Pagado por")));
+        payments.stream()
+                .sorted(Comparator.comparing(Payment::paymentDate))
+                .map(p -> FileSupport.csvRow(List.of(p.receiptNumber(), Formats.date(p.paymentDate()), p.conceptName(),
+                        p.method().dbValue(), excelNumber(p.amount()), Formats.text(p.guardianName()))))
+                .forEach(lines::add);
+        BigDecimal total = payments.stream().map(Payment::amount).reduce(BigDecimal.ZERO, BigDecimal::add);
+        lines.add(FileSupport.csvRow(List.of("", "", "TOTAL", "", excelNumber(total), "")));
+        Path file = FileSupport.EXPORTS.resolve("pagos").resolve("pagos_" + student.documentNumber() + ".csv");
+        return FileSupport.write(file, lines, PaymentService.class);
+    }
+
+    /** 450000.00 becomes "450000,00", a number for Excel in Spanish. */
+    private static String excelNumber(BigDecimal amount) {
+        return amount.toPlainString().replace('.', ',');
     }
 
     public List<Payment> historyByStudent(int studentId, Integer academicYear) {

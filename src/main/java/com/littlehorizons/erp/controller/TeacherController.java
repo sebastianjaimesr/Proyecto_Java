@@ -1,5 +1,6 @@
 package com.littlehorizons.erp.controller;
 
+import com.littlehorizons.erp.model.common.ImportResult;
 import com.littlehorizons.erp.model.academic.ClassSchedule;
 import com.littlehorizons.erp.model.academic.Grade;
 import com.littlehorizons.erp.model.academic.Subject;
@@ -9,6 +10,7 @@ import com.littlehorizons.erp.model.academic.WeekDay;
 import com.littlehorizons.erp.service.SubjectService;
 import com.littlehorizons.erp.service.TeacherService;
 
+import java.nio.file.Path;
 import java.time.LocalTime;
 import java.util.List;
 import java.util.Objects;
@@ -103,5 +105,16 @@ public class TeacherController extends BaseController {
 
     public OperationResult<List<Grade>> findGrades() {
         return execute(subjectService::findGrades, "Grados cargados.");
+    }
+
+    // ------------------------------------------------------ text file exercises
+
+    public OperationResult<Path> exportTimetable(int teacherId, int academicYear) {
+        return execute(() -> teacherService.exportTimetable(teacherId, academicYear),
+                path -> "Horario creado en " + path);
+    }
+
+    public OperationResult<ImportResult> importSchedules(Path file) {
+        return execute(() -> teacherService.importSchedules(file), ImportResult::summary);
     }
 }

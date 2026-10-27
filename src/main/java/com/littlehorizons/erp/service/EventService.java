@@ -12,10 +12,16 @@ import com.littlehorizons.erp.model.extracurricular.Event;
 import com.littlehorizons.erp.model.extracurricular.EventParticipant;
 import com.littlehorizons.erp.model.extracurricular.EventType;
 import com.littlehorizons.erp.model.extracurricular.ParticipationRole;
+import com.littlehorizons.erp.model.common.FileReport;
+import com.littlehorizons.erp.util.FileNames;
+import com.littlehorizons.erp.util.Formats;
 import com.littlehorizons.erp.util.InputValidator;
 
+import java.nio.file.Path;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -144,6 +150,50 @@ public class EventService {
 
     public List<EventParticipant> findResults(int year) {
         return transactions.read(connection -> eventDao.findResults(connection, year));
+    }
+
+    // ------------------------------------------------------ text file exercises
+
+    /**
+     * Exercise 10: one diploma file per student with 1st, 2nd or 3rd place,
+     * in exports/diplomas, named &lt;evento&gt;_&lt;puesto&gt;_&lt;documento&gt;.txt.
+     */
+    public FileReport generateDiplomas(int eventId) {
+        Event event = findById(eventId);
+        if (!event.competition()) {
+            throw new BusinessRuleException("El evento " + event.name() + " no tiene competencia con posiciones.");
+        }
+        List<EventParticipant> winners = findParticipants(eventId).stream()
+                .filter(p -> p.position() != null && p.position() != CompetitionPosition.PARTICIPANT)
+                .sorted(Comparator.comparing(EventParticipant::position)) // FIRST, SECOND, THIRD: enum order
+                .toList();
+        if (winners.isEmpty()) {
+            throw new BusinessRuleException("El evento " + event.name() + " no tiene ganadores registrados.");
+        }
+        Path folder = FileSupport.EXPORTS.resolve("diplomas");
+        List<Path> files = new ArrayList<>();
+        for (EventParticipant winner : winners) {
+            Student student = transactions.read(connection -> ServiceChecks.require(
+                    studentDao.findById(connection, winner.studentId()),
+                    "No existe un estudiante con id " + winner.studentId() + "."));
+            List<String> lines = List.of(
+                    "COLEGIO INTERNACIONAL LITTLE HORIZONS",
+                    "",
+                    "DIPLOMA DE RECONOCIMIENTO",
+                    "",
+                    "Otorgado a " + student.fullName().toUpperCase(),
+                    "por obtener el " + winner.position().dbValue().toUpperCase(),
+                    "en el evento " + event.name() + " (" + event.type().dbValue() + ")",
+                    "realizado el " + Formats.longDate(event.date())
+                            + (event.place() == null ? "" : " en " + event.place()) + ".",
+                    "",
+                    "______________________________",
+                    "Rectoría");
+            String name = FileNames.safe(event.name()) + "_" + FileNames.safe(winner.position().dbValue()) + "_"
+                    + student.documentNumber() + ".txt";
+            files.add(FileSupport.write(folder.resolve(name), lines, EventService.class));
+        }
+        return new FileReport(folder, files);
     }
 
     private Event requireEvent(Connection connection, int eventId) throws SQLException {

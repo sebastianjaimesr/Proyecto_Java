@@ -48,7 +48,9 @@ public class TeacherMenuView {
                         new Menu.Item("Consultar asignaciones de un profesor", this::listAssignments),
                         new Menu.Item("Registrar día y hora de clase", this::addSchedule),
                         new Menu.Item("Consultar horario semanal de un profesor", this::showTimetable),
-                        new Menu.Item("Eliminar un bloque de horario", this::removeSchedule)),
+                        new Menu.Item("Eliminar un bloque de horario", this::removeSchedule),
+                        new Menu.Item("Exportar horario semanal de un profesor (TXT)", this::exportTimetable),
+                        new Menu.Item("Cargar horarios desde archivo (Scanner)", this::importSchedules)),
                 "GESTIÓN DE PROFESORES").run();
     }
 
@@ -238,6 +240,26 @@ public class TeacherMenuView {
         } else if (console.confirm("¿Eliminar el bloque " + scheduleId + "?")) {
             support.show(controller.removeSchedule(scheduleId));
         }
+        console.pause();
+    }
+
+    private void exportTimetable() {
+        console.printTitle("Exportar horario semanal");
+        Optional<Teacher> teacher = pickTeacher();
+        if (teacher.isEmpty()) {
+            support.notFound();
+            return;
+        }
+        int year = support.readYear("Año académico");
+        support.show(controller.exportTimetable(teacher.get().id(), year));
+        console.pause();
+    }
+
+    private void importSchedules() {
+        console.printTitle("Cargar horarios desde archivo");
+        console.printInfo("Formato por línea: idAsignacion;dia;horaInicio;horaFin;aula  (ejemplo: 12;Lunes;7:00;8:00;Aula 101)");
+        console.printInfo("El id de la asignación aparece en \"Consultar asignaciones de un profesor\".");
+        support.showImport(controller.importSchedules(support.readPath("Archivo de horarios")));
         console.pause();
     }
 

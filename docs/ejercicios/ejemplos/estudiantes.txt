@@ -1,0 +1,7 @@
+# tipoDoc;documento;primerNombre;segundoNombre;primerApellido;segundoApellido;fechaNacimiento;genero;direccion;telefono
+TI;1099000001;Laura;Sofía;Gómez;Ruiz;2015-04-12;F;Calle 10 # 5-20;3001234567
+ti;1099000002;Martín;;Pérez;;2014-11-30;m;;
+TI;1099000001;Repetido;;Doc;;2015-01-01;F;;
+TI;1099000003;Ana;;Díaz;;2015-02-30;F;;
+TI;1099000004;Juan;;Mora;;2015-01-01;X;;
+TI;1099000005;Falta;Campos

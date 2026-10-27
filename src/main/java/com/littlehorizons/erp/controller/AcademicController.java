@@ -7,6 +7,7 @@ import com.littlehorizons.erp.model.academic.GradeRecord;
 import com.littlehorizons.erp.model.academic.GradingPeriod;
 import com.littlehorizons.erp.model.academic.Student;
 import com.littlehorizons.erp.model.academic.SubjectRegistration;
+import com.littlehorizons.erp.model.common.ImportResult;
 import com.littlehorizons.erp.model.report.AbsenceReportRow;
 import com.littlehorizons.erp.model.report.AcademicHistory;
 import com.littlehorizons.erp.model.report.CourseAverageReport;
@@ -16,6 +17,7 @@ import com.littlehorizons.erp.service.AttendanceService;
 import com.littlehorizons.erp.util.Formats;
 
 import java.math.BigDecimal;
+import java.nio.file.Path;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
@@ -140,5 +142,42 @@ public class AcademicController extends BaseController {
 
     public OperationResult<List<AbsenceReportRow>> absenceSummary(LocalDate from, LocalDate to) {
         return execute(() -> attendanceService.absenceSummary(from, to), list -> list.size() + " estudiante(s).");
+    }
+
+    // ------------------------------------------------------ text file exercises
+
+    public OperationResult<Path> exportReportCard(int studentId, int academicYear) {
+        return execute(() -> academicService.exportReportCard(studentId, academicYear),
+                path -> "Boletín creado en " + path);
+    }
+
+    public OperationResult<Path> exportClassList(int subjectId, int academicYear, String section) {
+        return execute(() -> academicService.exportClassList(subjectId, academicYear, section),
+                path -> "Lista de clase creada en " + path);
+    }
+
+    public OperationResult<ImportResult> importGrades(Path file, int subjectId, int teacherId, int academicYear,
+                                                      boolean replaceExisting) {
+        return execute(() -> academicService.importGrades(file, subjectId, teacherId, academicYear, replaceExisting),
+                result -> "Todas las notas se guardaron. " + result.summary());
+    }
+
+    public OperationResult<AttendanceService.WeeklyHistory> weeklyReportWithHistory(LocalDate anyDay) {
+        return execute(() -> attendanceService.weeklyReportWithHistory(anyDay),
+                history -> history.rows().size() + " estudiante(s) con más de " + AttendanceService.MAX_WEEKLY_ABSENCES
+                        + " ausencias en la semana.");
+    }
+
+    public OperationResult<Path> exportAttendanceSheet(int subjectId, String section, LocalDate date) {
+        return execute(() -> attendanceService.exportAttendanceSheet(subjectId, section, date),
+                path -> "Planilla creada en " + path);
+    }
+
+    public OperationResult<AttendanceService.SheetResult> recordFromSheet(Path file, int subjectId, String section,
+                                                                          LocalDate date, int teacherId,
+                                                                          boolean allowCorrection) {
+        return execute(() -> attendanceService.recordFromSheet(file, subjectId, section, date, teacherId,
+                allowCorrection), result -> "Asistencia registrada para " + result.recorded() + " estudiante(s)"
+                + (result.corrected() > 0 ? " (" + result.corrected() + " corregida(s))" : "") + ".");
     }
 }
